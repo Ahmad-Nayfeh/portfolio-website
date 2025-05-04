@@ -1,0 +1,144 @@
+/* D:\FDM Downloads\portfolio-website-3\app\globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import highlight.js theme for code syntax highlighting */
+@import "highlight.js/styles/github.css"; /* ONLY Light Mode Theme */
+/* @import "highlight.js/styles/github-dark.css"; */ /* REMOVED Dark Mode Theme Import */
+
+body {
+  font-family: Arial, Helvetica, sans-serif; /* Consider using your Inter font from layout here if desired */
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%; /* Used for light mode code background */
+    --secondary-foreground: 240 5.9% 10%; /* Used for light mode code text */
+    --muted: 240 4.8% 95.9%; /* Used for inline code background */
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%; /* Used for dark mode inline code background */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%; /* Re-using secondary for muted */
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* --- MODIFIED STYLES FOR MARKDOWN --- */
+/* Target ONLY INLINE code specifically */
+.prose code:not(pre code) {
+  @apply rounded bg-muted px-[0.4em] py-[0.2em] font-mono text-sm font-semibold text-foreground;
+}
+
+/* Base styles for CODE BLOCKS container in light mode */
+.prose pre {
+  @apply rounded-lg border p-4 overflow-x-auto bg-secondary text-secondary-foreground;
+}
+
+/* Override CODE BLOCK container styles for dark mode */
+.dark .prose pre {
+    @apply bg-[#0d1117] text-[#c9d1d9] border-gray-700; /* GitHub dark-like colors */
+    /* Or use Tailwind variables: e.g., bg-gray-900 text-gray-300 border-gray-700 */
+}
+
+/* Styles for the <code> element INSIDE <pre> */
+.prose pre code {
+   @apply block /* Use block for better layout control inside pre */
+          min-w-full /* Ensure code block takes full width */
+          bg-transparent p-0 border-none text-sm text-inherit; /* Reset background/padding/border, inherit text color */
+   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; /* Common monospace fonts */
+   /* The actual syntax colors (keywords, strings, etc.) come from github.css */
+}
+
+/* Base image styling */
+.prose img {
+  @apply rounded-lg;
+}
+/* --- END OF MODIFIED MARKDOWN STYLES --- */
+
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,50 @@
+name: "Ahmad Nayfeh"
+tagline: "AI Researcher & Electrical Engineer"
+skills:
+  - Python
+  - PyTorch
+  - TensorFlow/Keras
+  - scikit-learn
+  - Self-Supervised Learning
+  - Time Series Forecasting
+  - OpenCV
+  - YOLOv8
+  - Image Augmentation
+  - Git / GitHub
+  - VS Code + SSH
+  - YAML-configured Pipelines
+experience:
+  - title: "Teaching Assistant – EE204: Fundamentals of Electric Circuits"
+    company: "KFUPM, Department of Electrical Engineering"
+    location: "Dhahran, Saudi Arabia"
+    startDate: "2024"
+    endDate: "2025"
+    description: >
+      Designed structured materials to teach core electrical circuit principles. Assisted with grading, office hours, and delivering problem-solving sessions.
+  - title: "AI Research Intern – Waste Detection Project"
+    company: "SDAIA-KFUPM Joint Research Center"
+    location: "Dhahran, Saudi Arabia"
+    startDate: "2023"
+    endDate: "2023"
+    description: >
+      Developed a YOLOv8 + classifier pipeline for waste object detection and improved classification accuracy through dataset curation and augmentation.
+  - title: "Research Assistant – Wind Power Forecasting"
+    company: "KFUPM"
+    location: "Dhahran, Saudi Arabia"
+    startDate: "2022"
+    endDate: "2022"
+    description: >
+      Built hybrid LSTM + Random Forest models to forecast wind power generation using cleanly modular Python pipelines.
+education:
+  - degree: "MSc in Electrical Engineering (AI Focus)"
+    institution: "King Fahd University of Petroleum and Minerals"
+    location: "Dhahran, Saudi Arabia"
+    startDate: "2024"
+    endDate: "Present"
+    description: "Currently researching self-supervised learning and cross-modal AI for computer vision tasks."
+  - degree: "BSc in Electrical Engineering"
+    institution: "King Fahd University of Petroleum and Minerals"
+    location: "Dhahran, Saudi Arabia"
+    startDate: "2018"
+    endDate: "2024"
+    description: "Graduated with distinction, specializing in machine learning and signal processing."
