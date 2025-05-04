@@ -3,7 +3,7 @@ import ProjectGrid from "@/components/ProjectGrid"
 import { getAllProjects } from "@/lib/content"
 
 export const metadata: Metadata = {
-  title: "Projects | Your Portfolio",
+  title: "Projects | Ahmad Nayfeh",
   description: "Showcase of my latest projects and work",
 }
 

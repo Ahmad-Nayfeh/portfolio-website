@@ -3,7 +3,7 @@ import BlogGrid from "@/components/BlogGrid"
 import { getAllPosts } from "@/lib/content"
 
 export const metadata: Metadata = {
-  title: "Blog | Your Portfolio",
+  title: "Blog | Ahmad Nayfeh",
   description: "Articles, tutorials, and thoughts on web development and design",
 }
 
