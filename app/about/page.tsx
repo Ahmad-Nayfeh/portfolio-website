@@ -10,7 +10,7 @@ import Education from "@/components/Education"
 import MarkdownRenderer from "@/components/MarkdownRenderer"
 
 export const metadata: Metadata = {
-  title: "About | Your Portfolio",
+  title: "About | Ahmad Nayfeh",
   description: "Learn more about me, my skills, and my experience",
 }
 
