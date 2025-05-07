@@ -1,8 +1,8 @@
 ## My Story
 
-I'm an AI researcher and electrical engineer with a deep passion for solving real-world problems using machine learning. My work spans across computer vision, time-series forecasting, and self-supervised learning. I specialize in designing scalable, reproducible pipelines that are not just functional—but robust and insightful.
+I'm an Electrical engineer with a focus on digital signal processing and a deep passion for solving real-world problems using Artificial Intelligence, machine learning, deep learning, and computer vision. I like to design a scalable, reproducible pipelines that are not just functional—but robust and insightful to automate many tasks!
 
-From predicting wind energy output to detecting waste using deep learning, I've led and contributed to projects that demand both engineering precision and scientific thinking.
+currently i'm working on researchs related to self-supervised learning, and exploring and investigating in the potential of recent AI trends and aiming to utilize last tech to the best i can to make a big success!
 
 ## My Approach
 
@@ -10,7 +10,7 @@ I believe in building AI systems that are not just technically sound, but also u
 
 ## Why Work With Me
 
-- **Research-Minded, Product-Oriented**: I fuse academic rigor with practical engineering.
-- **Reproducibility Champion**: I build modular, pipeline-driven codebases that are easy to extend.
-- **Computer Vision Specialist**: From augmentation to detection, I understand images deeply.
-- **Team-Oriented**: I enjoy mentoring, collaborating, and building great things with others.
+- **Thing 1**: one sentence exlpaning and extending thing 1.
+- **Thing 2**: one sentence exlpaning and extending thing 2.
+- **Thing 3**: one sentence exlpaning and extending thing 3.
+- **Thing 4**: one sentence exlpaning and extending thing 4.

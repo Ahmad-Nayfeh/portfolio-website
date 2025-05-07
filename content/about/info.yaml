@@ -2,17 +2,14 @@ name: "Ahmad Nayfeh"
 tagline: "AI Researcher & Electrical Engineer"
 skills:
   - Python
-  - PyTorch
-  - TensorFlow/Keras
-  - scikit-learn
-  - Self-Supervised Learning
-  - Time Series Forecasting
-  - OpenCV
-  - YOLOv8
-  - Image Augmentation
-  - Git / GitHub
-  - VS Code + SSH
-  - YAML-configured Pipelines
+  - Machine Learning
+  - Deep Learning
+  - Computer Vision
+  - Signal Processing
+  - image processing
+  - Data Preprocessing
+  - Data Analysis
+  - Data Visualization
 experience:
   - title: "Teaching Assistant – EE204: Fundamentals of Electric Circuits"
     company: "KFUPM, Department of Electrical Engineering"
@@ -47,4 +44,4 @@ education:
     location: "Dhahran, Saudi Arabia"
     startDate: "2018"
     endDate: "2024"
-    description: "Graduated with distinction, specializing in machine learning and signal processing."
+    description: "Graduated with a second honor."
