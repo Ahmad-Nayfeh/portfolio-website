@@ -7,10 +7,9 @@ export default function CTA() {
   return (
     <section className="py-16">
       <div className="bg-muted rounded-lg p-8 md:p-12 text-center">
-        <h2 className="text-3xl font-bold mb-4">Let's Work Together</h2>
+        <h2 className="text-3xl font-bold mb-4">Ready for New Challenges</h2>
         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-          I'm currently available for freelance work and open to new opportunities. If you have a project that needs
-          some creative input, feel free to reach out.
+        Finishing an M.Sc. in Electrical Engineering with a focus on signal & image processing, I’m seeking full‑time EE or AI roles—and open to research collaborations. Let’s connect and explore what we can build together.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           {/* "About Me" Button (already modified correctly) */}
