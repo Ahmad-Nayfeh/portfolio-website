@@ -10,7 +10,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-lg font-semibold mb-4">Ahmad Nayfeh</h3>
-            <p className="text-muted-foreground mb-4">AI Researcher & Electrical Engineer building intelligent, scalable systems.</p>
+            <p className="text-muted-foreground mb-4">Bridging signal processing and deep learning for smarter systems.</p>
             <div className="flex gap-4">
               <Link
                 href="https://github.com/Ahmad-Nayfeh"

@@ -6,18 +6,15 @@ interface SkillsProps {
 
 export default function Skills({
   skills = [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Next.js",
-    "Node.js",
-    "HTML",
-    "CSS",
-    "Tailwind CSS",
-    "Git",
-    "GitHub",
-    "Figma",
-    "Responsive Design",
+    "Python",
+    "Machine Learning",
+    "Deep Learning",
+    "Computer Vision",
+    "Signal Processing",
+    "Image Processing",
+    "Data Preprocessing",
+    "Data Analysis",
+    "Data Visualization",
   ],
 }: SkillsProps) {
   return (
