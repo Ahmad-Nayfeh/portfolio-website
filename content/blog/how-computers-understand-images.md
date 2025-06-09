@@ -5,7 +5,7 @@ date: "2025-05-01"
 tags: ["Image Processing", "Computer Vision", "Educational Tools", "Feature Extraction", "Visualization"]
 excerpt: "Explore how computers interpret and manipulate images — from pixels and filters to denoising and contrast enhancement — in this beginner-friendly introduction to digital image processing."
 readTime: "29 min read"
-featured: true
+featured: false
 coverImage: "/images/blog/how_computers_understand_images.jpg"
 ---
 
