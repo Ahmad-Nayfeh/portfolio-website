@@ -25,7 +25,7 @@ features:
   - "Real-time collaboration"
   - "User authentication and authorization"
   - "Mobile-responsive design"
-featured: true
+featured: false
 ---
 
 # Edge Vision
