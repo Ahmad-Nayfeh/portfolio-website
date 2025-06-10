@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { formatDate } from "@/lib/utils"
 import MarkdownRenderer from "@/components/MarkdownRenderer"
 import type { FullProject } from "@/types" // Ensure FullProject includes 'description' if used in generateMetadata
+import RelatedProjects from "@/components/RelatedProjects"
 
 // Define the parameter structure for generateStaticParams
 interface ProjectPageParams {
@@ -178,7 +179,7 @@ export default async function ProjectPage({ params }: PageProps) {
         <section className="max-w-3xl mx-auto mt-16 pt-8 border-t">
           <h2 className="text-2xl font-bold mb-8">Related Projects</h2>
           {/* You might need a RelatedProjects component similar to the blog one */}
-          {/* <RelatedProjects projects={relatedProjects} /> */}
+          <RelatedProjects projects={relatedProjects} />
         </section>
       )}
     </div>
