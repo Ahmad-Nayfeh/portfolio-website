@@ -32,7 +32,7 @@ featured: true
 
 ### Watch the Video Demo
 
-[![Project Demo Thumbnail](/images/projects/ai-bearing-diagnosis.jpg)](https://youtu.be/F31jicRn_A8)
+[>> Click Here <<](https://youtu.be/F31jicRn_A8)
 
 ## Overview
 
