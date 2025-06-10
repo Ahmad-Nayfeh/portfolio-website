@@ -167,7 +167,7 @@ export async function getAllProjects(): Promise<Project[]> {
         featured: projectFile.data.featured ?? false,
       }
     })
-    .filter((project): project is Project => project !== null) // Type guard remains useful
+    .filter((project) => project !== null)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return projects
@@ -203,7 +203,7 @@ export async function getAllProjectsWithContent(): Promise<FullProject[]> {
         content: projectFile.content, // Already checked it exists
       }
     })
-    .filter((project): project is FullProject => project !== null)
+    .filter((project) => project !== null)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return projects
@@ -268,7 +268,7 @@ export async function getAllPosts(): Promise<Post[]> {
         featured: postFile.data.featured ?? false, // Default to false if not specified
       }
     })
-    .filter((post): post is Post => post !== null)
+    .filter((post) => post !== null)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return posts
@@ -298,7 +298,7 @@ export async function getAllPostsWithContent(): Promise<FullPost[]> {
         content: postFile.content, // Already checked existence
       }
     })
-    .filter((post): post is FullPost => post !== null)
+    .filter((post) => post !== null)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return posts
