@@ -30,6 +30,10 @@ featured: true
 
 # AI-Powered Bearing Fault Diagnosis
 
+### Watch the Video Demo
+
+[![Project Demo Thumbnail](/images/projects/ai-bearing-diagnosis.jpg)](https://youtu.be/F31jicRn_A8)
+
 ## Overview
 
 This project provides an end-to-end solution for automated bearing fault diagnosis using deep learning. It leverages a 1D Convolutional Neural Network (CNN) to analyze raw vibration signals from machinery and accurately classify the health of the bearing. The entire workflow, from data exploration and preprocessing to model training and deployment, is encapsulated in a series of Jupyter notebooks and a final, user-friendly Streamlit web application.
