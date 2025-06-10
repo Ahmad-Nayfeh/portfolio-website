@@ -12,6 +12,7 @@ export interface Project {
   solution: string
   technologies: string[]
   features: string[]
+  featured?: boolean
 }
 
 export interface FullProject extends Project {
@@ -26,6 +27,7 @@ export interface Post {
   coverImage: string
   tags: string[]
   readTime: string
+  featured?: boolean
 }
 
 export interface FullPost extends Post {

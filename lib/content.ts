@@ -164,6 +164,7 @@ export async function getAllProjects(): Promise<Project[]> {
         solution: projectFile.data.solution ?? "",
         technologies: projectFile.data.technologies ?? [],
         features: projectFile.data.features ?? [],
+        featured: projectFile.data.featured ?? false,
       }
     })
     .filter((project): project is Project => project !== null) // Type guard remains useful
@@ -208,11 +209,20 @@ export async function getAllProjectsWithContent(): Promise<FullProject[]> {
   return projects
 }
 
-// Get featured projects
+// New Get featured projects
+// ===========================================
+
 export async function getFeaturedProjects(count: number): Promise<Project[]> {
   const projects = await getAllProjects()
-  return projects.slice(0, count)
+  return projects
+    .filter((project) => project.featured === true) // <-- ADD THIS FILTER
+    .slice(0, count)
 }
+
+// ===========================================
+
+
+
 
 // Get a single project by slug
 export async function getProjectBySlug(slug: string): Promise<FullProject | null> {
@@ -255,6 +265,7 @@ export async function getAllPosts(): Promise<Post[]> {
         coverImage: postFile.data.coverImage || "/placeholder.svg?height=600&width=800",
         tags: postFile.data.tags ?? [],
         readTime: postFile.data.readTime || "5 min read", // Default read time might be ok with ||
+        featured: postFile.data.featured ?? false, // Default to false if not specified
       }
     })
     .filter((post): post is Post => post !== null)
@@ -293,11 +304,18 @@ export async function getAllPostsWithContent(): Promise<FullPost[]> {
   return posts
 }
 
-// Get recent blog posts
+// New Get Featured blog posts
+// ===========================================
+
 export async function getRecentPosts(count: number): Promise<Post[]> {
   const posts = await getAllPosts()
-  return posts.slice(0, count)
+  return posts
+    .filter((post) => post.featured === true) // <-- ADD THIS FILTER
+    .slice(0, count)
 }
+
+// ===========================================
+
 
 // Get a single blog post by slug
 export async function getPostBySlug(slug: string): Promise<FullPost | null> {
