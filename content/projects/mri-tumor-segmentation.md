@@ -48,11 +48,36 @@ I built a comprehensive AI pipeline that delivers:
 ### Deep Learning Models
 I implemented and rigorously benchmarked three distinct architectures, each representing different approaches to medical image segmentation:
 
-| Model | My Implementation | Results | Key Insight |
-|-------|------------------|---------|-------------|
-| **ResNetUNet** | Enhanced U-Net with pre-trained ResNet34 backbone | **96.34% Dice Score** | Transfer learning dominates |
-| **BaselineUNet** | Standard U-Net built from scratch | 50.59% Dice Score | Good foundation, limited generalization |
-| **TransUNet** | Simplified CNN-Transformer hybrid foundation | 6.86% Dice Score* | Architectural complexity challenges |
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Implementation</th>
+<th>Dice Score</th>
+<th>Key Insight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ResNetUNet</strong></td>
+<td>Enhanced U-Net with pre-trained ResNet34 backbone</td>
+<td><strong>96.34%</strong></td>
+<td>Transfer learning dominates</td>
+</tr>
+<tr>
+<td><strong>BaselineUNet</strong></td>
+<td>Standard U-Net built from scratch</td>
+<td>50.59%</td>
+<td>Good foundation, limited generalization</td>
+</tr>
+<tr>
+<td><strong>TransUNet</strong></td>
+<td>Simplified CNN-Transformer hybrid foundation</td>
+<td>6.86%*</td>
+<td>Architectural complexity challenges</td>
+</tr>
+</tbody>
+</table>
 
 *My TransUNet implementation was deliberately simplified as a stepping stone toward full Vision Transformer integration - the low performance revealed critical insights about skip connections and architectural requirements.
 
