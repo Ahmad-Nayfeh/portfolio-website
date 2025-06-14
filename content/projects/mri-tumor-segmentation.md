@@ -45,39 +45,22 @@ I built a comprehensive AI pipeline that delivers:
 
 ## Technical Approach & Architecture
 
-### Deep Learning Models
+Deep Learning Models
 I implemented and rigorously benchmarked three distinct architectures, each representing different approaches to medical image segmentation:
+ResNetUNet - Enhanced U-Net with pre-trained ResNet34 backbone
 
-<table>
-<thead>
-<tr>
-<th>Model</th>
-<th>Implementation</th>
-<th>Dice Score</th>
-<th>Key Insight</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>ResNetUNet</strong></td>
-<td>Enhanced U-Net with pre-trained ResNet34 backbone</td>
-<td><strong>96.34%</strong></td>
-<td>Transfer learning dominates</td>
-</tr>
-<tr>
-<td><strong>BaselineUNet</strong></td>
-<td>Standard U-Net built from scratch</td>
-<td>50.59%</td>
-<td>Good foundation, limited generalization</td>
-</tr>
-<tr>
-<td><strong>TransUNet</strong></td>
-<td>Simplified CNN-Transformer hybrid foundation</td>
-<td>6.86%*</td>
-<td>Architectural complexity challenges</td>
-</tr>
-</tbody>
-</table>
+Dice Score: 96.34%
+Key Insight: Transfer learning dominates
+
+BaselineUNet - Standard U-Net built from scratch
+
+Dice Score: 50.59%
+Key Insight: Good foundation, limited generalization
+
+TransUNet - Simplified CNN-Transformer hybrid foundation
+
+Dice Score: 6.86%*
+Key Insight: Architectural complexity challenges
 
 *My TransUNet implementation was deliberately simplified as a stepping stone toward full Vision Transformer integration - the low performance revealed critical insights about skip connections and architectural requirements.
 
