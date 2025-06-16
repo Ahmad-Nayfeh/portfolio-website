@@ -1,13 +1,14 @@
 ---
 title: "From Automatons to Autonomy: A Comprehensive Guide to AI Agents"
 slug: "a-comprehensive-guide-to-ai-agents"
-date: "2025-06-15"
+date: "2025-06-16"
 tags: ["AI", "AI Agents", "LLM", "Autonomous Systems", "Multi-Agent Systems", "Agentic Design"]
-excerpt: "Delve into the world of AI Agents. This guide, synthesized from over 15 research papers, deconstructs what agents are, how they 'think' and 'act' through the agentic loop, and the frameworks used to build them. Explore the future of autonomous systems, from single agents to complex multi-agent collaboration."
-readTime: "28 min read"
+excerpt: "Delve into the world of AI Agents. This guide, synthesized from nearly 30 research papers, deconstructs what agents are, how they 'think,' and the frameworks used to build them. Explore real-world case studies in science and software engineering, and understand the future of autonomous systems, from single agents to complex multi-agent collaboration."
+readTime: "48 min read"
 featured: true
 coverImage: "/images/blog/ai_agents_guide_cover.jpg"
 ---
+
 
 ## The Big Picture: A Map of AI Agents
 
