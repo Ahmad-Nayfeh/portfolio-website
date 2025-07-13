@@ -141,72 +141,69 @@ export async function getAboutContent(): Promise<AboutContent> {
 export async function getAllProjects(): Promise<Project[]> {
   const projectFiles = readDirectory("projects")
 
-  const projects = projectFiles
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
-      const projectFile = readMarkdownFile(`projects/${file}`)
-      if (!projectFile?.data) return null // Check for data existence
-
-      const slug = projectFile.data.slug || file.replace(/\.md$/, "")
-
-      return {
-        // Provide defaults directly using ?? or ||
-        title: projectFile.data.title ?? "Untitled Project",
-        slug,
-        date: projectFile.data.date ?? new Date().toISOString(), // Default to today if no date
-        excerpt: projectFile.data.excerpt ?? "",
-        coverImage: projectFile.data.coverImage || "/placeholder.svg?height=600&width=800", // || is ok for image fallback
-        tags: projectFile.data.tags ?? [],
-        githubLink: projectFile.data.githubLink ?? "#", // Use # or empty string for missing links
-        liveDemoUrl: projectFile.data.liveDemoUrl ?? "#",
-        category: projectFile.data.category ?? "Uncategorized",
-        challenge: projectFile.data.challenge ?? "",
-        solution: projectFile.data.solution ?? "",
-        technologies: projectFile.data.technologies ?? [],
-        features: projectFile.data.features ?? [],
-        featured: projectFile.data.featured ?? false,
+  const projects = projectFiles.reduce<Project[]>((acc, file) => {
+    if (file.endsWith(".md")) {
+      const projectFile = readMarkdownFile(`projects/${file}`);
+      if (projectFile?.data) {
+        const slug = projectFile.data.slug || file.replace(/\.md$/, "");
+        acc.push({
+          title: projectFile.data.title ?? "Untitled Project",
+          slug,
+          date: projectFile.data.date ?? new Date().toISOString(),
+          excerpt: projectFile.data.excerpt ?? "",
+          coverImage: projectFile.data.coverImage || "/placeholder.svg?height=600&width=800",
+          tags: projectFile.data.tags ?? [],
+          githubLink: projectFile.data.githubLink ?? "#",
+          liveDemoUrl: projectFile.data.liveDemoUrl ?? "#",
+          category: projectFile.data.category ?? "Uncategorized",
+          challenge: projectFile.data.challenge ?? "",
+          solution: projectFile.data.solution ?? "",
+          technologies: projectFile.data.technologies ?? [],
+          features: projectFile.data.features ?? [],
+          featured: projectFile.data.featured ?? false,
+          lang: projectFile.data.lang || "en",
+        });
       }
-    })
-    .filter((project) => project !== null)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    }
+    return acc;
+  }, []);
 
-  return projects
+  return projects.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 // Get all projects with content
 export async function getAllProjectsWithContent(): Promise<FullProject[]> {
   const projectFiles = readDirectory("projects")
 
-  const projects = projectFiles
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
-      const projectFile = readMarkdownFile(`projects/${file}`)
-       // Check for data and content existence
-      if (!projectFile?.data || projectFile.content === undefined || projectFile.content === null) return null
+  const projects = projectFiles.reduce<FullProject[]>((acc, file) => {
+    if (file.endsWith(".md")) {
+        const projectFile = readMarkdownFile(`projects/${file}`);
+        if (projectFile?.data && projectFile.content !== undefined && projectFile.content !== null) {
+            const slug = projectFile.data.slug || file.replace(/\.md$/, "");
+            acc.push({
+                title: projectFile.data.title ?? "Untitled Project",
+                slug,
+                date: projectFile.data.date ?? new Date().toISOString(),
+                excerpt: projectFile.data.excerpt ?? "",
+                coverImage: projectFile.data.coverImage || "/placeholder.svg?height=600&width=800",
+                tags: projectFile.data.tags ?? [],
+                githubLink: projectFile.data.githubLink ?? "#",
+                liveDemoUrl: projectFile.data.liveDemoUrl ?? "#",
+                category: projectFile.data.category ?? "Uncategorized",
+                challenge: projectFile.data.challenge ?? "",
+                solution: projectFile.data.solution ?? "",
+                technologies: projectFile.data.technologies ?? [],
+                features: projectFile.data.features ?? [],
+                content: projectFile.content,
+                lang: projectFile.data.lang || "en",
+                featured: projectFile.data.featured ?? false,
+            });
+        }
+    }
+    return acc;
+  }, []);
 
-      const slug = projectFile.data.slug || file.replace(/\.md$/, "")
-
-      return {
-        title: projectFile.data.title ?? "Untitled Project",
-        slug,
-        date: projectFile.data.date ?? new Date().toISOString(),
-        excerpt: projectFile.data.excerpt ?? "",
-        coverImage: projectFile.data.coverImage || "/placeholder.svg?height=600&width=800",
-        tags: projectFile.data.tags ?? [],
-        githubLink: projectFile.data.githubLink ?? "#",
-        liveDemoUrl: projectFile.data.liveDemoUrl ?? "#",
-        category: projectFile.data.category ?? "Uncategorized",
-        challenge: projectFile.data.challenge ?? "",
-        solution: projectFile.data.solution ?? "",
-        technologies: projectFile.data.technologies ?? [],
-        features: projectFile.data.features ?? [],
-        content: projectFile.content, // Already checked it exists
-      }
-    })
-    .filter((project) => project !== null)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
-  return projects
+  return projects.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 // New Get featured projects
@@ -215,33 +212,28 @@ export async function getAllProjectsWithContent(): Promise<FullProject[]> {
 export async function getFeaturedProjects(count: number): Promise<Project[]> {
   const projects = await getAllProjects()
   return projects
-    .filter((project) => project.featured === true) // <-- ADD THIS FILTER
+    .filter((project) => project.featured === true)
     .slice(0, count)
 }
 
 // ===========================================
 
-
-
-
 // Get a single project by slug
 export async function getProjectBySlug(slug: string): Promise<FullProject | null> {
   const projects = await getAllProjectsWithContent()
-  // Ensure slug comparison is safe
   return projects.find((project) => project && project.slug === slug) || null
 }
 
 // Get related projects
 export async function getRelatedProjects(project: Project, count: number): Promise<Project[]> {
-   // Basic validation
    if (!project || !project.tags || !project.slug) {
       return [];
    }
   const allProjects = await getAllProjects()
 
   return allProjects
-    .filter((p) => p && p.slug !== project.slug) // Ensure p exists before accessing slug
-    .filter((p) => p.tags && p.tags.some((tag) => project.tags.includes(tag))) // Ensure p.tags exists
+    .filter((p) => p && p.slug !== project.slug)
+    .filter((p) => p.tags && p.tags.some((tag) => project.tags.includes(tag)))
     .slice(0, count)
 }
 
@@ -249,59 +241,55 @@ export async function getRelatedProjects(project: Project, count: number): Promi
 export async function getAllPosts(): Promise<Post[]> {
   const postFiles = readDirectory("blog")
 
-  const posts = postFiles
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
-      const postFile = readMarkdownFile(`blog/${file}`)
-      if (!postFile?.data) return null // Check for data existence
+  const posts = postFiles.reduce<Post[]>((acc, file) => {
+    if (file.endsWith(".md")) {
+        const postFile = readMarkdownFile(`blog/${file}`);
+        if (postFile?.data) {
+            const slug = postFile.data.slug || file.replace(/\.md$/, "");
+            acc.push({
+                title: postFile.data.title ?? "Untitled Post",
+                slug,
+                date: postFile.data.date ?? new Date().toISOString(),
+                excerpt: postFile.data.excerpt ?? "",
+                coverImage: postFile.data.coverImage || "/placeholder.svg?height=600&width=800",
+                tags: postFile.data.tags ?? [],
+                readTime: postFile.data.readTime || "5 min read",
+                featured: postFile.data.featured ?? false,
+            });
+        }
+    }
+    return acc;
+  }, []);
 
-      const slug = postFile.data.slug || file.replace(/\.md$/, "")
-
-      return {
-        title: postFile.data.title ?? "Untitled Post",
-        slug,
-        date: postFile.data.date ?? new Date().toISOString(),
-        excerpt: postFile.data.excerpt ?? "",
-        coverImage: postFile.data.coverImage || "/placeholder.svg?height=600&width=800",
-        tags: postFile.data.tags ?? [],
-        readTime: postFile.data.readTime || "5 min read", // Default read time might be ok with ||
-        featured: postFile.data.featured ?? false, // Default to false if not specified
-      }
-    })
-    .filter((post) => post !== null)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
-  return posts
+  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 // Get all blog posts with content
 export async function getAllPostsWithContent(): Promise<FullPost[]> {
   const postFiles = readDirectory("blog")
 
-  const posts = postFiles
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
-      const postFile = readMarkdownFile(`blog/${file}`)
-      // Check for data and content existence
-      if (!postFile?.data || postFile.content === undefined || postFile.content === null) return null
+  const posts = postFiles.reduce<FullPost[]>((acc, file) => {
+    if (file.endsWith(".md")) {
+        const postFile = readMarkdownFile(`blog/${file}`);
+        if (postFile?.data && postFile.content !== undefined && postFile.content !== null) {
+            const slug = postFile.data.slug || file.replace(/\.md$/, "");
+            acc.push({
+                title: postFile.data.title ?? "Untitled Post",
+                slug,
+                date: postFile.data.date ?? new Date().toISOString(),
+                excerpt: postFile.data.excerpt ?? "",
+                coverImage: postFile.data.coverImage || "/placeholder.svg?height=600&width=800",
+                tags: postFile.data.tags ?? [],
+                readTime: postFile.data.readTime || "5 min read",
+                content: postFile.content,
+                featured: postFile.data.featured ?? false,
+            });
+        }
+    }
+    return acc;
+  }, []);
 
-      const slug = postFile.data.slug || file.replace(/\.md$/, "")
-
-      return {
-        title: postFile.data.title ?? "Untitled Post",
-        slug,
-        date: postFile.data.date ?? new Date().toISOString(),
-        excerpt: postFile.data.excerpt ?? "",
-        coverImage: postFile.data.coverImage || "/placeholder.svg?height=600&width=800",
-        tags: postFile.data.tags ?? [],
-        readTime: postFile.data.readTime || "5 min read",
-        content: postFile.content, // Already checked existence
-      }
-    })
-    .filter((post) => post !== null)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
-  return posts
+  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 // New Get Featured blog posts
@@ -310,7 +298,7 @@ export async function getAllPostsWithContent(): Promise<FullPost[]> {
 export async function getRecentPosts(count: number): Promise<Post[]> {
   const posts = await getAllPosts()
   return posts
-    .filter((post) => post.featured === true) // <-- ADD THIS FILTER
+    .filter((post) => post.featured === true)
     .slice(0, count)
 }
 
@@ -320,20 +308,18 @@ export async function getRecentPosts(count: number): Promise<Post[]> {
 // Get a single blog post by slug
 export async function getPostBySlug(slug: string): Promise<FullPost | null> {
   const posts = await getAllPostsWithContent()
-   // Ensure slug comparison is safe
-  return posts.find((post) => post && post.slug === slug) || null
+   return posts.find((post) => post && post.slug === slug) || null
 }
 
 // Get related blog posts
 export async function getRelatedPosts(post: Post, count: number): Promise<Post[]> {
-  // Basic validation
   if (!post || !post.tags || !post.slug) {
       return [];
    }
   const allPosts = await getAllPosts()
 
   return allPosts
-    .filter((p) => p && p.slug !== post.slug) // Ensure p exists
-    .filter((p) => p.tags && p.tags.some((tag) => post.tags.includes(tag))) // Ensure p.tags exists
+    .filter((p) => p && p.slug !== post.slug)
+    .filter((p) => p.tags && p.tags.some((tag) => post.tags.includes(tag)))
     .slice(0, count)
 }
