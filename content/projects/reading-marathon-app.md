@@ -94,8 +94,12 @@ featured: true
 | لوحة التحكم العامة | تحليلات التحدي |
 | :---: | :---: |
 | ![لوحة التحكم العامة](/images/projects/reading-marathon-app/dashboard.png) | ![تحليلات التحدي](/images/projects/reading-marathon-app/challenge-analytics.png) |
-| **بطاقة أداء القارئ** | **لوحة الإدارة والإعدادات** |
+| **لوحة التحكم العامة** | **تحليلات التحدي** |
+
+| بطاقة أداء القارئ | لوحة الإدارة والإعدادات |
+| :---: | :---: |
 | ![بطاقة القارئ](/images/projects/reading-marathon-app/reader-card.png) | ![لوحة الإدارة](/images/projects/reading-marathon-app/admin-panel.png) |
+| **بطاقة أداء القارئ** | **لوحة الإدارة والإعدادات** |
 
 ## الدروس المستفادة والانعكاسات
 
