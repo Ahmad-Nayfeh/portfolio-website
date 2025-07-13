@@ -90,26 +90,24 @@ featured: true
 - **إدارة آلية:** عند إضافة أو تعطيل عضو، يقوم التطبيق تلقائياً بتحديث قائمة الأسماء في Google Form لمنع أو السماح بالتسجيل.
 - **إنشاء تقارير PDF:** قمت ببناء وحدة مخصصة باستخدام **FPDF2** لإنشاء 3 أنواع من التقارير الاحترافية (عام، تحدي، قارئ) تدعم اللغة العربية بشكل كامل، مما يسهل مشاركة الإنجازات.
 
-## معرض صور التطبيق
+<h2>معرض صور التطبيق</h2>
 
 <table style="width:100%; border:0; border-collapse:collapse;">
   <tbody>
     <tr>
-      <td style="width:50%; text-align:center; padding:10px; border:0;">
+      <td style="text-align:center; padding:5px; border:0;">
         <img src="/images/projects/reading-marathon-app/dashboard.png" alt="لوحة التحكم العامة" style="max-width:100%; border-radius: 8px;">
         <p><strong>لوحة التحكم العامة</strong></p>
       </td>
-      <td style="width:50%; text-align:center; padding:10px; border:0;">
+      <td style="text-align:center; padding:5px; border:0;">
         <img src="/images/projects/reading-marathon-app/challenge-analytics.png" alt="تحليلات التحدي" style="max-width:100%; border-radius: 8px;">
         <p><strong>تحليلات التحدي</strong></p>
       </td>
-    </tr>
-    <tr>
-      <td style="width:50%; text-align:center; padding:10px; border:0;">
+      <td style="text-align:center; padding:5px; border:0;">
         <img src="/images/projects/reading-marathon-app/reader-card.png" alt="بطاقة القارئ" style="max-width:100%; border-radius: 8px;">
         <p><strong>بطاقة أداء القارئ</strong></p>
       </td>
-      <td style="width:50%; text-align:center; padding:10px; border:0;">
+      <td style="text-align:center; padding:5px; border:0;">
         <img src="/images/projects/reading-marathon-app/admin-panel.png" alt="لوحة الإدارة" style="max-width:100%; border-radius: 8px;">
         <p><strong>لوحة الإدارة والإعدادات</strong></p>
       </td>
@@ -117,8 +115,7 @@ featured: true
   </tbody>
 </table>
 
-
-## الدروس المستفادة والانعكاسات
+<h2>الدروس المستفادة والانعكاسات</h2>
 
 كان هذا المشروع رحلة تعليمية رائعة في بناء منتج برمجي متكامل. لقد أتاح لي الفرصة لتطبيق مهاراتي في **تحليل البيانات** في سياق أكبر يتطلب **هندسة برمجيات** و **تصميم أنظمة**. تعلمت أهمية التفكير في تجربة المستخدم (UX)، وأمان البيانات، وقابلية التوسع منذ اليوم الأول.
 
