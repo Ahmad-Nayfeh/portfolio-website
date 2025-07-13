@@ -11,24 +11,22 @@ import MarkdownRenderer from "@/components/MarkdownRenderer"
 import type { FullProject } from "@/types"
 import RelatedProjects from "@/components/RelatedProjects"
 
-interface ProjectPageParams {
-  slug: string;
+// Define the parameter structure for the page
+interface PageProps {
+  params: {
+    slug: string;
+  };
 }
 
-// Props for the page component
-type PageProps = {
-  params: { slug: string };
-};
-
-// Generate static paths for all projects
-export async function generateStaticParams(): Promise<Array<ProjectPageParams>> {
+// Generate static paths for all projects to improve performance
+export async function generateStaticParams() {
   const projects = await getAllProjects();
   return projects.map((project) => ({
     slug: project.slug,
   }));
 }
 
-// Generate metadata for the page
+// Generate metadata for the page (for SEO)
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const project = await getProjectBySlug(params.slug);
 
@@ -63,6 +61,7 @@ export default async function ProjectPage({ params }: PageProps) {
     // --- START: تطبيق اتجاه اللغة على العنصر الرئيسي ---
     <div className="container mx-auto px-4 py-12" dir={direction}>
     {/* --- END: تطبيق اتجاه اللغة --- */}
+
       <Link
         href="/projects"
         className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -130,14 +129,12 @@ export default async function ProjectPage({ params }: PageProps) {
               <p>{project.challenge}</p>
             </div>
           )}
-
           {project.solution && (
             <div>
               <h2 className="text-2xl font-bold mb-2">The Solution</h2>
               <p>{project.solution}</p>
             </div>
           )}
-
           {project.technologies && project.technologies.length > 0 && (
             <div>
               <h2 className="text-2xl font-bold mb-2">Technologies Used</h2>
@@ -148,7 +145,6 @@ export default async function ProjectPage({ params }: PageProps) {
               </div>
             </div>
           )}
-
           {project.features && project.features.length > 0 && (
             <div>
               <h2 className="text-2xl font-bold mb-2">Key Features</h2>
