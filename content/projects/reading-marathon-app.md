@@ -92,11 +92,30 @@ featured: true
 
 ## معرض صور التطبيق
 
-| لوحة التحكم العامة | تحليلات التحدي |
-| :---: | :---: |
-| ![لوحة التحكم العامة](/images/projects/reading-marathon-app/dashboard.png) | ![تحليلات التحدي](/images/projects/reading-marathon-app/challenge-analytics.png) |
-| **بطاقة أداء القارئ** | **لوحة الإدارة والإعدادات** |
-| ![بطاقة القارئ](/images/projects/reading-marathon-app/reader-card.png) | ![لوحة الإدارة](/images/projects/reading-marathon-app/admin-panel.png) |
+<table style="width:100%; border:0; border-collapse:collapse;">
+  <tbody>
+    <tr>
+      <td style="width:50%; text-align:center; padding:10px; border:0;">
+        <img src="/images/projects/reading-marathon-app/dashboard.png" alt="لوحة التحكم العامة" style="max-width:100%; border-radius: 8px;">
+        <p><strong>لوحة التحكم العامة</strong></p>
+      </td>
+      <td style="width:50%; text-align:center; padding:10px; border:0;">
+        <img src="/images/projects/reading-marathon-app/challenge-analytics.png" alt="تحليلات التحدي" style="max-width:100%; border-radius: 8px;">
+        <p><strong>تحليلات التحدي</strong></p>
+      </td>
+    </tr>
+    <tr>
+      <td style="width:50%; text-align:center; padding:10px; border:0;">
+        <img src="/images/projects/reading-marathon-app/reader-card.png" alt="بطاقة القارئ" style="max-width:100%; border-radius: 8px;">
+        <p><strong>بطاقة أداء القارئ</strong></p>
+      </td>
+      <td style="width:50%; text-align:center; padding:10px; border:0;">
+        <img src="/images/projects/reading-marathon-app/admin-panel.png" alt="لوحة الإدارة" style="max-width:100%; border-radius: 8px;">
+        <p><strong>لوحة الإدارة والإعدادات</strong></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 
 ## الدروس المستفادة والانعكاسات
