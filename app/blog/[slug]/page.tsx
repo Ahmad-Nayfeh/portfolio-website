@@ -15,12 +15,6 @@ interface BlogPageParams {
   slug: string;
 }
 
-// *** Define the Props type for Page and generateMetadata (using Promise for params) ***
-type PageProps = {
-  params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-};
-
 // generateStaticParams remains largely the same, returning slugs
 export async function generateStaticParams(): Promise<Array<BlogPageParams>> {
   const posts = await getAllPosts()
@@ -126,3 +120,9 @@ export default async function BlogPostPage({ params }: PageProps) {
     </div>
   )
 }
+
+// *** Define the Props type for Page and generateMetadata (using Promise for params) ***
+type PageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+};
