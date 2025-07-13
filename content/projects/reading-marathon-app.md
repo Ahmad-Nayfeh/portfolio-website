@@ -36,7 +36,6 @@ featured: true
 > مشروع شامل يوضح بناء تطبيق بيانات (Data App) من مرحلة الفكرة إلى النشر والإنتاج، باستخدام Python وتقنيات سحابية حديثة.
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_App-brightgreen?style=for-the-badge)](https://reading-marathon.streamlit.app)
-[![GitHub](https://img.shields.io/badge/📁-الكود المصدري-black?style=for-the-badge)](https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud)
 [![GitHub](https://img.shields.io/badge/GitHub-Ahmad--Nayfeh-black?style=for-the-badge&logo=github)](https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud)
 
 
