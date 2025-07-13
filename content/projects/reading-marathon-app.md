@@ -31,93 +31,98 @@ features:
 featured: true
 ---
 
-# 🏃‍♂️ منصة ماراثون القراءة: تطبيق تحليلي متكامل
+<div dir="rtl" lang="ar" style="font-family: Arial, sans-serif; color: hsl(var(--foreground));">
 
-> مشروع شامل يوضح بناء تطبيق بيانات (Data App) من مرحلة الفكرة إلى النشر والإنتاج، باستخدام Python وتقنيات سحابية حديثة.
+  <header style="text-align: center; margin-bottom: 4rem; border-bottom: 1px solid hsl(var(--border)); padding-bottom: 2rem;">
+    <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem;">🏃‍♂️ منصة ماراثون القراءة: تطبيق تحليلي متكامل</h1>
+    <p style="font-size: 1.25rem; color: hsl(var(--muted-foreground));">
+      مشروع شامل يوضح بناء تطبيق بيانات (Data App) من مرحلة الفكرة إلى النشر والإنتاج، باستخدام Python وتقنيات سحابية حديثة.
+    </p>
+    <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
+      <a href="https://reading-marathon.streamlit.app/" target="_blank" style="text-decoration: none; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); padding: 0.75rem 1.5rem; border-radius: var(--radius); font-weight: 500; display: inline-flex; align-items: center; gap: 0.5rem; transition: opacity 0.2s;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        العرض المباشر
+      </a>
+      <a href="https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud" target="_blank" style="text-decoration: none; background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); padding: 0.75rem 1.5rem; border-radius: var(--radius); font-weight: 500; display: inline-flex; align-items: center; gap: 0.5rem; transition: opacity 0.2s;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/></svg>
+        الكود المصدري
+      </a>
+    </div>
+  </header>
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_App-brightgreen?style=for-the-badge)](https://reading-marathon.streamlit.app)
-[![GitHub](https://img.shields.io/badge/GitHub-Ahmad--Nayfeh-black?style=for-the-badge&logo=github)](https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud)
+  <section style="margin-bottom: 4rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+    <div style="background-color: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: var(--radius); padding: 1.5rem;">
+      <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">التقنيات المستخدمة</h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <span style="background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">Python</span>
+        <span style="background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">Streamlit</span>
+        <span style="background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">Firebase</span>
+        <span style="background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">Pandas</span>
+        <span style="background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">Plotly</span>
+        <span style="background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">Google Cloud</span>
+      </div>
+    </div>
+    <div style="background-color: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: var(--radius); padding: 1.5rem;">
+      <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">أبرز المميزات</h3>
+      <ul style="padding-right: 1.5rem; margin: 0; list-style-type: '✓ '; display: flex; flex-direction: column; gap: 0.5rem;">
+        <li>بنية سحابية آمنة ومتعددة المستخدمين.</li>
+        <li>أتمتة كاملة لخط بيانات (Data Pipeline).</li>
+        <li>نظام ألعاب (Gamification) لتحفيز المستخدمين.</li>
+        <li>إنشاء تقارير PDF آلية باللغة العربية.</li>
+      </ul>
+    </div>
+  </section>
 
+  <article>
+    <section style="margin-bottom: 3rem;">
+      <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem; border-bottom: 2px solid hsl(var(--primary)); padding-bottom: 0.5rem; display: inline-block;">نظرة عامة</h2>
+      <p style="line-height: 1.7; font-size: 1.1rem; color: hsl(var(--muted-foreground));">
+        "ماراثون القراءة" هو أكثر من مجرد لوحة تحكم؛ إنه منصة متكاملة قمت بتصميمها وتطويرها بالكامل لحل مشكلة حقيقية يواجهها مشرفو مجموعات القراءة. يحول التطبيق عملية تتبع القراءة اليدوية والمملة إلى تجربة تفاعلية ومحفزة، مع توفير أدوات تحليلية قوية للمشرفين لاتخاذ قرارات مبنية على البيانات.
+      </p>
+    </section>
 
-![صورة لواجهة التطبيق الرئيسية](/images/projects/reading-marathon-app/dashboard.png)
+    <section style="margin-bottom: 3rem;">
+      <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem; border-bottom: 2px solid hsl(var(--primary)); padding-bottom: 0.5rem; display: inline-block;">المشكلة</h2>
+      <p style="line-height: 1.7; font-size: 1.1rem; color: hsl(var(--muted-foreground));">
+        تواجه مجموعات القراءة التقليدية تحديات كبيرة تعيق نموها واستمراريتها، مثل العبء الإداري، انخفاض التفاعل، وغياب الرؤى التحليلية.
+      </p>
+    </section>
+    
+    <section style="margin-bottom: 3rem;">
+      <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem; border-bottom: 2px solid hsl(var(--primary)); padding-bottom: 0.5rem; display: inline-block;">الحل المقترح</h2>
+      <p style="line-height: 1.7; font-size: 1.1rem; color: hsl(var(--muted-foreground)); margin-bottom: 1.5rem;">
+        قمت ببناء تطبيق ويب سحابي يعالج كل هذه التحديات من خلال بنية تحتية ذكية ومؤتمتة بالكامل.
+      </p>
+      <img src="/images/projects/reading-marathon-app/architecture.png" alt="الهيكل المعماري للتطبيق" style="width: 100%; border-radius: var(--radius); border: 1px solid hsl(var(--border));">
+    </section>
 
-## نظرة عامة على المشروع
+    <section style="margin-bottom: 3rem;">
+      <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem; border-bottom: 2px solid hsl(var(--primary)); padding-bottom: 0.5rem; display: inline-block;">معرض صور التطبيق</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div style="border: 1px solid hsl(var(--border)); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.3s;" onmouseover="this.style.boxShadow='0 4px 20px hsla(var(--foreground), 0.1)'" onmouseout="this.style.boxShadow='none'">
+          <img src="/images/projects/reading-marathon-app/dashboard.png" alt="لوحة التحكم العامة" style="width: 100%; display: block;">
+          <p style="padding: 1rem; text-align: center; font-weight: 600; background-color: hsl(var(--card)); margin: 0;">لوحة التحكم العامة</p>
+        </div>
+        <div style="border: 1px solid hsl(var(--border)); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.3s;" onmouseover="this.style.boxShadow='0 4px 20px hsla(var(--foreground), 0.1)'" onmouseout="this.style.boxShadow='none'">
+          <img src="/images/projects/reading-marathon-app/challenge-analytics.png" alt="تحليلات التحدي" style="width: 100%; display: block;">
+          <p style="padding: 1rem; text-align: center; font-weight: 600; background-color: hsl(var(--card)); margin: 0;">تحليلات التحدي</p>
+        </div>
+        <div style="border: 1px solid hsl(var(--border)); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.3s;" onmouseover="this.style.boxShadow='0 4px 20px hsla(var(--foreground), 0.1)'" onmouseout="this.style.boxShadow='none'">
+          <img src="/images/projects/reading-marathon-app/reader-card.png" alt="بطاقة أداء القارئ" style="width: 100%; display: block;">
+          <p style="padding: 1rem; text-align: center; font-weight: 600; background-color: hsl(var(--card)); margin: 0;">بطاقة أداء القارئ</p>
+        </div>
+        <div style="border: 1px solid hsl(var(--border)); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.3s;" onmouseover="this.style.boxShadow='0 4px 20px hsla(var(--foreground), 0.1)'" onmouseout="this.style.boxShadow='none'">
+          <img src="/images/projects/reading-marathon-app/admin-panel.png" alt="لوحة الإدارة والإعدادات" style="width: 100%; display: block;">
+          <p style="padding: 1rem; text-align: center; font-weight: 600; background-color: hsl(var(--card)); margin: 0;">لوحة الإدارة والإعدادات</p>
+        </div>
+      </div>
+    </section>
 
-"ماراثون القراءة" هو أكثر من مجرد لوحة تحكم؛ إنه منصة متكاملةقمت بتصميمها وتطويرها بالكامل لحل مشكلة حقيقية يواجهها مشرفو مجموعات القراءة. يحول التطبيق عملية تتبع القراءة اليدوية والمملة إلى تجربة تفاعلية ومحفزة، مع توفير أدوات تحليلية قوية للمشرفين لاتخاذ قرارات مبنية على البيانات.
-
-المشروع يبرز قدرتي على بناء حلول بيانات شاملة، بدءًا من تصميم البنية التحتية السحابية وخطوط البيانات (Data Pipelines) وصولًا إلى تطوير واجهات مستخدم تفاعلية وإنشاء تقارير آلية.
-
-## المشكلة التي قمت بحلها
-
-تواجه مجموعات القراءة التقليدية تحديات كبيرة تعيق نموها واستمراريتها:
-- **العبء الإداري:** يقضي المشرفون وقتاً طويلاً في جمع البيانات يدوياً وتتبع التزام كل عضو.
-- **انخفاض التفاعل:** بدون حوافز واضحة، يفقد الأعضاء حماسهم تدريجياً.
-- **غياب الرؤى:** من الصعب تحليل أداء المجموعة، ومعرفة أكثر الكتب تأثيراً، أو فهم عادات القراءة للأعضاء.
-- **صعوبة التوسع:** إدارة مجموعة كبيرة بشكل يدوي شبه مستحيلة.
-
-## الحل: منصة بيانات مركزية ومؤتمتة
-
-قمت ببناء تطبيق ويب سحابي يعالج كل هذه التحديات من خلال بنية تحتية ذكية:
-
-![الهيكل المعماري للتطبيق](/images/projects/reading-marathon-app/architecture.png)
-
-1.  **جمع البيانات (Data Collection):** يستخدم كل عضو **نموذج جوجل (Google Form)** بسيط لتسجيل قراءاته اليومية.
-2.  **التخزين المؤقت (Staging):** يتم حفظ الردود تلقائياً في **جدول بيانات جوجل (Google Sheet)** خاص بالمشرف.
-3.  **المعالجة والمزامنة (Processing & Sync):** عند ضغط المشرف على زر "تحديث"، يقوم التطبيق بسحب البيانات من الـ Sheet، ومعالجتها باستخدام **Pandas** وحساب كافة الإحصائيات والنقاط.
-4.  **التخزين الدائم (Persistence):** يتم تخزين البيانات المعالجة والمنظفة في قاعدة بيانات **Firebase Firestore** سحابية، حيث يكون لكل مشرف مساحة عمل خاصة به.
-5.  **العرض والتحليل (Visualization & Analysis):** يتم عرض البيانات والتحليلات في واجهات تفاعلية مبنية باستخدام **Streamlit** و **Plotly** مما يوفر رؤى عميقة للمشرف.
-
-## الإنجازات التقنية الرئيسية
-
-### 🏗️ **بناء تطبيق بيانات شامل (End-to-End Data App)**
-لقد قمت بتطوير المشروع بالكامل، مما يثبت قدرتي على إدارة دورة حياة المنتج كاملة:
-- **تصميم النظام:** وضعت بنية تحتية قابلة للتوسع باستخدام خدمات سحابية.
-- **هندسة البيانات:** أنشأت خط بيانات مؤتمت بالكامل وموثوق.
-- **تطوير الواجهة الخلفية:** كتبت منطق معالجة البيانات، وحساب النقاط، وإدارة قاعدة البيانات.
-- **تطوير الواجهة الأمامية:** صممت واجهات مستخدم تفاعلية وجذابة باستخدام Streamlit.
-
-### ☁️ **بنية سحابية متعددة المستخدمين (Multi-Tenant Cloud Architecture)**
-- **مصادقة آمنة:** استخدمت **Google OAuth2** لتوفير نظام تسجيل دخول آمن ومألوف للمستخدمين.
-- **عزل البيانات:** تم تصميم قاعدة بيانات **Firestore** بحيث يكون لكل مشرف (مستخدم) مساحة عمل (Workspace) معزولة تماماً عن الآخرين، مما يضمن خصوصية وأمان البيانات.
-- **قابلية التوسع:** البنية السحابية تسمح للمنصة بدعم عدد كبير من المستخدمين والمجموعات دون التأثير على الأداء.
-
-### 📊 **تحليلات متقدمة ونظام ألعاب (Advanced Analytics & Gamification)**
-- **لوحات تحكم متعددة المستويات:** يوفر التطبيق 3 مستويات من التحليل: نظرة عامة على كل التحديات، تحليل عميق لتحدي معين، وبطاقة أداء شخصية لكل قارئ.
-- **نظام نقاط مرن:** قمت بتصميم "فلسفة تحفيز ذكي" توازن بين الالتزام الجماعي والحرية الفردية، مع إمكانية تخصيص نظام النقاط لكل تحدي.
-- **الأوسمة والشارات:** نظام يكافئ الإنجازات الخاصة (مثل سرعة القراءة والاستمرارية) لتحفيز جميع أنواع القراء.
-
-### 🤖 **أتمتة كاملة وتقارير احترافية**
-- **إدارة آلية:** عند إضافة أو تعطيل عضو، يقوم التطبيق تلقائياً بتحديث قائمة الأسماء في Google Form لمنع أو السماح بالتسجيل.
-- **إنشاء تقارير PDF:** قمت ببناء وحدة مخصصة باستخدام **FPDF2** لإنشاء 3 أنواع من التقارير الاحترافية (عام، تحدي، قارئ) تدعم اللغة العربية بشكل كامل، مما يسهل مشاركة الإنجازات.
-
-<h2>معرض صور التطبيق</h2>
-
-<table style="width:100%; border:0; border-collapse:collapse;">
-  <tbody>
-    <tr>
-      <td style="text-align:center; padding:5px; border:0;">
-        <img src="/images/projects/reading-marathon-app/dashboard.png" alt="لوحة التحكم العامة" style="max-width:100%; border-radius: 8px;">
-        <p><strong>لوحة التحكم العامة</strong></p>
-      </td>
-      <td style="text-align:center; padding:5px; border:0;">
-        <img src="/images/projects/reading-marathon-app/challenge-analytics.png" alt="تحليلات التحدي" style="max-width:100%; border-radius: 8px;">
-        <p><strong>تحليلات التحدي</strong></p>
-      </td>
-      <td style="text-align:center; padding:5px; border:0;">
-        <img src="/images/projects/reading-marathon-app/reader-card.png" alt="بطاقة القارئ" style="max-width:100%; border-radius: 8px;">
-        <p><strong>بطاقة أداء القارئ</strong></p>
-      </td>
-      <td style="text-align:center; padding:5px; border:0;">
-        <img src="/images/projects/reading-marathon-app/admin-panel.png" alt="لوحة الإدارة" style="max-width:100%; border-radius: 8px;">
-        <p><strong>لوحة الإدارة والإعدادات</strong></p>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<h2>الدروس المستفادة والانعكاسات</h2>
-
-كان هذا المشروع رحلة تعليمية رائعة في بناء منتج برمجي متكامل. لقد أتاح لي الفرصة لتطبيق مهاراتي في **تحليل البيانات** في سياق أكبر يتطلب **هندسة برمجيات** و **تصميم أنظمة**. تعلمت أهمية التفكير في تجربة المستخدم (UX)، وأمان البيانات، وقابلية التوسع منذ اليوم الأول.
-
-يثبت هذا المشروع قدرتي على ترجمة فكرة إلى منتج حقيقي قابل للاستخدام، والتعامل مع تقنيات متعددة ومتكاملة (Python, Streamlit, Firebase, Google Cloud APIs) لبناء حل قوي ومؤثر.
-
+    <section>
+      <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem; border-bottom: 2px solid hsl(var(--primary)); padding-bottom: 0.5rem; display: inline-block;">الدروس المستفادة</h2>
+      <p style="line-height: 1.7; font-size: 1.1rem; color: hsl(var(--muted-foreground));">
+        كان هذا المشروع رحلة تعليمية رائعة في بناء منتج برمجي متكامل. لقد أتاح لي الفرصة لتطبيق مهاراتي في **تحليل البيانات** في سياق أكبر يتطلب **هندسة برمجيات** و **تصميم أنظمة**. تعلمت أهمية التفكير في تجربة المستخدم (UX)، وأمان البيانات، وقابلية التوسع منذ اليوم الأول. يثبت هذا المشروع قدرتي على ترجمة فكرة إلى منتج حقيقي قابل للاستخدام، والتعامل مع تقنيات متعددة ومتكاملة لبناء حل قوي ومؤثر.
+      </p>
+    </section>
+  </article>
+</div>
