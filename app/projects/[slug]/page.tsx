@@ -52,16 +52,12 @@ export default async function ProjectPage({ params }: PageProps) {
 
   const relatedProjects = await getRelatedProjects(project, 3);
 
-  // --- START: التعديل الرئيسي ---
   // Check the language property of the project and set the direction
   const direction = project.lang === "ar" ? "rtl" : "ltr";
-  // --- END: التعديل الرئيسي ---
 
   return (
-    // --- START: تطبيق اتجاه اللغة على العنصر الرئيسي ---
+    // Apply the language direction to the main container
     <div className="container mx-auto px-4 py-12" dir={direction}>
-    {/* --- END: تطبيق اتجاه اللغة --- */}
-
       <Link
         href="/projects"
         className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
