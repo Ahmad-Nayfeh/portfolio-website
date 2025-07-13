@@ -8,67 +8,61 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/lib/utils"
 import MarkdownRenderer from "@/components/MarkdownRenderer"
-import type { FullProject } from "@/types" // Ensure FullProject includes 'description' if used in generateMetadata
+import type { FullProject } from "@/types"
 import RelatedProjects from "@/components/RelatedProjects"
 
-// Define the parameter structure for generateStaticParams
 interface ProjectPageParams {
   slug: string;
 }
 
-// *** Define the Props type for Page and generateMetadata (using Promise for params) ***
+// Props for the page component
 type PageProps = {
-  params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: { slug: string };
 };
 
-// generateStaticParams remains largely the same, returning slugs
+// Generate static paths for all projects
 export async function generateStaticParams(): Promise<Array<ProjectPageParams>> {
-  const projects = await getAllProjects()
-   // Ensure slugs are valid strings
-  return projects.filter(project => typeof project.slug === 'string').map((project) => ({
+  const projects = await getAllProjects();
+  return projects.map((project) => ({
     slug: project.slug,
-  }))
+  }));
 }
 
-// *** Updated generateMetadata to use PageProps and await params ***
+// Generate metadata for the page
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  // Await the params Promise
-  const resolvedParams = await params;
-  const { slug } = resolvedParams; // Get slug from resolved params
-
-  const project = await getProjectBySlug(slug)
+  const project = await getProjectBySlug(params.slug);
 
   if (!project) {
     return {
       title: "Project Not Found",
-    }
+    };
   }
 
   return {
     title: `${project.title} | Projects`,
-    // Use excerpt if description is not available on FullProject type
     description: project.excerpt,
-  }
+  };
 }
 
-// *** Updated Page component to use PageProps and await params ***
+// The main page component
 export default async function ProjectPage({ params }: PageProps) {
-  // Await the params Promise
-  const resolvedParams = await params;
-  const { slug } = resolvedParams; // Get slug from resolved params
-
-  const project: FullProject | null = await getProjectBySlug(slug)
+  const project: FullProject | null = await getProjectBySlug(params.slug);
 
   if (!project) {
-    notFound()
+    notFound();
   }
 
-  // Fetch related projects AFTER getting the current project successfully
-  const relatedProjects = await getRelatedProjects(project, 3)
+  const relatedProjects = await getRelatedProjects(project, 3);
+
+  // --- START: التعديل الرئيسي ---
+  // Check the language property of the project and set the direction
+  const direction = project.lang === "ar" ? "rtl" : "ltr";
+  // --- END: التعديل الرئيسي ---
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    // --- START: تطبيق اتجاه اللغة على العنصر الرئيسي ---
+    <div className="container mx-auto px-4 py-12" dir={direction}>
+    {/* --- END: تطبيق اتجاه اللغة --- */}
       <Link
         href="/projects"
         className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -83,26 +77,22 @@ export default async function ProjectPage({ params }: PageProps) {
         </h1>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-8 text-sm text-muted-foreground">
-          {/* Ensure date is valid before formatting */}
           {project.date && <time dateTime={project.date}>{formatDate(project.date)}</time>}
           <div className="flex items-center gap-2">
-             {/* Use Button with <a> tag for external links */}
              {project.githubLink && (
                <Button asChild variant="outline" size="sm">
-                 {/* Use <a> tag for external link */}
                  <a href={project.githubLink} target="_blank" rel="noopener noreferrer">
-                   <span className="flex items-center"> {/* Wrap icon and text */}
+                   <span className="flex items-center">
                      <Github size={16} className="mr-2" />
                      <span>Source Code</span>
                    </span>
                  </a>
                </Button>
              )}
-             {project.liveDemoUrl && project.liveDemoUrl !== "#" && ( // Check for placeholder '#'
+             {project.liveDemoUrl && project.liveDemoUrl !== "#" && (
                 <Button asChild variant="outline" size="sm">
-                  {/* Use <a> tag for external link */}
                   <a href={project.liveDemoUrl} target="_blank" rel="noopener noreferrer">
-                    <span className="flex items-center"> {/* Wrap icon and text */}
+                    <span className="flex items-center">
                       <ExternalLink size={16} className="mr-2" />
                       <span>Live Demo</span>
                     </span>
@@ -171,14 +161,12 @@ export default async function ProjectPage({ params }: PageProps) {
           )}
         </div>
 
-        {/* Ensure content exists before rendering */}
         {project.content && <MarkdownRenderer content={project.content} />}
       </article>
 
       {relatedProjects.length > 0 && (
         <section className="max-w-3xl mx-auto mt-16 pt-8 border-t">
           <h2 className="text-2xl font-bold mb-8">Related Projects</h2>
-          {/* You might need a RelatedProjects component similar to the blog one */}
           <RelatedProjects projects={relatedProjects} />
         </section>
       )}
