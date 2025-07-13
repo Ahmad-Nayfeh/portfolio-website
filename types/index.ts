@@ -1,3 +1,5 @@
+// types/index.ts
+
 export interface Project {
   title: string
   slug: string
@@ -13,6 +15,7 @@ export interface Project {
   technologies: string[]
   features: string[]
   featured?: boolean
+  lang?: string // <-- تم إضافة هذا السطر
 }
 
 export interface FullProject extends Project {
