@@ -13,9 +13,9 @@ import RelatedProjects from "@/components/RelatedProjects"
 
 // Define the parameter structure for the page
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 // Generate static paths for all projects to improve performance
@@ -28,7 +28,8 @@ export async function generateStaticParams() {
 
 // Generate metadata for the page (for SEO)
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const project = await getProjectBySlug(params.slug);
+  const { slug } = await params;
+  const project = await getProjectBySlug(slug);
 
   if (!project) {
     return {
@@ -44,7 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 // The main page component
 export default async function ProjectPage({ params }: PageProps) {
-  const project: FullProject | null = await getProjectBySlug(params.slug);
+  const { slug } = await params;
+  const project: FullProject | null = await getProjectBySlug(slug);
 
   if (!project) {
     notFound();
