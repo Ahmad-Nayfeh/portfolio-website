@@ -11,19 +11,13 @@ githubLink: "https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud"
 liveDemoUrl: "https://reading-marathon.streamlit.app/"
 featured: true
 ---
-
 <style>
-    /* --- Add a professional Arabic font --- */
     @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
-
-    /* --- Global Project Styles --- */
     .project-container-custom {
         font-family: 'Tajawal', sans-serif;
         line-height: 1.8;
         color: hsl(var(--foreground) / 0.9);
     }
-
-    /* --- Custom Headers --- */
     .section-header-custom {
         text-align: center;
         margin-top: 4rem;
@@ -51,8 +45,6 @@ featured: true
         border-radius: 2px;
         margin: 1.5rem auto 0;
     }
-
-    /* --- Buttons & Links --- */
     .cta-buttons-custom {
         display: flex;
         justify-content: center;
@@ -89,8 +81,6 @@ featured: true
         color: hsl(var(--primary-foreground));
         transform: translateY(-3px);
     }
-    
-    /* --- Two-Column Layout for Problem/Solution --- */
     .two-col-layout-custom {
         display: grid;
         grid-template-columns: 1fr;
@@ -128,8 +118,6 @@ featured: true
         margin-bottom: 0.75rem;
         padding-right: 0.5rem;
     }
-
-    /* --- Architecture Diagram --- */
     .architecture-diagram-custom {
         margin: 3rem auto;
         padding: 1rem;
@@ -147,8 +135,6 @@ featured: true
         font-style: italic;
         color: hsl(var(--muted-foreground));
     }
-
-    /* --- Feature Cards Grid --- */
     .features-grid-custom {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -186,8 +172,6 @@ featured: true
         color: hsl(var(--muted-foreground));
         line-height: 1.7;
     }
-
-    /* --- Technology Stack --- */
     .tech-stack-custom {
         display: flex;
         flex-wrap: wrap;
@@ -212,16 +196,13 @@ featured: true
         transform: scale(1.05);
     }
 </style>
-
-<div class="project-container-custom">
-
+<div class="project-container-custom" dir="rtl">
     <div style="text-align: center; margin-bottom: 2rem;">
         <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">🏆 منصة ماراثون القراءة</h1>
         <p style="font-size: 1.25rem; max-width: 750px; margin: 0 auto; color: hsl(var(--muted-foreground));">
             هندسة نظام تحليلي متكامل يستخدم قوة البيانات لتحويل تجربة القراءة الجماعية إلى رحلة تفاعلية ومحفزة.
         </p>
     </div>
-
     <div class="cta-buttons-custom">
         <a href="https://reading-marathon.streamlit.app/" target="_blank" rel="noopener noreferrer" class="cta-button-primary">
             <span>🚀</span>
@@ -232,17 +213,14 @@ featured: true
             <span>الكود المصدري</span>
         </a>
     </div>
-
     <figure class="architecture-diagram-custom">
         <img src="/images/projects/reading-marathon-app/dashboard.png" alt="لقطة شاملة للوحة التحكم في منصة ماراثون القراءة" />
         <figcaption>لوحة التحكم الرئيسية التي توفر رؤى شاملة لأداء المجموعة.</figcaption>
     </figure>
-
     <div class="section-header-custom">
         <h2>من الفكرة إلى الواقع</h2>
         <p class="subtitle-custom">كيف حولنا تحديات القراءة العربية إلى فرصة للابتكار الهندسي.</p>
     </div>
-
     <div class="two-col-layout-custom">
         <div class="col-box-custom">
             <h3><span>🎯</span> المشكلة الحقيقية</h3>
@@ -263,12 +241,10 @@ featured: true
             </ul>
         </div>
     </div>
-    
     <div class="section-header-custom">
         <h2>حلول هندسية مبتكرة</h2>
         <p class="subtitle-custom">استعراض للميزات الرئيسية التي تمثل حلولاً هندسية لمشاكل حقيقية.</p>
     </div>
-
     <div class="features-grid-custom">
         <div class="feature-card-custom">
             <div class="icon-custom">🔐</div>
@@ -301,22 +277,18 @@ featured: true
             <p>وحدة مخصصة باستخدام FPDF2 تتغلب على تحديات اللغة العربية، لتحويل أي لوحة تحكم إلى تقرير PDF احترافي بنقرة زر.</p>
         </div>
     </div>
-
     <div class="section-header-custom">
         <h2>الهيكل المعماري للنظام</h2>
         <p class="subtitle-custom">نظرة على كيفية ترابط مكونات النظام لتقديم تجربة سلسة ومتكاملة.</p>
     </div>
-
     <figure class="architecture-diagram-custom">
         <img src="/images/projects/reading-marathon-app/architecture.png" alt="الهيكل المعماري لمنصة ماراثون القراءة" />
         <figcaption>خط تدفق البيانات من الجمع عبر نماذج جوجل إلى التحليل والعرض في تطبيق ستريمليت.</figcaption>
     </figure>
-
     <div class="section-header-custom">
         <h2>حزمة التقنيات</h2>
         <p class="subtitle-custom">الأدوات والأطر التي شكلت العمود الفقري لهذا المشروع.</p>
     </div>
-
     <div class="tech-stack-custom">
         <span class="tech-pill-custom">Python</span>
         <span class="tech-pill-custom">Streamlit</span>
@@ -327,5 +299,4 @@ featured: true
         <span class="tech-pill-custom">Google OAuth</span>
         <span class="tech-pill-custom">FPDF2</span>
     </div>
-
 </div>
