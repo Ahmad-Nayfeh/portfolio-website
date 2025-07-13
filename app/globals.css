@@ -142,3 +142,34 @@ body {
     transform: translateY(0);
   }
 }
+
+
+/* --- START: Arabic RTL Overrides for Prose --- */
+
+.prose {
+  text-align: left; /* Default LTR alignment */
+}
+
+/* Force RTL alignment when inside a container with dir="rtl" */
+[dir="rtl"] .prose {
+  text-align: right;
+}
+
+/* Align list items correctly in RTL */
+[dir="rtl"] .prose ul,
+[dir="rtl"] .prose ol {
+  padding-right: 1.625em;
+  padding-left: 0;
+}
+
+[dir="rtl"] .prose ul > li::before {
+    margin-right: -1.625em;
+    margin-left: 0.75em;
+}
+
+[dir="rtl"] .prose ol > li::before {
+    margin-right: -1.625em;
+    margin-left: 0.5em;
+}
+
+/* --- END: Arabic RTL Overrides for Prose --- */
