@@ -1,163 +1,331 @@
 ---
-title: "🏆 منصة ماراثون القراءة: رحلة إبداعية في عالم تحليل البيانات"
+title: "🏆 منصة ماراثون القراءة: هندسة نظام تحليلي متكامل لتحفيز القراءة"
 slug: "reading-marathon-app"
 lang: ar
 date: "2025-07-13"
 coverImage: "/images/projects/reading-marathon-app.jpg"
-tags: ["تحليل البيانات", "تصور البيانات", "Streamlit", "Firebase", "Pandas", "Plotly", "بايثون متكامل", "جوجل كلاود", "هندسة البيانات"]
-excerpt: "منصة رقمية متكاملة تُحوّل تجربة القراءة الجماعية إلى رحلة تفاعلية مليئة بالتحدي والإنجاز. تجمع المنصة بين قوة تحليل البيانات وسهولة الاستخدام مع نظام تحفيزي ذكي، مدعومة بتقنيات سحابية متطورة وواجهات تفاعلية جذابة تناسب المستخدم العربي."
+tags: ["هندسة البيانات", "تحليل البيانات", "Streamlit", "Firebase", "Pandas", "Plotly", "بايثون متكامل", "Google Cloud", "API Integration"]
+excerpt: "ابتكار وتطوير منظومة سحابية شاملة (End-to-End System) تستخدم هندسة البيانات والتحليلات المتقدمة لتحويل تجربة القراءة الجماعية إلى رحلة تفاعلية ومحفزة. المنصة تعالج التحديات الإدارية والتحفيزية من خلال خط بيانات آلي، ونظام ألعاب ذكي، ولوحات تحكم متطورة."
 category: "تطبيقات وتحليلات البيانات"
 githubLink: "https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud"
 liveDemoUrl: "https://reading-marathon.streamlit.app/"
-challenge: "تواجه مجموعات القراءة العربية تحديات جوهرية تتمثل في صعوبة متابعة التزام الأعضاء بشكل دقيق، وتراجع الحماس مع مرور الوقت، والعبء الإداري الهائل على المشرفين. كانت الحاجة ملحة لابتكار حل تقني متكامل يجعل تجربة القراءة أكثر متعة وتحفيزاً، مع توفير رؤى تحليلية عميقة تساعد في اتخاذ قرارات مدروسة."
-solution: "ابتكرت منظومة رقمية متكاملة تعمل كمركز شامل لإدارة وتحليل نشاط القراءة. تبدأ الرحلة من جمع البيانات عبر نماذج جوجل بطريقة سلسة، مروراً بمعالجتها وتخزينها في قاعدة بيانات Firestore السحابية، وصولاً إلى عرضها في لوحات تحكم تفاعلية مصممة بعناية. يتميز النظام بآلية ذكية للنقاط والأوسمة تحفز المشاركين على الاستمرار، مع توفير أدوات إدارية متطورة تمنح المشرفين تحكماً كاملاً وفعالاً."
-technologies:
-  - "بايثون (Python)"
-  - "ستريمليت (Streamlit)"
-  - "فايربيس (Firebase/Firestore)"
-  - "بانداز ونمباي (Pandas & NumPy)"
-  - "بلوتلي (Plotly)"
-  - "واجهات برمجة جوجل (Google Workspace API)"
-  - "نظام مصادقة جوجل (Google OAuth)"
-  - "FPDF2 (لإنشاء تقارير PDF)"
-features:
-  - "🔐 بنية سحابية آمنة متعددة المستخدمين مع نظام مصادقة متطور."
-  - "⚡ خط بيانات آلي متكامل من نماذج جوجل إلى التطبيق بدون تدخل يدوي."
-  - "💾 قاعدة بيانات NoSQL مرنة وقوية لتخزين البيانات بشكل منظم وفعال."
-  - "📊 لوحات تحليلية تفاعلية متعددة المستويات تقدم رؤى عميقة ومفيدة."
-  - "🎮 نظام تحفيزي متكامل مع نقاط وأوسمة وتصنيفات تنافسية مشوقة."
-  - "⚙️ لوحة تحكم إدارية شاملة مع أدوات متقدمة لإدارة المستخدمين والتحديات."
-  - "📄 مولد تقارير PDF احترافية باللغة العربية يعمل بشكل آلي بالكامل."
-  - "🎨 واجهة مستخدم عصرية وجذابة مصممة خصيصاً للمستخدم العربي."
 featured: true
 ---
 
-# 📚 منصة ماراثون القراءة: رحلة إبداعية في عالم البيانات
+<style>
+    /* --- Add a professional Arabic font --- */
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
 
-> **"حوّل شغفك بالقراءة إلى رحلة تفاعلية مليئة بالإنجازات والتحديات"**
+    /* --- Global Project Styles --- */
+    .project-container-custom {
+        font-family: 'Tajawal', sans-serif;
+        line-height: 1.8;
+        color: hsl(var(--foreground) / 0.9);
+    }
 
-[![تجربة التطبيق مباشرة](https://img.shields.io/badge/🚀_جرب_التطبيق-زيارة_المنصة-brightgreen?style=for-the-badge)](https://reading-marathon.streamlit.app/)
-[![المستودع على جيتهاب](https://img.shields.io/badge/GitHub-أحمد_نايفة-black?style=for-the-badge&logo=github)](https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud)
+    /* --- Custom Headers --- */
+    .section-header-custom {
+        text-align: center;
+        margin-top: 4rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+    }
+    .section-header-custom h2 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: hsl(var(--primary));
+        margin-bottom: 0.5rem;
+    }
+    .section-header-custom .subtitle-custom {
+        font-size: 1.1rem;
+        color: hsl(var(--muted-foreground));
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .section-header-custom::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 3px;
+        background: hsl(var(--primary) / 0.5);
+        border-radius: 2px;
+        margin: 1.5rem auto 0;
+    }
 
-![لقطة شاملة للمنصة](/images/projects/reading-marathon-app/dashboard.png)
+    /* --- Buttons & Links --- */
+    .cta-buttons-custom {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0 3rem;
+    }
+    .cta-buttons-custom a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    .cta-button-primary {
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+    }
+    .cta-button-primary:hover {
+        background-color: hsl(var(--primary) / 0.85);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px hsl(var(--primary) / 0.2);
+    }
+    .cta-button-secondary {
+        background-color: hsl(var(--card));
+        color: hsl(var(--primary));
+        border-color: hsl(var(--primary));
+    }
+    .cta-button-secondary:hover {
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        transform: translateY(-3px);
+    }
+    
+    /* --- Two-Column Layout for Problem/Solution --- */
+    .two-col-layout-custom {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        margin-top: 2rem;
+        align-items: start;
+    }
+    @media (min-width: 768px) {
+        .two-col-layout-custom {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    .col-box-custom {
+        padding: 2rem;
+        border-radius: 1rem;
+        background: hsl(var(--background));
+        border: 1px solid hsl(var(--border));
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -2px rgba(0,0,0,0.03);
+    }
+    .col-box-custom h3 {
+        font-size: 1.5rem;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: hsl(var(--foreground));
+        font-weight: 700;
+    }
+    .col-box-custom ul {
+        padding-right: 1.5rem;
+        margin: 0;
+        list-style-type: '✓ ';
+    }
+    .col-box-custom li {
+        margin-bottom: 0.75rem;
+        padding-right: 0.5rem;
+    }
 
-## ✨ نظرة شاملة على المشروع
+    /* --- Architecture Diagram --- */
+    .architecture-diagram-custom {
+        margin: 3rem auto;
+        padding: 1rem;
+        background: hsl(var(--muted) / 0.4);
+        border-radius: 1rem;
+        border: 1px solid hsl(var(--border));
+        text-align: center;
+    }
+    .architecture-diagram-custom img {
+        border-radius: 0.5rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .architecture-diagram-custom figcaption {
+        margin-top: 1rem;
+        font-style: italic;
+        color: hsl(var(--muted-foreground));
+    }
 
-**ماراثون القراءة** ليس مجرد تطبيق عادي، بل هو منظومة متكاملة صُممت لتحويل تجربة القراءة الجماعية التقليدية إلى رحلة رقمية مشوقة ومحفزة. يجمع المشروع بين قوة تحليل البيانات وسهولة الاستخدام، مع التركيز على تعزيز تجربة المستخدم العربي.
+    /* --- Feature Cards Grid --- */
+    .features-grid-custom {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    .feature-card-custom {
+        background: hsl(var(--card));
+        border: 1px solid hsl(var(--border));
+        border-radius: 12px;
+        padding: 1.75rem;
+        text-align: right;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+    }
+    .feature-card-custom:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.07), 0 4px 6px -4px rgba(0,0,0,0.07);
+        border-color: hsl(var(--primary) / 0.5);
+    }
+    .feature-card-custom .icon-custom {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: hsl(var(--primary));
+        line-height: 1;
+    }
+    .feature-card-custom h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-top: 0;
+        color: hsl(var(--foreground));
+    }
+    .feature-card-custom p {
+        font-size: 0.95rem;
+        color: hsl(var(--muted-foreground));
+        line-height: 1.7;
+    }
 
-تم تطوير هذه المنصة استجابة لحاجة حقيقية في مجتمع القراء العرب، حيث تعاني مجموعات القراءة من صعوبات في المتابعة والتحفيز والتحليل. تقدم المنصة حلاً شاملاً يعالج هذه التحديات من خلال نظام متكامل يجمع بين جمع البيانات وتحليلها وعرضها بطريقة جذابة ومفيدة.
+    /* --- Technology Stack --- */
+    .tech-stack-custom {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 2rem;
+    }
+    .tech-pill-custom {
+        background-color: hsl(var(--secondary));
+        color: hsl(var(--secondary-foreground));
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: 1px solid hsl(var(--border));
+        transition: all 0.2s ease-in-out;
+    }
+    .tech-pill-custom:hover {
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        border-color: hsl(var(--primary));
+        transform: scale(1.05);
+    }
+</style>
 
-## 🔍 التحديات والمشكلات
+<div class="project-container-custom">
 
-تواجه مجموعات القراءة العربية تحديات متعددة تؤثر على فعاليتها واستمراريتها:
-
-### 📋 العبء الإداري الثقيل
-* **متابعة يدوية مرهقة** - يقضي المشرفون ساعات طويلة في تتبع إنجازات الأعضاء يدوياً
-* **صعوبة التوثيق** - تشتت البيانات بين منصات متعددة يجعل الوصول إليها وتحليلها أمراً صعباً
-* **غياب الرؤية الشاملة** - صعوبة الحصول على صورة كاملة لأداء المجموعة في لحظة معينة
-
-### 🔥 تراجع الحماس والتفاعل
-* **غياب التحفيز المستمر** - فقدان الدافع مع مرور الوقت وغياب آليات التشجيع المنتظمة
-* **عدم وضوح الإنجاز** - صعوبة رؤية التقدم الشخصي والجماعي بشكل واضح ومحفز
-* **انعدام روح المنافسة الإيجابية** - غياب عنصر التحدي الذي يدفع الأعضاء للاستمرار
-
-### 📊 نقص التحليلات والرؤى
-* **قرارات غير مدروسة** - اتخاذ قرارات بناءً على انطباعات شخصية بدلاً من بيانات دقيقة
-* **صعوبة فهم الاتجاهات** - عدم القدرة على تحليل أنماط القراءة وتطورها مع الوقت
-* **غياب التخصيص** - صعوبة تقديم توصيات مخصصة تناسب كل قارئ على حدة
-
-## 💡 الحل: منصة متكاملة مدعومة بالبيانات
-
-لمواجهة هذه التحديات، قمت بتصميم وتطوير منصة شاملة تعتمد على أحدث تقنيات تحليل البيانات والحوسبة السحابية:
-
-![الهيكل المعماري للمنصة](/images/projects/reading-marathon-app/architecture.png)
-
-### 🏗️ البنية التقنية المتكاملة
-
-1. **جمع البيانات بسلاسة** - استخدام نماذج جوجل لتسجيل إنجازات القراءة بطريقة سهلة ومألوفة
-2. **معالجة وتخزين ذكي** - تنقية البيانات ومعالجتها وتخزينها في قاعدة بيانات Firestore السحابية
-3. **تحليل متعدد المستويات** - تحويل البيانات الخام إلى رؤى قيمة عبر خوارزميات تحليلية متقدمة
-4. **عرض تفاعلي جذاب** - تقديم النتائج في واجهات سهلة الاستخدام مصممة خصيصاً للمستخدم العربي
-
-### 🎯 المميزات الرئيسية
-
-#### 🔐 نظام أمان متكامل
-* مصادقة آمنة عبر حسابات جوجل
-* عزل بيانات كل مجموعة قراءة
-* صلاحيات متعددة المستويات (مشرف، قارئ، ضيف)
-
-#### 📊 تحليلات متقدمة ثلاثية المستوى
-* **لوحة تحكم عامة** - نظرة شاملة على أداء المجموعة ككل
-* **تحليلات التحدي** - متابعة تفصيلية لكل تحدي قراءة على حدة
-* **بطاقة القارئ** - تحليل شخصي مفصل لكل عضو مع توصيات مخصصة
-
-#### 🎮 نظام تحفيزي متكامل
-* نظام نقاط ذكي يكافئ الالتزام والتفوق
-* أوسمة متنوعة تُمنح عند تحقيق إنجازات محددة
-* لوحة متصدرين تعزز روح المنافسة الإيجابية
-* تحديات أسبوعية وشهرية متجددة
-
-#### ⚙️ أدوات إدارية متطورة
-* لوحة تحكم شاملة للمشرفين
-* إدارة سهلة للأعضاء والتحديات
-* محرر بيانات متقدم مع تدقيق تلقائي
-* مولد تقارير PDF احترافية باللغة العربية
-
-## 📱 معرض المنصة
-
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
-  <div style="border: 2px solid hsl(var(--border)); border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <img src="/images/projects/reading-marathon-app/dashboard.png" alt="لوحة التحكم الرئيسية" style="width: 100%; height: 200px; object-fit: cover;"/>
-    <div style="padding: 1rem; background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.1));">
-      <h4 style="margin: 0 0 0.5rem; font-weight: 600; text-align: center;">لوحة التحكم الرئيسية</h4>
-      <p style="margin: 0; font-size: 0.9rem; text-align: center;">نظرة شاملة على أداء المجموعة مع مؤشرات رئيسية</p>
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">🏆 منصة ماراثون القراءة</h1>
+        <p style="font-size: 1.25rem; max-width: 750px; margin: 0 auto; color: hsl(var(--muted-foreground));">
+            هندسة نظام تحليلي متكامل يستخدم قوة البيانات لتحويل تجربة القراءة الجماعية إلى رحلة تفاعلية ومحفزة.
+        </p>
     </div>
-  </div>
-  
-  <div style="border: 2px solid hsl(var(--border)); border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <img src="/images/projects/reading-marathon-app/challenge-analytics.png" alt="تحليلات التحدي" style="width: 100%; height: 200px; object-fit: cover;"/>
-    <div style="padding: 1rem; background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.1));">
-      <h4 style="margin: 0 0 0.5rem; font-weight: 600; text-align: center;">تحليلات التحدي</h4>
-      <p style="margin: 0; font-size: 0.9rem; text-align: center;">متابعة تفصيلية لتحديات القراءة مع رسوم بيانية تفاعلية</p>
+
+    <div class="cta-buttons-custom">
+        <a href="https://reading-marathon.streamlit.app/" target="_blank" rel="noopener noreferrer" class="cta-button-primary">
+            <span>🚀</span>
+            <span>جرب التطبيق مباشرة</span>
+        </a>
+        <a href="https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud" target="_blank" rel="noopener noreferrer" class="cta-button-secondary">
+            <span>📁</span>
+            <span>الكود المصدري</span>
+        </a>
     </div>
-  </div>
-  
-  <div style="border: 2px solid hsl(var(--border)); border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <img src="/images/projects/reading-marathon-app/reader-card.png" alt="بطاقة القارئ" style="width: 100%; height: 200px; object-fit: cover;"/>
-    <div style="padding: 1rem; background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.1));">
-      <h4 style="margin: 0 0 0.5rem; font-weight: 600; text-align: center;">بطاقة القارئ</h4>
-      <p style="margin: 0; font-size: 0.9rem; text-align: center;">ملف شخصي تفاعلي يعرض إنجازات وإحصائيات القارئ</p>
+
+    <figure class="architecture-diagram-custom">
+        <img src="/images/projects/reading-marathon-app/dashboard.png" alt="لقطة شاملة للوحة التحكم في منصة ماراثون القراءة" />
+        <figcaption>لوحة التحكم الرئيسية التي توفر رؤى شاملة لأداء المجموعة.</figcaption>
+    </figure>
+
+    <div class="section-header-custom">
+        <h2>من الفكرة إلى الواقع</h2>
+        <p class="subtitle-custom">كيف حولنا تحديات القراءة العربية إلى فرصة للابتكار الهندسي.</p>
     </div>
-  </div>
-  
-  <div style="border: 2px solid hsl(var(--border)); border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <img src="/images/projects/reading-marathon-app/admin-panel.png" alt="لوحة الإدارة" style="width: 100%; height: 200px; object-fit: cover;"/>
-    <div style="padding: 1rem; background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.1));">
-      <h4 style="margin: 0 0 0.5rem; font-weight: 600; text-align: center;">لوحة الإدارة</h4>
-      <p style="margin: 0; font-size: 0.9rem; text-align: center;">أدوات متقدمة للمشرفين لإدارة المجموعة بكفاءة</p>
+
+    <div class="two-col-layout-custom">
+        <div class="col-box-custom">
+            <h3><span>🎯</span> المشكلة الحقيقية</h3>
+            <p>تنطلق فكرة المشروع من تحديات حقيقية تواجه مجموعات القراءة:</p>
+            <ul>
+                <li><strong>العبء الإداري:</strong> استهلاك وقت المشرفين في مهام يدوية متكررة.</li>
+                <li><strong>تآكل الحماس:</strong> غياب آليات التحفيز المرئية والمستمرة.</li>
+                <li><strong>قرارات عشوائية:</strong> الاعتماد على الانطباعات بدلاً من البيانات الدقيقة.</li>
+            </ul>
+        </div>
+        <div class="col-box-custom">
+            <h3><span>💡</span> رؤيتنا للحل</h3>
+            <p>لم نكتفِ ببناء تطبيق، بل صممنا نظامًا بيئيًا متكاملًا يرتكز على:</p>
+            <ul>
+                <li><strong>الأتمتة الكاملة:</strong> خط بيانات آلي يربط بين جمع البيانات وعرضها بسلاسة.</li>
+                <li><strong>التحفيز الذكي:</strong> نظام ألعاب يكافئ الالتزام والإنجاز بفعالية.</li>
+                <li><strong>الرؤى العميقة:</strong> تحليلات متعددة المستويات لدعم اتخاذ قرارات مدروسة.</li>
+            </ul>
+        </div>
     </div>
-  </div>
+    
+    <div class="section-header-custom">
+        <h2>حلول هندسية مبتكرة</h2>
+        <p class="subtitle-custom">استعراض للميزات الرئيسية التي تمثل حلولاً هندسية لمشاكل حقيقية.</p>
+    </div>
+
+    <div class="features-grid-custom">
+        <div class="feature-card-custom">
+            <div class="icon-custom">🔐</div>
+            <h3>بنية سحابية آمنة</h3>
+            <p>باستخدام Firestore، تم تصميم بنية بيانات معزولة لكل مشرف، مع نظام مصادقة آمن عبر Google OAuth 2.0 لضمان خصوصية البيانات وأمانها.</p>
+        </div>
+        <div class="feature-card-custom">
+            <div class="icon-custom">⚡</div>
+            <h3>خط بيانات آلي</h3>
+            <p>منظومة مؤتمتة بالكامل تبدأ من نماذج جوجل، مرورًا بالمعالجة عبر Pandas، وصولًا إلى التخزين في Firestore، مما يلغي أي تدخل يدوي.</p>
+        </div>
+        <div class="feature-card-custom">
+            <div class="icon-custom">📊</div>
+            <h3>محرك تحليلات ثلاثي</h3>
+            <p>يقدم رؤى على 3 مستويات: نظرة شاملة للماراثون، تحليل تكتيكي لكل تحدي، وملف شخصي تحليلي عميق لكل قارئ على حدة.</p>
+        </div>
+        <div class="feature-card-custom">
+            <div class="icon-custom">🎮</div>
+            <h3>نظام ألعاب ذكي</h3>
+            <p>نظام نقاط وأوسمة ديناميكي ومصمم بعناية لمكافأة الالتزام الجماعي والاستمرارية الفردية، مما يعزز الحماس وروح المنافسة.</p>
+        </div>
+        <div class="feature-card-custom">
+            <div class="icon-custom">⚙️</div>
+            <h3>أدوات إدارية فائقة</h3>
+            <p>محرر سجلات ذكي يتكامل مع Google Sheets API وميزة تعطيل الأعضاء التي تتفاعل مع Google Forms API لضمان إدارة سلسة وفعالة.</p>
+        </div>
+        <div class="feature-card-custom">
+            <div class="icon-custom">📄</div>
+            <h3>مولد تقارير PDF</h3>
+            <p>وحدة مخصصة باستخدام FPDF2 تتغلب على تحديات اللغة العربية، لتحويل أي لوحة تحكم إلى تقرير PDF احترافي بنقرة زر.</p>
+        </div>
+    </div>
+
+    <div class="section-header-custom">
+        <h2>الهيكل المعماري للنظام</h2>
+        <p class="subtitle-custom">نظرة على كيفية ترابط مكونات النظام لتقديم تجربة سلسة ومتكاملة.</p>
+    </div>
+
+    <figure class="architecture-diagram-custom">
+        <img src="/images/projects/reading-marathon-app/architecture.png" alt="الهيكل المعماري لمنصة ماراثون القراءة" />
+        <figcaption>خط تدفق البيانات من الجمع عبر نماذج جوجل إلى التحليل والعرض في تطبيق ستريمليت.</figcaption>
+    </figure>
+
+    <div class="section-header-custom">
+        <h2>حزمة التقنيات</h2>
+        <p class="subtitle-custom">الأدوات والأطر التي شكلت العمود الفقري لهذا المشروع.</p>
+    </div>
+
+    <div class="tech-stack-custom">
+        <span class="tech-pill-custom">Python</span>
+        <span class="tech-pill-custom">Streamlit</span>
+        <span class="tech-pill-custom">Firebase</span>
+        <span class="tech-pill-custom">Pandas & NumPy</span>
+        <span class="tech-pill-custom">Plotly</span>
+        <span class="tech-pill-custom">Google Workspace API</span>
+        <span class="tech-pill-custom">Google OAuth</span>
+        <span class="tech-pill-custom">FPDF2</span>
+    </div>
+
 </div>
-
-## 🛠️ التقنيات المستخدمة
-
-<div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0;">
-  <span style="background: rgba(25, 118, 210, 0.1); color: #1976d2; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500; border: 1px solid rgba(25, 118, 210, 0.2);">بايثون</span>
-  <span style="background: rgba(255, 87, 34, 0.1); color: #ff5722; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500; border: 1px solid rgba(255, 87, 34, 0.2);">ستريمليت</span>
-  <span style="background: rgba(255, 193, 7, 0.1); color: #ffc107; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500; border: 1px solid rgba(255, 193, 7, 0.2);">فايربيس</span>
-  <span style="background: rgba(76, 175, 80, 0.1); color: #4caf50; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500; border: 1px solid rgba(76, 175, 80, 0.2);">بانداز</span>
-  <span style="background: rgba(156, 39, 176, 0.1); color: #9c27b0; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500; border: 1px solid rgba(156, 39, 176, 0.2);">بلوتلي</span>
-  <span style="background: rgba(33, 150, 243, 0.1); color: #2196f3; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500; border: 1px solid rgba(33, 150, 243, 0.2);">جوجل كلاود</span>
-  <span style="background: rgba(233, 30, 99, 0.1); color: #e91e63; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500; border: 1px solid rgba(233, 30, 99, 0.2);">FPDF2</span>
-</div>
-
-## 📈 التأثير والنتائج
-
-* **زيادة معدلات الالتزام** - ارتفاع نسبة إكمال التحديات بمعدل 78% مقارنة بالطرق التقليدية
-* **تحسين تجربة المستخدم** - معدل رضا يتجاوز 92% وفقاً لاستطلاعات المستخدمين
-* **توفير الوقت والجهد** - تقليص وقت الإدارة بنسبة 85% للمشرفين
-* **قرارات أفضل** - اعتماد على البيانات في تصميم التحديات وتخصيص التجربة
-
-## 🎓 الدروس المستفادة
-
-كان تطوير هذا المشروع رحلة تعليمية رائعة في بناء منتج برمجي متكامل. لقد أتاح لي الفرصة لتطبيق مهاراتي في **تحليل البيانات** في سياق أكبر يتطلب **هندسة برمجيات** و **تصميم أنظمة**.
