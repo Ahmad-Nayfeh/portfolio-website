@@ -70,6 +70,9 @@ export default async function ProjectPage({ params }: PageProps) {
       </Link>
 
       <article className="max-w-3xl mx-auto">
+        {/* ================================================================== */}
+        {/* البيانات الوصفية الأساسية للمشروع                  */}
+        {/* ================================================================== */}
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
           {project.title}
         </h1>
@@ -121,44 +124,31 @@ export default async function ProjectPage({ params }: PageProps) {
           ))}
         </div>
 
-        <div className="grid gap-8 mb-8">
-          {project.challenge && (
-            <div>
-              <h2 className="text-2xl font-bold mb-2">The Challenge</h2>
-              <p>{project.challenge}</p>
-            </div>
-          )}
-          {project.solution && (
-            <div>
-              <h2 className="text-2xl font-bold mb-2">The Solution</h2>
-              <p>{project.solution}</p>
-            </div>
-          )}
-          {project.technologies && project.technologies.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Technologies Used</h2>
-              <div className="flex flex-wrap gap-2">
-                {project.technologies.map((tech) => (
-                  <Badge key={tech}>{tech}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
-          {project.features && project.features.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Key Features</h2>
-              <ul className="list-disc pl-5 space-y-1">
-                {project.features.map((feature, index) => (
-                  <li key={index}>{feature}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+        {/* ================================================================== */}
+        {/* تمت إزالة الأقسام الثابتة من هنا                  */}
+        {/* الآن، كل المحتوى يأتي مباشرة من ملف الماركدون، مما يمنحك تحكمًا كاملاً */}
+        {/* ================================================================== */}
+        
+        {/* // The following block has been removed to allow for full customization
+          // from within the Markdown file itself.
+          
+          <div className="grid gap-8 mb-8">
+            {project.challenge && ( ... )}
+            {project.solution && ( ... )}
+            {project.technologies && ( ... )}
+            {project.features && ( ... )}
+          </div>
+        */}
 
+        {/* ================================================================== */}
+        {/* عرض المحتوى الرئيسي من ملف الماركدون             */}
+        {/* ================================================================== */}
         {project.content && <MarkdownRenderer content={project.content} />}
       </article>
 
+      {/* ================================================================== */}
+      {/* قسم المشاريع ذات الصلة                    */}
+      {/* ================================================================== */}
       {relatedProjects.length > 0 && (
         <section className="max-w-3xl mx-auto mt-16 pt-8 border-t">
           <h2 className="text-2xl font-bold mb-8">Related Projects</h2>
