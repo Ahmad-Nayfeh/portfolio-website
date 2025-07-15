@@ -11,8 +11,8 @@ featured: false
 ---
 <style>
     .project-container-grid {
-        font-family: 'Inter', sans-serif !important; /* Ensure font is applied */
-        line-height: 1.75 !important; /* Ensure line height is applied */
+        font-family: 'Inter', sans-serif;
+        line-height: 1.75;
     }
     .project-header-grid {
         text-align: center;
@@ -21,14 +21,14 @@ featured: false
         margin-bottom: 2.5rem;
     }
     .project-header-grid h1 {
-        font-size: 2.5rem !important; /* Ensure font size is applied */
-        font-weight: 800 !important; /* Ensure font weight is applied */
+        font-size: 2.5rem;
+        font-weight: 800;
         letter-spacing: -0.025em;
         margin-bottom: 0.5rem;
     }
     .project-header-grid p.subtitle {
-        font-size: 1.125rem !important; /* Ensure font size is applied */
-        color: hsl(var(--muted-foreground)) !important; /* Ensure color is applied */
+        font-size: 1.125rem;
+        color: hsl(var(--muted-foreground));
         max-width: 700px;
         margin: 0 auto;
     }
@@ -36,9 +36,9 @@ featured: false
         margin-bottom: 3rem;
     }
     .project-section-grid h2 {
-        font-size: 1.75rem !important; /* Ensure font size is applied */
-        font-weight: 700 !important; /* Ensure font weight is applied */
-        color: hsl(var(--primary)) !important; /* Ensure color is applied */
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: hsl(var(--primary));
         margin-bottom: 1.5rem;
         padding-bottom: 0.5rem;
         border-bottom: 2px solid hsl(var(--primary) / 0.1);
@@ -62,7 +62,7 @@ featured: false
     }
     .subproject-card img {
         width: 100%;
-        height: 250px; /* تم تعديل هذا السطر لزيادة ارتفاع الصورة */
+        height: 250px;
         object-fit: cover;
         border-bottom: 1px solid hsl(var(--border));
     }
@@ -70,14 +70,14 @@ featured: false
         padding: 1.5rem;
     }
     .subproject-content h3 {
-        font-size: 1.25rem !important; /* Ensure font size is applied */
-        font-weight: 700 !important; /* Ensure font weight is applied */
+        font-size: 1.25rem;
+        font-weight: 700;
         margin-top: 0;
         margin-bottom: 0.75rem;
     }
     .subproject-content p {
-        font-size: 0.95rem !important; /* Ensure font size is applied */
-        color: hsl(var(--muted-foreground)) !important; /* Ensure color is applied */
+        font-size: 0.95rem;
+        color: hsl(var(--muted-foreground));
         margin-bottom: 0;
     }
     .styled-list-grid ul {
@@ -92,7 +92,6 @@ featured: false
         border-left: 4px solid hsl(var(--primary));
     }
 </style>
-
 <div class="project-container-grid">
     <div class="project-header-grid">
         <h1>Digital Image Processing Projects</h1>
