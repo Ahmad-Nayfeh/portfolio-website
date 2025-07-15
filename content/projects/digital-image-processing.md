@@ -1,176 +1,197 @@
 ---
-title: "Digital Image Processing Projects"
-slug: "digital-image-processing"
+title: "DIP-Lib: Interactive Digital Image Processing Toolkit"
+slug: "digital-image-processing-lib"
 date: "2024-05-01"
-coverImage: "/images/projects/digital-image-processing.jpg"
+coverImage: "/images/projects/digital-image-processing-lib.jpg"
 tags: ["Image Processing", "Educational Tools", "Denoising", "Edge Detection", "Visualization"]
-excerpt: "A modular suite of classic image processing mini-projects — covering interpolation, compression, denoising, enhancement, and shading correction — with clean visual benchmarks and Python implementations."
+excerpt: "A modular Streamlit-based web app for exploring core image processing techniques — complete with parameterized controls, visual comparisons, and dynamic pipelines."
 category: "Computer Vision"
-githubLink: "https://github.com/nahmad2000/Digital-Image-Processing"
-featured: false
+githubLink: "https://github.com/nahmad2000/Digital-Image-Processing-Library"
+liveDemoUrl: "https://digital-image-processing-library-nahmad.streamlit.app/"
+challenge: "Building a real-time collaborative task management system that works seamlessly across devices was the main challenge. The app needed to handle concurrent updates from multiple users and provide a smooth, responsive experience."
+solution: "I used Firebase for real-time database and authentication, which allowed for instant updates across all connected clients. React was used for the UI, with TypeScript providing type safety and improved developer experience."
+technologies:
+  - "React"
+  - "Firebase (Firestore, Authentication)"
+  - "TypeScript"
+  - "CSS Modules"
+  - "React DnD (for drag-and-drop functionality)"
+  - "React Query"
+features:
+  - "Task creation and management"
+  - "Project organization"
+  - "Due dates and reminders"
+  - "Drag-and-drop interface"
+  - "Real-time collaboration"
+  - "User authentication and authorization"
+  - "Mobile-responsive design"
+featured: true
 ---
 
 <style>
-    .project-container-grid {
-        font-family: 'Inter', sans-serif;
-        line-height: 1.75;
-    }
-    .project-header-grid {
-        text-align: center;
-        padding: 2rem 0;
-        border-bottom: 1px solid hsl(var(--border));
-        margin-bottom: 2.5rem;
-    }
-    .project-header-grid h1 {
-        font-size: 2.5rem;
-        font-weight: 800;
-        letter-spacing: -0.025em;
-        margin-bottom: 0.5rem;
-    }
-    .project-header-grid p.subtitle {
-        font-size: 1.125rem;
-        color: hsl(var(--muted-foreground));
-        max-width: 700px;
-        margin: 0 auto;
-    }
-    .project-section-grid {
-        margin-bottom: 3rem;
-    }
-    .project-section-grid h2 {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: hsl(var(--primary));
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid hsl(var(--primary) / 0.1);
-    }
-    .subproject-gallery {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-    }
-    .subproject-card {
-        background: hsl(var(--card));
-        border: 1px solid hsl(var(--border));
-        border-radius: 0.75rem;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .subproject-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }
-    .subproject-card img {
-        width: 100%;
-        /* REMOVED FIXED HEIGHT to allow aspect ratio to be maintained */
-        /* height: 250px; */
-        object-fit: cover;
-        border-bottom: 1px solid hsl(var(--border));
-    }
-    .subproject-content {
-        padding: 1.5rem;
-    }
-    .subproject-content h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-top: 0;
-        margin-bottom: 0.75rem;
-    }
-    .subproject-content p {
-        font-size: 0.95rem;
-        color: hsl(var(--muted-foreground));
-        margin-bottom: 0;
-    }
-    .styled-list-grid ul {
-        list-style-type: none;
-        padding: 0;
-    }
-    .styled-list-grid li {
-        background-color: hsl(var(--secondary));
-        padding: 0.75rem 1rem;
-        border-radius: 0.5rem;
-        margin-bottom: 0.5rem;
-        border-left: 4px solid hsl(var(--primary));
-    }
+  .dip-lib-container {
+    font-family: 'Inter', sans-serif;
+  }
+  .dip-lib-header {
+    text-align: center;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+  }
+  .dip-lib-header h1 {
+    font-size: 2.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+  .dip-lib-header p {
+    font-size: 1.2rem;
+    color: hsl(var(--muted-foreground));
+    max-width: 750px;
+    margin: 0 auto;
+    text-wrap: balance;
+  }
+  .dip-lib-cta {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+  .dip-lib-cta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+  }
+  .dip-lib-cta .primary-btn {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+  .dip-lib-cta .primary-btn:hover {
+      background-color: hsl(var(--primary) / 0.85);
+      transform: translateY(-2px);
+  }
+  .dip-lib-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid hsl(var(--border));
+    padding-bottom: 0.75rem;
+  }
+  .dip-lib-module {
+    padding: 1.5rem;
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .dip-lib-module h3 {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  .dip-lib-module p, .dip-lib-module ul {
+    font-size: 1.05rem;
+    color: hsl(var(--muted-foreground));
+    line-height: 1.8;
+  }
+  .dip-lib-module ul {
+    padding-left: 1.5rem;
+    list-style-type: '✓  ';
+  }
+  .dip-lib-module li {
+    padding-left: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .dip-lib-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+  }
+  .dip-lib-gallery img {
+      border-radius: 0.5rem;
+      border: 1px solid hsl(var(--border));
+  }
 </style>
 
-<div class="project-container-grid">
-    <div class="project-header-grid">
-        <h1>Digital Image Processing Projects</h1>
-        <p class="subtitle">A modular suite of classic image processing mini-projects — covering interpolation, compression, denoising, enhancement, and shading correction — with clean visual benchmarks and Python implementations.</p>
-    </div>
+<div class="dip-lib-container">
 
-    <div class="project-section-grid">
-        <h2>🧠 Project Summary</h2>
-        <p>This repository is a curated set of image processing mini-projects developed in Python. Each subfolder tackles a key concept — such as interpolation accuracy, shading correction, or denoising — and offers an end-to-end experimental setup: from transformation to visualization. The goal is to distill theoretical concepts into practical, testable code for both learning and application.</p>
-    </div>
+<div class="dip-lib-header">
+    <h1>DIP-Lib: Interactive Digital Image Processing Toolkit</h1>
+    <p>A hands-on, visual toolkit for digital image processing — built as an interactive web app using Streamlit. Designed for learners, researchers, and engineers alike, it brings together 9 classical image processing modules into a single pipeline-based UI where users can adjust parameters, stack transformations, and observe results live.</p>
+</div>
 
-    <div class="project-section-grid">
-        <h2>📂 Subproject Gallery</h2>
-        <div class="subproject-gallery">
-            <div class="subproject-card">
-                <img src="/images/projects/digital-image-processing/dip-downsampling.png" alt="Downsampling heatmap metrics" />
-                <div class="subproject-content">
-                    <h3>🔻 1. Downsampling & Interpolation</h3>
-                    <p>This module explores how downsampling methods (Simple, Anti-aliased, Area-based) and interpolation strategies (Nearest, Bilinear, Bicubic, Lanczos) affect image quality. It generates full grids of upsampled results and evaluates combinations using SSIM and PSNR. Results show that Area-based downsampling followed by Lanczos interpolation provides the best balance of detail and structural fidelity. The module also auto-generates heatmaps to compare metric scores visually.</p>
-                </div>
-            </div>
-            <div class="subproject-card">
-                <img src="/images/projects/digital-image-processing/dip-geometry.png" alt="Rotated Image Example" />
-                <div class="subproject-content">
-                    <h3>🔄 2. Geometric Transformations</h3>
-                    <p>Applies core affine transformations in batch — including rotation, scaling, translation, and shearing — with a flexible command-line interface. All operations are applied using transformation matrices and OpenCV’s high-performance functions. What makes this unique is the ability to stack multiple transformations in a single run, apply padding, and save annotated outputs systematically. It's ideal for preprocessing pipelines or synthetic data generation.</p>
-                </div>
-            </div>
-            <div class="subproject-card">
-                <img src="/images/projects/digital-image-processing/dip-compression.png" alt="Compression Metric Barplots" />
-                <div class="subproject-content">
-                    <h3>🗜️ 3. Image Compression</h3>
-                    <p>Benchmarks JPEG, PNG, and WebP formats on file size vs. visual fidelity. It calculates Compression Ratio, MSE, PSNR, and SSIM across images, then visualizes results using bar charts, scatter plots, and summary CSV exports. Includes parallel processing for speed and customizable quality levels for each format. Perfect for evaluating trade-offs in applications like web optimization or mobile image delivery.</p>
-                </div>
-            </div>
-            <div class="subproject-card">
-                <img src="/images/projects/digital-image-processing/dip-denoising.png" alt="Denoising Filter Comparison" />
-                <div class="subproject-content">
-                    <h3>🧹 4. Image Denoising</h3>
-                    <p>Simulates noisy environments using Gaussian and Salt & Pepper noise, then applies classical denoising filters — Median, Gaussian Blur, and Non-Local Means. Outputs include before/after comparisons, metric bar charts, and histograms. It also measures how each filter performs in restoring structure (SSIM) and fidelity (PSNR), offering insight into the strengths and weaknesses of each method under controlled degradation.</p>
-                </div>
-            </div>
-            <div class="subproject-card">
-                <img src="/images/projects/digital-image-processing/dip-enhancement.png" alt="Enhanced Image Comparison" />
-                <div class="subproject-content">
-                    <h3>✨ 5. Image Enhancement</h3>
-                    <p>Applies two key enhancement techniques — Gamma Correction (Power Law) and Histogram Equalization — to improve image brightness and contrast. Users can run it interactively or through CLI with tunable parameters like gamma value and constant multiplier. The system even visualizes how the pixel intensity distribution changes before and after enhancement, helping to explain the effects beyond just the output image.</p>
-                </div>
-            </div>
-            <div class="subproject-card">
-                <img src="/images/projects/digital-image-processing/dip-shading.png" alt="Shading Correction Output" />
-                <div class="subproject-content">
-                    <h3>🌗 6. Shading Correction</h3>
-                    <p>Corrects uneven lighting using both spatial and frequency domain techniques. The spatial method uses Gaussian blur subtraction, while the frequency method implements homomorphic filtering (with CLAHE). It includes full visualizations of corrected images and extracted illumination layers — providing both corrective outputs and insight into the nature of lighting artifacts in images.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="dip-lib-cta">
+    <a href="https://digital-image-processing-library-nahmad.streamlit.app/" target="_blank" rel="noopener noreferrer" class="primary-btn">
+        🚀 Launch the App
+    </a>
+</div>
 
-    <div class="project-section-grid styled-list-grid">
-        <h2>⚙️ Technologies Used</h2>
+<div class="dip-lib-section">
+    <h2>🧠 Project Summary</h2>
+    <p>Whether you're experimenting with thresholding or cleaning noisy images, DIP-Lib helps you build intuition through guided exploration and real-time visual feedback.</p>
+</div>
+
+<div class="dip-lib-section">
+    <h2>📂 Core Modules</h2>
+    <div class="dip-lib-module">
+        <h3>🔻 1. Downsampling & Interpolation</h3>
+        <p>Resize images with different downsampling methods (<code>simple</code>, <code>antialias</code>, <code>area</code>) and upscale them using interpolation (<code>nearest</code>, <code>bilinear</code>, <code>bicubic</code>, <code>lanczos</code>). DIP-Lib visualizes how each combination affects quality using PSNR and SSIM metrics.</p>
+    </div>
+    <div class="dip-lib-module">
+        <h3>🔄 2. Geometric Transformations</h3>
+        <p>Apply affine and projective transformations such as rotation, scaling, translation, and shearing. Parameters are controlled via sliders, and transformations can be layered and previewed dynamically.</p>
+    </div>
+    <div class="dip-lib-module">
+        <h3>🧹 3. Noise Analysis & Removal</h3>
+        <p>Add synthetic noise (Gaussian or Salt & Pepper) and evaluate denoising methods:</p>
         <ul>
-            <li>Python 3.x</li>
-            <li>OpenCV • NumPy • scikit-image</li>
-            <li>Matplotlib • Seaborn</li>
-            <li>Jupyter Notebooks • Command-line Interfaces</li>
-            <li>Parallel Processing (Compression module)</li>
+            <li><strong>Median Filter</strong> (great for impulse noise)</li>
+            <li><strong>Gaussian Blur</strong> (for smoothing)</li>
+            <li><strong>Non-Local Means</strong> (for preserving texture)</li>
         </ul>
     </div>
-
-    <div class="project-section-grid styled-list-grid">
-        <h2>🧠 Key Takeaways</h2>
-        <ul>
-            <li>Each subproject translates a fundamental image processing technique into hands-on, reproducible experiments.</li>
-            <li>Visualizations make metric-based evaluation clear and digestible.</li>
-            <li>Modular code design allows you to plug components into larger CV pipelines or teaching demos.</li>
-        </ul>
+    <div class="dip-lib-module">
+        <h3>✨ 4. Image Enhancement</h3>
+        <p>Boost brightness and contrast using Gamma Correction, Histogram Equalization, and CLAHE (adaptive enhancement).</p>
     </div>
+    <div class="dip-lib-module">
+        <h3>🌗 5. Lighting Correction</h3>
+        <p>Fix non-uniform lighting using spatial filtering (Gaussian blur subtraction) or homomorphic filtering (frequency domain).</p>
+    </div>
+    <div class="dip-lib-module">
+        <h3>🔬 6. Edge Detection & Sharpening</h3>
+        <p>Compare classic edge detectors (Sobel, Scharr, Laplacian, Canny) and apply Unsharp Masking to enhance fine details.</p>
+    </div>
+    <div class="dip-lib-module">
+        <h3>⚪ 7. Thresholding & Color Spaces</h3>
+        <p>Convert images to binary using global, adaptive, or advanced methods like Otsu's. Also, convert images between BGR, RGB, GRAY, HSV, and other color spaces.</p>
+    </div>
+</div>
+
+<div class="dip-lib-section">
+    <h2>🛠️ Technologies Used</h2>
+    <ul>
+        <li>Streamlit (UI framework)</li>
+        <li>OpenCV (image manipulation)</li>
+        <li>NumPy, scikit-image (processing utilities)</li>
+        <li>Matplotlib, Seaborn (metrics visualization)</li>
+    </ul>
+</div>
+
+<div class="dip-lib-section">
+    <h2>📸 Sample Gallery</h2>
+    <div class="dip-lib-gallery">
+        <img src="/images/projects/digital-image-processing-lib/demo1.png" alt="Demo Screenshot 1" />
+        <img src="/images/projects/digital-image-processing-lib/demo2.png" alt="Demo Screenshot 2" />
+        <img src="/images/projects/digital-image-processing-lib/demo3.png" alt="Demo Screenshot 3" />
+    </div>
+</div>
+
 </div>
