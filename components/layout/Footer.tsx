@@ -60,10 +60,15 @@ export default function Footer() {
                   About
                 </Link>
               </li>
-              {/* 👇 هذا هو السطر الجديد الذي تمت إضافته */}
               <li>
                 <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
                   Privacy Policy
+                </Link>
+              </li>
+              {/* 👇 هذا هو السطر الجديد الذي تمت إضافته لشروط الخدمة */}
+              <li>
+                <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Terms of Service
                 </Link>
               </li>
             </ul>
