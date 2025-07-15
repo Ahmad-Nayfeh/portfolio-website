@@ -26,7 +26,7 @@ featured: false
         letter-spacing: -0.025em;
         margin-bottom: 0.5rem;
     }
-    .project-header-grid p {
+    .project-header-grid p.subtitle {
         font-size: 1.125rem;
         color: hsl(var(--muted-foreground));
         max-width: 700px;
@@ -80,11 +80,11 @@ featured: false
         color: hsl(var(--muted-foreground));
         margin-bottom: 0;
     }
-    .tech-list-grid ul, .takeaways-list-grid ul {
+    .styled-list-grid ul {
         list-style-type: none;
         padding: 0;
     }
-    .tech-list-grid li, .takeaways-list-grid li {
+    .styled-list-grid li {
         background-color: hsl(var(--secondary));
         padding: 0.75rem 1rem;
         border-radius: 0.5rem;
@@ -96,7 +96,7 @@ featured: false
 <div class="project-container-grid">
     <div class="project-header-grid">
         <h1>Digital Image Processing Projects</h1>
-        <p>A modular suite of classic image processing mini-projects — covering interpolation, compression, denoising, enhancement, and shading correction — with clean visual benchmarks and Python implementations.</p>
+        <p class="subtitle">A modular suite of classic image processing mini-projects — covering interpolation, compression, denoising, enhancement, and shading correction — with clean visual benchmarks and Python implementations.</p>
     </div>
 
     <div class="project-section-grid">
@@ -152,7 +152,7 @@ featured: false
         </div>
     </div>
 
-    <div class="project-section-grid tech-list-grid">
+    <div class="project-section-grid styled-list-grid">
         <h2>⚙️ Technologies Used</h2>
         <ul>
             <li>Python 3.x</li>
@@ -163,7 +163,7 @@ featured: false
         </ul>
     </div>
 
-    <div class="project-section-grid takeaways-list-grid">
+    <div class="project-section-grid styled-list-grid">
         <h2>🧠 Key Takeaways</h2>
         <ul>
             <li>Each subproject translates a fundamental image processing technique into hands-on, reproducible experiments.</li>
