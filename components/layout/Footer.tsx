@@ -60,6 +60,12 @@ export default function Footer() {
                   About
                 </Link>
               </li>
+              {/* 👇 هذا هو السطر الجديد الذي تمت إضافته */}
+              <li>
+                <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
             </ul>
           </div>
 
