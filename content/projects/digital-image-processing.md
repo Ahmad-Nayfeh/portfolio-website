@@ -9,6 +9,7 @@ category: "Computer Vision"
 githubLink: "https://github.com/nahmad2000/Digital-Image-Processing"
 featured: false
 ---
+
 <style>
     .project-container-grid {
         font-family: 'Inter', sans-serif;
@@ -92,6 +93,7 @@ featured: false
         border-left: 4px solid hsl(var(--primary));
     }
 </style>
+
 <div class="project-container-grid">
     <div class="project-header-grid">
         <h1>Digital Image Processing Projects</h1>
