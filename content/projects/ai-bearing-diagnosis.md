@@ -1,3 +1,4 @@
+---
 title: "AI-Powered Bearing Fault Diagnosis"
 slug: "ai-bearing-diagnosis"
 date: "2025-06-09"
@@ -9,35 +10,8 @@ githubLink: "https://github.com/ahmad-nayfeh/ai-bearing-diagnosis"
 liveDemoUrl: "https://ai-bearing-diagnosis-nahmad.streamlit.app/"
 challenge: "A key challenge was handling the inherent class imbalance in the CWRU bearing dataset, where healthy signals are far more common than faulty ones. Another challenge was designing an inference system that could process real-world signals of any length, as the CNN model requires a fixed-size input."
 solution: "To address class imbalance, I used the Synthetic Minority Over-sampling Technique (SMOTE) to generate new data points for the underrepresented fault classes, creating a balanced training set. For handling variable-length signals in the Streamlit app, I implemented a robust preprocessing pipeline that pads short signals and uses a sliding window approach for long signals, ensuring consistent and accurate predictions."
-technologies:
-
-"Python"
-
-"PyTorch"
-
-"Streamlit"
-
-"Scikit-learn"
-
-"Pandas & NumPy"
-
-"Imbalanced-learn"
-
-"Matplotlib & Seaborn"
-features:
-
-"Fault diagnosis for Normal, Inner Race, Outer Race, and Ball faults"
-
-"Interactive web interface for real-time signal diagnosis"
-
-"Robustly handles signals of any length (padding/windowing)"
-
-"1D CNN model optimized for vibration signal data"
-
-"Data augmentation using SMOTE to handle class imbalance"
-
-"Performance comparison between models trained on balanced vs. imbalanced data"
 featured: false
+---
 
 <style>
 .project-container-simple {
