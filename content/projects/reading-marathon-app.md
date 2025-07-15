@@ -218,6 +218,11 @@ featured: true
             اطلع على سياسة الخصوصية الخاصة بالتطبيق
         </a>
     </div>
+    <div style="text-align: center; margin-top: -2rem; margin-bottom: 3rem;">
+        <a href="/terms" style="font-size: 0.9rem; text-decoration: underline;">
+            اطلع على شروط الخدمة الخاصة بالتطبيق
+        </a>
+    </div>
     <figure class="architecture-diagram-custom">
         <img src="/images/projects/reading-marathon-app/dashboard.png" alt="لقطة شاملة للوحة التحكم في منصة ماراثون القراءة" />
         <figcaption>لوحة التحكم الرئيسية التي توفر رؤى شاملة لأداء المجموعة.</figcaption>
