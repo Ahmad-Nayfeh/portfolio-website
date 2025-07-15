@@ -11,8 +11,8 @@ featured: false
 ---
 <style>
     .project-container-grid {
-        font-family: 'Inter', sans-serif;
-        line-height: 1.75;
+        font-family: 'Inter', sans-serif !important; /* Ensure font is applied */
+        line-height: 1.75 !important; /* Ensure line height is applied */
     }
     .project-header-grid {
         text-align: center;
@@ -21,14 +21,14 @@ featured: false
         margin-bottom: 2.5rem;
     }
     .project-header-grid h1 {
-        font-size: 2.5rem;
-        font-weight: 800;
+        font-size: 2.5rem !important; /* Ensure font size is applied */
+        font-weight: 800 !important; /* Ensure font weight is applied */
         letter-spacing: -0.025em;
         margin-bottom: 0.5rem;
     }
     .project-header-grid p.subtitle {
-        font-size: 1.125rem;
-        color: hsl(var(--muted-foreground));
+        font-size: 1.125rem !important; /* Ensure font size is applied */
+        color: hsl(var(--muted-foreground)) !important; /* Ensure color is applied */
         max-width: 700px;
         margin: 0 auto;
     }
@@ -36,9 +36,9 @@ featured: false
         margin-bottom: 3rem;
     }
     .project-section-grid h2 {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: hsl(var(--primary));
+        font-size: 1.75rem !important; /* Ensure font size is applied */
+        font-weight: 700 !important; /* Ensure font weight is applied */
+        color: hsl(var(--primary)) !important; /* Ensure color is applied */
         margin-bottom: 1.5rem;
         padding-bottom: 0.5rem;
         border-bottom: 2px solid hsl(var(--primary) / 0.1);
@@ -62,7 +62,7 @@ featured: false
     }
     .subproject-card img {
         width: 100%;
-        height: 200px;
+        height: 250px; /* تم تعديل هذا السطر لزيادة ارتفاع الصورة */
         object-fit: cover;
         border-bottom: 1px solid hsl(var(--border));
     }
@@ -70,21 +70,21 @@ featured: false
         padding: 1.5rem;
     }
     .subproject-content h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-size: 1.25rem !important; /* Ensure font size is applied */
+        font-weight: 700 !important; /* Ensure font weight is applied */
         margin-top: 0;
         margin-bottom: 0.75rem;
     }
     .subproject-content p {
-        font-size: 0.95rem;
-        color: hsl(var(--muted-foreground));
+        font-size: 0.95rem !important; /* Ensure font size is applied */
+        color: hsl(var(--muted-foreground)) !important; /* Ensure color is applied */
         margin-bottom: 0;
     }
-    .styled-list ul {
+    .styled-list-grid ul {
         list-style-type: none;
         padding: 0;
     }
-    .styled-list li {
+    .styled-list-grid li {
         background-color: hsl(var(--secondary));
         padding: 0.75rem 1rem;
         border-radius: 0.5rem;
@@ -92,15 +92,18 @@ featured: false
         border-left: 4px solid hsl(var(--primary));
     }
 </style>
+
 <div class="project-container-grid">
     <div class="project-header-grid">
         <h1>Digital Image Processing Projects</h1>
         <p class="subtitle">A modular suite of classic image processing mini-projects — covering interpolation, compression, denoising, enhancement, and shading correction — with clean visual benchmarks and Python implementations.</p>
     </div>
+
     <div class="project-section-grid">
         <h2>🧠 Project Summary</h2>
         <p>This repository is a curated set of image processing mini-projects developed in Python. Each subfolder tackles a key concept — such as interpolation accuracy, shading correction, or denoising — and offers an end-to-end experimental setup: from transformation to visualization. The goal is to distill theoretical concepts into practical, testable code for both learning and application.</p>
     </div>
+
     <div class="project-section-grid">
         <h2>📂 Subproject Gallery</h2>
         <div class="subproject-gallery">
@@ -148,7 +151,8 @@ featured: false
             </div>
         </div>
     </div>
-    <div class="project-section-grid styled-list">
+
+    <div class="project-section-grid styled-list-grid">
         <h2>⚙️ Technologies Used</h2>
         <ul>
             <li>Python 3.x</li>
@@ -158,7 +162,8 @@ featured: false
             <li>Parallel Processing (Compression module)</li>
         </ul>
     </div>
-    <div class="project-section-grid styled-list">
+
+    <div class="project-section-grid styled-list-grid">
         <h2>🧠 Key Takeaways</h2>
         <ul>
             <li>Each subproject translates a fundamental image processing technique into hands-on, reproducible experiments.</li>
