@@ -263,3 +263,49 @@ body {
 }
 
 /* === PROJECT PAGE STYLES END === */
+
+
+/* === NEW: Two-Column Layout Styles START === */
+
+.project-two-col-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  margin-top: 2.5rem;
+}
+
+@media (min-width: 992px) {
+  .project-two-col-layout {
+    grid-template-columns: 2fr 1fr; /* Main content takes 2/3, side content takes 1/3 */
+  }
+}
+
+.project-feature-box {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.project-feature-box h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 0.75rem;
+}
+
+.project-feature-box ul {
+  list-style-type: '✓ ';
+  padding-right: 1.25rem;
+  font-size: 1rem;
+}
+
+.project-feature-box li {
+  padding-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: hsl(var(--muted-foreground));
+}
+
+/* === Two-Column Layout Styles END === */
