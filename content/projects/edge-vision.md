@@ -8,68 +8,67 @@ excerpt: "Compare multiple edge detection algorithms (Sobel, Scharr, Laplacian, 
 category: "Computer Vision"
 githubLink: "https://github.com/nahmad2000/Edge-Vision"
 liveDemoUrl: "https://edge-vision-nahmad.streamlit.app/"
-challenge: "Building a real-time collaborative task management system that works seamlessly across devices was the main challenge. The app needed to handle concurrent updates from multiple users and provide a smooth, responsive experience."
-solution: "I used Firebase for real-time database and authentication, which allowed for instant updates across all connected clients. React was used for the UI, with TypeScript providing type safety and improved developer experience."
-technologies:
-  - "React"
-  - "Firebase (Firestore, Authentication)"
-  - "TypeScript"
-  - "CSS Modules"
-  - "React DnD (for drag-and-drop functionality)"
-  - "React Query"
-features:
-  - "Task creation and management"
-  - "Project organization"
-  - "Due dates and reminders"
-  - "Drag-and-drop interface"
-  - "Real-time collaboration"
-  - "User authentication and authorization"
-  - "Mobile-responsive design"
 featured: false
 ---
 
-# Edge Vision
+<div class="project-prose-container">
 
-## Overview
+## 🔬 Edge Vision: An Interactive Comparison Tool
 
-Edge Vision is a Streamlit-based application for visually comparing classical edge detection algorithms including Sobel, Scharr, Laplacian, and Canny. With an intuitive interface and adjustable parameters, users can analyze how different methods and settings influence edge detection results — all in real-time. It serves both as a learning tool and a benchmarking sandbox for vision researchers.
+<br/>
+<a href="https://edge-vision-nahmad.streamlit.app/" target="_blank" rel="noopener noreferrer" class="project-cta-link">
+    🚀 Launch the Interactive App
+</a>
 
-## Motivation
+<div class="project-two-col-layout">
 
-In traditional computer vision, edge detection is a foundational step for object recognition, segmentation, and feature extraction. However, comparing different edge detectors usually requires coding from scratch. Edge Vision solves this by offering an interactive tool where users can visually explore strengths and limitations of each algorithm side-by-side.
+  <div class="project-main-content">
+    <h3>Project Overview</h3>
+    <p>
+      Edge Vision is a Streamlit-based application for visually comparing classical edge detection algorithms including Sobel, Scharr, Laplacian, and Canny. With an intuitive interface and adjustable parameters, users can analyze how different methods influence edge detection results in real-time. It serves both as a learning tool and a benchmarking sandbox for vision researchers.
+    </p>
 
-## Technical Approach
+    <h3>Motivation</h3>
+    <p>
+      In traditional computer vision, edge detection is a foundational step for object recognition and feature extraction. However, comparing different edge detectors usually requires coding from scratch. Edge Vision solves this by offering an interactive tool where users can visually explore the strengths and limitations of each algorithm side-by-side.
+    </p>
+    
+    <h3>Reflection</h3>
+    <p>
+      This project sharpened my ability to bridge algorithmic vision concepts with user-centric interfaces. It also gave me practical experience with Streamlit app design, OpenCV filters, and scalable UI/UX structuring for educational tools. In future versions, I aim to add noise robustness testing and integration of deep edge detectors for comparison.
+    </p>
+  </div>
 
-- **Frontend**: Streamlit web interface for easy use and deployment
-- **Backbone Algorithms**: Implemented in OpenCV and wrapped in modular Python functions
-- **User Controls**:
-  - Upload or choose sample image
-  - Toggle each algorithm on/off
-  - Customize parameters: kernel size, thresholds, direction (dx/dy), and more
-- **Display Engine**:
-  - Edge results rendered in a grid layout using Matplotlib
-  - Tabs for performance notes explaining when to use each method
+  <div class="project-sidebar-content">
+    <div class="project-feature-box">
+        <h3>Technical Approach</h3>
+        <ul>
+            <li><strong>Frontend:</strong> Streamlit</li>
+            <li><strong>Algorithms:</strong> OpenCV</li>
+            <li><strong>Controls:</strong> Full parameter control</li>
+            <li><strong>Display:</strong> Matplotlib grid layout</li>
+        </ul>
+    </div>
+    <div class="project-feature-box" style="margin-top: 1.5rem;">
+        <h3>Key Features</h3>
+        <ul>
+            <li>Interactive UI</li>
+            <li>Side-by-side visualization</li>
+            <li>Custom `compare_all()` pipeline</li>
+            <li>Educational performance notes</li>
+            <li>Extensible backend</li>
+        </ul>
+    </div>
+  </div>
 
-## Key Features / Contributions
+</div>
 
-- Interactive UI with full parameter control for each detector
-- Visualization of all outputs (Original, Sobel, Scharr, Laplacian, Canny)
-- Custom `compare_all()` pipeline with clean fallback and error handling
-- Educational performance notes explaining detector pros/cons
-- Fully modular and extensible backend for adding new methods (e.g., Prewitt, Roberts)
+## 📊 Results & Gallery
+<p>The application demonstrates that **Canny** consistently produces cleaner results, **Scharr** offers sharper edges than Sobel, and **Laplacian** is useful for symmetric edge detection but is sensitive to noise.</p>
 
-## Results & Findings
+<div class="project-gallery">
+    <img src="/images/projects/edge-vision/demo1.png" alt="Edge Vision UI showing multiple algorithms" />
+    <img src="/images/projects/edge-vision/demo2.png" alt="Edge Vision UI with parameter controls" />
+</div>
 
-- **Canny** consistently produces cleaner and more accurate results when properly tuned
-- **Scharr** offers sharper edges and better gradient estimates than Sobel
-- **Laplacian** is more noise-sensitive but useful for symmetric edge detection
-- Performance visualization is highly responsive, even for large images
-
-
-![Edge Vision UI-1](/images/projects/edge-vision/demo1.png)
-![Edge Vision UI-2](/images/projects/edge-vision/demo2.png)
-
-
-## Reflection
-
-This project sharpened my ability to bridge algorithmic vision concepts with user-centric interfaces. It also gave me practical experience with Streamlit app design, OpenCV filters, and scalable UI/UX structuring for educational tools. In future versions, I aim to add noise robustness testing and integration of deep edge detectors for comparison.
+</div>
