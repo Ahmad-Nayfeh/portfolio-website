@@ -25,7 +25,7 @@ features:
   - "1D CNN model optimized for vibration signal data"
   - "Data augmentation using SMOTE to handle class imbalance"
   - "Performance comparison between models trained on balanced vs. imbalanced data"
-featured: true
+featured: false
 ---
 
 # AI-Powered Bearing Fault Diagnosis
