@@ -4,12 +4,7 @@ My career is a story about building things that work—and then making them inte
 
 As I moved into my Master's studies, my focus shifted to a new, exciting frontier: applying that same engineering rigor to the world of Artificial Intelligence. I discovered a passion for the complete lifecycle of data-driven products, from the initial spark of an idea to the final deployed application.
 
-Today, my work sits at the intersection of three key domains:
-* **Computer Vision:** Developing advanced deep learning models for tasks like automated medical image segmentation.
-* **Digital Signal Processing:** Building custom 1D CNNs to diagnose industrial faults from raw vibration signals.
-* **Data Engineering:** Architecting and deploying full-stack, cloud-native platforms that process and analyze user data in real time.
-
-My goal is to do more than just build models; it is to engineer complete, end-to-end systems that deliver tangible value and solve meaningful problems.
+> My goal is to do more than just build models; it is to engineer complete, end-to-end systems that deliver tangible value and solve meaningful problems.
 
 ## My Guiding Principles
 
