@@ -1,9 +1,11 @@
 ---
-title: "Hi, I'm Ahmad Nayfeh"
-subtitle: "Electrical Engineer focused on Signal Processing, Image Processing, AI, and computer vision."
-description: "Based in Saudi Arabia, I like developing robust, scalable AI systems that bridge academic research with real-world impact."
+title: "Ahmad Nayfeh"
+subtitle: "AI Engineer & Data Scientist"
+description: "I architect and deploy end-to-end intelligent systems, transforming complex data from medical imaging and industrial sensors into production-ready applications."
 ---
 
-# Welcome to My Portfolio
+# From Data to Deployed Solution
 
-I design and build intelligent systems that solve meaningful problems. Currently, I’m a master of science student at King Fahd University of Petroleum and Minerals (KFUPM), focusing on self-supervised learning, signal processing, and scientific AI.
+Welcome. I am an AI Engineer with a passion for building robust, full-stack systems that solve meaningful problems. My work combines **Computer Vision**, **Signal Processing**, and **Cloud-Native Data Engineering** to deliver solutions that are not just technically sound, but also scalable and impactful.
+
+Explore my projects to see how I leverage deep learning and rigorous engineering principles to turn raw data into actionable insights.
