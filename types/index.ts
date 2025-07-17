@@ -69,3 +69,9 @@ export interface EducationItem {
   endDate: string
   description: string
 }
+
+export interface HomeContent {
+  title: string
+  subtitle: string
+  description: string // Add this line
+}
