@@ -1,0 +1,32 @@
+# streams/_defaults.yaml
+#
+# Shared settings inherited by every stream. A stream's own YAML overrides
+# only the keys that actually differ — everything else falls through to here.
+#
+# Edit with care: changes here ripple to every stream.
+
+generation:
+  fallback_model: "claude-haiku-4-5"
+  use_batch_api: true              # 50% discount; weekly jobs aren't urgent
+  max_output_tokens: 64000         # safety net only — NOT a content cap
+
+demo:
+  enabled: false                   # streams that want demos opt in
+  runtime: github_actions_cpu
+  timeout_minutes: 15
+  output_dir: "public/blog-images/{slug}"
+  on_failure: strip_demo_section   # strip_demo_section | fail_pipeline | leave_with_warning
+
+approval:
+  method: github_pr_auto_merge     # bot opens PR; auto-merges if Vercel preview build is green
+  reviewers: ["Ahmad-Nayfeh"]
+  branch_pattern: "auto/{stream-id}/{slug}"
+  pr_title_pattern: "[{stream-name}] {post-title}"
+
+quality_gates:
+  build_validation: true           # `next build` against the new MDX before merging
+  require_verbatim_quotes: 0       # 0 = disabled by default; streams opt in
+  # No min_word_count. Length follows depth.
+
+content:
+  cover_image: auto                # auto | none | path

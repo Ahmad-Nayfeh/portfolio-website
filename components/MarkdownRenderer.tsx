@@ -1,10 +1,16 @@
 // components/MarkdownRenderer.tsx
+//
+// Markdown renderer for non-blog content: about-story, project descriptions,
+// home intro. Blog posts use components/MdxRenderer.tsx instead.
+//
+// rehype-raw stays — some project .md files contain raw HTML (e.g. <div class=
+// "...">) that the project pages depend on. Those files are not migrated to
+// MDX in Layer B; if Layer C migrates them, this file can drop rehype-raw.
 "use client"
 
 import ReactMarkdown from "react-markdown"
-import rehypeHighlight from "rehype-highlight"
-import rehypeRaw from "rehype-raw" // <--- تأكدنا من وجوده
-import remarkGfm from 'remark-gfm'   // <--- إضافة مكتبة لدعم الجداول بشكل أفضل
+import rehypeRaw from "rehype-raw"
+import remarkGfm from "remark-gfm"
 
 interface MarkdownRendererProps {
   content: string
@@ -14,19 +20,15 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <div className="prose dark:prose-invert max-w-none prose-lg">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]} // <-- إضافة لدعم الجداول
-        rehypePlugins={[
-          rehypeRaw,               // <-- هذا هو الأهم، لعرض الـ HTML
-          rehypeHighlight
-        ]}
-        // المكونات التالية تضمن أن الروابط الخارجية تفتح في تبويب جديد
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw]}
         components={{
           a: ({ node, ...props }) => {
-            if (props.href && (props.href.startsWith('http') || props.href.startsWith('//'))) {
-              return <a {...props} target="_blank" rel="noopener noreferrer" />;
+            if (props.href && (props.href.startsWith("http") || props.href.startsWith("//"))) {
+              return <a {...props} target="_blank" rel="noopener noreferrer" />
             }
-            return <a {...props} />;
-          }
+            return <a {...props} />
+          },
         }}
       >
         {content}

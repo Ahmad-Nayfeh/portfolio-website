@@ -7,7 +7,7 @@ import { getPostBySlug, getRelatedPosts, getAllPosts } from "@/lib/content"
 import { Badge } from "@/components/ui/badge"
 import RelatedPosts from "@/components/RelatedPosts"
 import { formatDate } from "@/lib/utils"
-import MarkdownRenderer from "@/components/MarkdownRenderer"
+import MdxRenderer from "@/components/MdxRenderer"
 import type { FullPost } from "@/types"
 
 // Define the parameter structure for generateStaticParams
@@ -108,7 +108,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         </div>
 
         {/* Ensure content exists before rendering */}
-        {post.content && <MarkdownRenderer content={post.content} />}
+        {post.content && <MdxRenderer source={post.content} />}
       </article>
 
       {relatedPosts.length > 0 && (
