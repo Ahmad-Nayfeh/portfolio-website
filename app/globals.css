@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import highlight.js theme for code syntax highlighting */
-@import "highlight.js/styles/github.css"; /* ONLY Light Mode Theme */
-/* @import "highlight.js/styles/github-dark.css"; */ /* REMOVED Dark Mode Theme Import */
+/* Code syntax highlighting is handled by Shiki via rehype-pretty-code at build
+ * time (see lib/content.ts). Shiki injects its own inline `style` attributes
+ * for token colors, so no external highlight.js stylesheet is needed. */
 
 @layer utilities {
   .text-balance {
@@ -117,7 +117,7 @@
           min-w-full /* Ensure code block takes full width */
           bg-transparent p-0 border-none text-sm text-inherit; /* Reset background/padding/border, inherit text color */
    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; /* Common monospace fonts */
-   /* The actual syntax colors (keywords, strings, etc.) come from github.css */
+   /* The actual syntax colors come from Shiki inline styles (rehype-pretty-code). */
 }
 
 /* Base image styling */
