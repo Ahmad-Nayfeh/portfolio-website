@@ -1,4 +1,12 @@
 // File: app/privacy/page.tsx
+//
+// ORPHAN PAGE — Privacy policy for the "Reading Marathon" Arabic mobile app
+// (a separate Ahmad project), not for this portfolio site. Kept here so the
+// /privacy URL continues to resolve for that app's listing. Revisit during
+// Layer C: either move this content under a sub-route (e.g. /apps/reading-marathon/privacy)
+// or migrate it to a dedicated property. Layer A only documents the orphan status.
+
+/* eslint-disable react/no-unescaped-entities */
 
 import { ShieldCheck, UserCircle, Database, Trash2, FileText, GitBranch } from 'lucide-react';
 import type { Metadata } from 'next';

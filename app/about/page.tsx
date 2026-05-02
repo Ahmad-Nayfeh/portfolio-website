@@ -37,7 +37,7 @@ export default async function AboutPage() {
 
         <div className="lg:col-span-2">
           <div className="prose dark:prose-invert max-w-none">
-            <h2>Hello, I'm {aboutContent.name}</h2>
+            <h2>Hello, I&apos;m {aboutContent.name}</h2>
             <p className="text-xl mb-6">{aboutContent.tagline}</p>
             <MarkdownRenderer content={aboutContent.bio} />
           </div>
