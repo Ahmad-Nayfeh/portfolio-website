@@ -23,7 +23,12 @@ discovery:
   lookback_days: 7
   top_n: 10
   filters:
-    categories: ["cs.LG", "cs.CL", "cs.AI", "stat.ML"]
+    # HF Daily Papers is already curated to AI/ML papers — no need to filter
+    # by arXiv categories (cs.LG, cs.CL, ...). HF tags papers with its own
+    # taxonomy (computer_vision, natural_language_processing, ...) which
+    # doesn't match arXiv codes, so any explicit category list here would
+    # reject everything. Re-add only if we switch source to `arxiv`.
+    categories: []
     min_upvotes: 5
   selection:
     method: claude_picks            # claude_picks | top_voted | manual
