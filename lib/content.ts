@@ -13,6 +13,11 @@ import type {
   EducationItem,
 } from "@/types"
 import yaml from "js-yaml"
+import {
+  PostFrontmatter,
+  ProjectFrontmatter,
+  parseFrontmatter,
+} from "@/lib/schemas"
 
 const contentDirectory = path.join(process.cwd(), "content")
 
@@ -145,23 +150,24 @@ export async function getAllProjects(): Promise<Project[]> {
     if (file.endsWith(".md")) {
       const projectFile = readMarkdownFile(`projects/${file}`);
       if (projectFile?.data) {
-        const slug = projectFile.data.slug || file.replace(/\.md$/, "");
+        const fm = parseFrontmatter(ProjectFrontmatter, projectFile.data, `content/projects/${file}`);
+        const slug = fm.slug || file.replace(/\.md$/, "");
         acc.push({
-          title: projectFile.data.title ?? "Untitled Project",
+          title: fm.title,
           slug,
-          date: projectFile.data.date ?? new Date().toISOString(),
-          excerpt: projectFile.data.excerpt ?? "",
-          coverImage: projectFile.data.coverImage || "/placeholder.svg?height=600&width=800",
-          tags: projectFile.data.tags ?? [],
-          githubLink: projectFile.data.githubLink ?? "#",
-          liveDemoUrl: projectFile.data.liveDemoUrl ?? "#",
-          category: projectFile.data.category ?? "Uncategorized",
-          challenge: projectFile.data.challenge ?? "",
-          solution: projectFile.data.solution ?? "",
-          technologies: projectFile.data.technologies ?? [],
-          features: projectFile.data.features ?? [],
-          featured: projectFile.data.featured ?? false,
-          lang: projectFile.data.lang || "en",
+          date: fm.date,
+          excerpt: fm.excerpt,
+          coverImage: fm.coverImage || "/placeholder.svg?height=600&width=800",
+          tags: fm.tags,
+          githubLink: fm.githubLink ?? "#",
+          liveDemoUrl: fm.liveDemoUrl ?? "#",
+          category: fm.category,
+          challenge: fm.challenge,
+          solution: fm.solution,
+          technologies: fm.technologies,
+          features: fm.features,
+          featured: fm.featured,
+          lang: fm.lang,
         });
       }
     }
@@ -179,24 +185,25 @@ export async function getAllProjectsWithContent(): Promise<FullProject[]> {
     if (file.endsWith(".md")) {
         const projectFile = readMarkdownFile(`projects/${file}`);
         if (projectFile?.data && projectFile.content !== undefined && projectFile.content !== null) {
-            const slug = projectFile.data.slug || file.replace(/\.md$/, "");
+            const fm = parseFrontmatter(ProjectFrontmatter, projectFile.data, `content/projects/${file}`);
+            const slug = fm.slug || file.replace(/\.md$/, "");
             acc.push({
-                title: projectFile.data.title ?? "Untitled Project",
+                title: fm.title,
                 slug,
-                date: projectFile.data.date ?? new Date().toISOString(),
-                excerpt: projectFile.data.excerpt ?? "",
-                coverImage: projectFile.data.coverImage || "/placeholder.svg?height=600&width=800",
-                tags: projectFile.data.tags ?? [],
-                githubLink: projectFile.data.githubLink ?? "#",
-                liveDemoUrl: projectFile.data.liveDemoUrl ?? "#",
-                category: projectFile.data.category ?? "Uncategorized",
-                challenge: projectFile.data.challenge ?? "",
-                solution: projectFile.data.solution ?? "",
-                technologies: projectFile.data.technologies ?? [],
-                features: projectFile.data.features ?? [],
+                date: fm.date,
+                excerpt: fm.excerpt,
+                coverImage: fm.coverImage || "/placeholder.svg?height=600&width=800",
+                tags: fm.tags,
+                githubLink: fm.githubLink ?? "#",
+                liveDemoUrl: fm.liveDemoUrl ?? "#",
+                category: fm.category,
+                challenge: fm.challenge,
+                solution: fm.solution,
+                technologies: fm.technologies,
+                features: fm.features,
                 content: projectFile.content,
-                lang: projectFile.data.lang || "en",
-                featured: projectFile.data.featured ?? false,
+                lang: fm.lang,
+                featured: fm.featured,
             });
         }
     }
@@ -242,19 +249,20 @@ export async function getAllPosts(): Promise<Post[]> {
   const postFiles = readDirectory("blog")
 
   const posts = postFiles.reduce<Post[]>((acc, file) => {
-    if (file.endsWith(".md")) {
+    if (file.endsWith(".mdx")) {
         const postFile = readMarkdownFile(`blog/${file}`);
         if (postFile?.data) {
-            const slug = postFile.data.slug || file.replace(/\.md$/, "");
+            const fm = parseFrontmatter(PostFrontmatter, postFile.data, `content/blog/${file}`);
+            const slug = fm.slug || file.replace(/\.mdx$/, "");
             acc.push({
-                title: postFile.data.title ?? "Untitled Post",
+                title: fm.title,
                 slug,
-                date: postFile.data.date ?? new Date().toISOString(),
-                excerpt: postFile.data.excerpt ?? "",
-                coverImage: postFile.data.coverImage || "/placeholder.svg?height=600&width=800",
-                tags: postFile.data.tags ?? [],
-                readTime: postFile.data.readTime || "5 min read",
-                featured: postFile.data.featured ?? false,
+                date: fm.date,
+                excerpt: fm.excerpt,
+                coverImage: fm.coverImage || "/placeholder.svg?height=600&width=800",
+                tags: fm.tags,
+                readTime: fm.readTime,
+                featured: fm.featured,
             });
         }
     }
@@ -269,20 +277,21 @@ export async function getAllPostsWithContent(): Promise<FullPost[]> {
   const postFiles = readDirectory("blog")
 
   const posts = postFiles.reduce<FullPost[]>((acc, file) => {
-    if (file.endsWith(".md")) {
+    if (file.endsWith(".mdx")) {
         const postFile = readMarkdownFile(`blog/${file}`);
         if (postFile?.data && postFile.content !== undefined && postFile.content !== null) {
-            const slug = postFile.data.slug || file.replace(/\.md$/, "");
+            const fm = parseFrontmatter(PostFrontmatter, postFile.data, `content/blog/${file}`);
+            const slug = fm.slug || file.replace(/\.mdx$/, "");
             acc.push({
-                title: postFile.data.title ?? "Untitled Post",
+                title: fm.title,
                 slug,
-                date: postFile.data.date ?? new Date().toISOString(),
-                excerpt: postFile.data.excerpt ?? "",
-                coverImage: postFile.data.coverImage || "/placeholder.svg?height=600&width=800",
-                tags: postFile.data.tags ?? [],
-                readTime: postFile.data.readTime || "5 min read",
+                date: fm.date,
+                excerpt: fm.excerpt,
+                coverImage: fm.coverImage || "/placeholder.svg?height=600&width=800",
+                tags: fm.tags,
+                readTime: fm.readTime,
                 content: postFile.content,
-                featured: postFile.data.featured ?? false,
+                featured: fm.featured,
             });
         }
     }

@@ -1,0 +1,78 @@
+# streams/ai-papers.yaml
+#
+# The first stream — weekly AI paper deep dives. Picks 1–2 recent papers from
+# Hugging Face Daily Papers, asks Claude to write a structured analysis with
+# math + a small Python demo, and opens a PR that auto-merges on a green
+# Vercel preview build.
+#
+# To pause this stream: set enabled to false, or move this file into
+# streams/_disabled/.
+
+stream:
+  id: ai-papers
+  name: "Weekly AI Paper Deep Dives"
+  enabled: true
+  language: "en"
+
+schedule:
+  cron: "17 0 * * 0"               # Sunday 00:17 UTC
+  timezone: "Asia/Riyadh"          # informational; cron evaluated UTC
+
+discovery:
+  source: huggingface_daily_papers # huggingface_daily_papers | arxiv | semantic_scholar | manual
+  lookback_days: 7
+  top_n: 10
+  filters:
+    categories: ["cs.LG", "cs.CL", "cs.AI", "stat.ML"]
+    min_upvotes: 5
+  selection:
+    method: claude_picks            # claude_picks | top_voted | manual
+    count: 2
+
+content:
+  output_path: "content/blog"
+  slug_pattern: "{year}-W{week}-{topic-slug}"
+  tags: ["AI", "weekly-paper"]
+
+generation:
+  model: "claude-sonnet-4-6"
+  # Multi-stage generation. Each sub-task has narrow scope to reduce
+  # hallucination — the orchestrator in scripts/generate_post.py runs these
+  # stages in order and stitches the result.
+  stages:
+    - name: paper_summary
+      task: "Restate each paper's contribution in plain language. Cite section numbers."
+    - name: method_explanation
+      task: "Explain the method, with key equations in $$...$$. Use only what's actually in the paper."
+    - name: quote_extraction
+      task: "Pull verbatim quotes from each paper that support the analysis. Mark each quote with section/page."
+    - name: critique
+      task: "Honest strengths and weaknesses. No hype. Acknowledge what the paper doesn't claim."
+    - name: demo_code
+      task: "Write a minimal didactic Python demo (numpy/matplotlib/sklearn/scipy/CPU-pytorch). Pick the right tool."
+    - name: synthesis
+      task: "Closing section connecting the papers. Only honest connections."
+
+  system_prompt: |
+    You are a technical writer for a portfolio blog by an engineer who values
+    rigor and clarity. Write a deep, structured analysis of the selected
+    papers. Length follows depth — there is no artificial cap.
+
+    Hard rules, in order of precedence:
+      1. Never invent quotes, authors, results, or numbers. If you cannot find
+         it in the paper, say so explicitly.
+      2. Verbatim quotes must be wrapped in markdown blockquotes and labelled
+         with a paper reference (e.g. "— Smith et al., §3.2").
+      3. Math goes in $$...$$ for blocks and $...$ for inline. Use standard
+         KaTeX syntax.
+      4. Code examples must be self-contained and runnable on CPU.
+      5. Avoid hype. Connect papers to broader trends only when the connection
+         is honest, not decorative.
+
+demo:
+  enabled: true
+  output_dir: "public/blog-images/{slug}"
+
+quality_gates:
+  build_validation: true
+  require_verbatim_quotes: 2       # at least 2 quoted blocks per paper

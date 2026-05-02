@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/.pnpm-store/
 
 # next.js
 /.next/
@@ -25,3 +26,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python (scripts/)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# pipeline run summaries (workflow artifacts; never committed)
+run-summary.json
+failure-body.md
