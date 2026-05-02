@@ -1,7 +1,7 @@
 ---
 title: "Seeing Signals: How Frequency Shapes the World Around Us"
 slug: "frequency-shapes-world"
-date: "2025-04-030"
+date: "2025-04-30"
 tags: ["Signal Processing", "Frequency Analysis", "Fourier Transform", "Image Processing", "Educational Tools"]
 excerpt: "Discover how frequency analysis forms the backbone of modern technology, from image processing to medical imaging, and how understanding frequencies offers a philosophical lens into the nature of reality itself."
 readTime: "22 min read"

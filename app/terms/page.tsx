@@ -1,4 +1,12 @@
 // File: app/terms/page.tsx
+//
+// ORPHAN PAGE — Terms of service for the "Reading Marathon" Arabic mobile app
+// (a separate Ahmad project), not for this portfolio site. Kept here so the
+// /terms URL continues to resolve for that app's listing. Revisit during
+// Layer C: either move this content under a sub-route (e.g. /apps/reading-marathon/terms)
+// or migrate it to a dedicated property. Layer A only documents the orphan status.
+
+/* eslint-disable react/no-unescaped-entities */
 
 import { FileText, Shield, User, Power, AlertTriangle, RefreshCw } from 'lucide-react';
 import type { Metadata } from 'next';

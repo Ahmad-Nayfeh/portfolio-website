@@ -1,0 +1,19 @@
+# Normalize line endings to LF on commit, regardless of contributor OS.
+# Pair this with `git config core.autocrlf true` on Windows clones if you
+# want CRLF in your working tree but LF in the index/remote.
+
+* text=auto eol=lf
+
+# Binary files — never touch
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.webp   binary
+*.ico    binary
+*.pdf    binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+*.eot    binary
+*.zip    binary
