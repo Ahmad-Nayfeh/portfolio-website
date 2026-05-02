@@ -29,7 +29,11 @@ discovery:
     # doesn't match arXiv codes, so any explicit category list here would
     # reject everything. Re-add only if we switch source to `arxiv`.
     categories: []
-    min_upvotes: 5
+    # Temporarily 0 while we diagnose HF's upvote-field shape. Raise back to
+    # ~5 once the debug log in discover_papers.py confirms upvotes parse
+    # correctly. Keeping it at 0 here is safe — Claude's selection stage still
+    # picks the best 1–2 from the top_n=10.
+    min_upvotes: 0
   selection:
     method: claude_picks            # claude_picks | top_voted | manual
     count: 2

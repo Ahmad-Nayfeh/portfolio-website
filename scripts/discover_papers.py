@@ -41,6 +41,7 @@ def fetch_huggingface_daily(lookback_days: int = 7) -> list[dict[str, Any]]:
     seen: set[str] = set()
     out: list[dict[str, Any]] = []
     today = dt.date.today()
+    debug_logged = False  # log structure of the first HF item we see, for diagnosis
     for offset in range(lookback_days):
         day = today - dt.timedelta(days=offset)
         url = f"{HF_DAILY_URL}?date={day.isoformat()}"
@@ -57,6 +58,20 @@ def fetch_huggingface_daily(lookback_days: int = 7) -> list[dict[str, Any]]:
             if not arxiv_id or arxiv_id in seen:
                 continue
             seen.add(arxiv_id)
+            if not debug_logged:
+                # One-shot debug: HF reshuffled their JSON in the past, so when
+                # the upvote field disappears we want to see exactly what keys
+                # they're returning today.
+                log.info(
+                    "HF debug — wrapper keys: %s; paper keys: %s; sample upvote candidates: "
+                    "wrapper.numUniqueUpvotes=%r wrapper.upvotes=%r paper.upvotes=%r",
+                    sorted(item.keys()),
+                    sorted(paper.keys()),
+                    item.get("numUniqueUpvotes"),
+                    item.get("upvotes"),
+                    paper.get("upvotes"),
+                )
+                debug_logged = True
             out.append(_normalize_hf_paper(paper, item))
     log.info("HF Daily Papers: %d unique papers across %d days", len(out), lookback_days)
     return out
@@ -73,7 +88,15 @@ def _normalize_hf_paper(paper: dict[str, Any], wrapper: dict[str, Any]) -> dict[
         "url": f"https://arxiv.org/abs/{arxiv_id}" if arxiv_id else "",
         "pdf_url": f"https://arxiv.org/pdf/{arxiv_id}.pdf" if arxiv_id else "",
         "categories": paper.get("ai_categories") or paper.get("categories") or [],
-        "upvotes": wrapper.get("numUniqueUpvotes") or wrapper.get("upvotes") or 0,
+        # HF has moved this field around historically. Look in both the
+        # wrapper and the nested paper object, and accept several aliases.
+        "upvotes": (
+            paper.get("upvotes")
+            or paper.get("numUniqueUpvotes")
+            or wrapper.get("numUniqueUpvotes")
+            or wrapper.get("upvotes")
+            or 0
+        ),
         "published": paper.get("publishedAt") or wrapper.get("publishedAt") or "",
     }
 
