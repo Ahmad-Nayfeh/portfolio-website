@@ -256,14 +256,14 @@ demo:
 # Each generated post gets a cover rendered from the `cover_image_brief`
 # stage above. The image is saved to public/blog-images/<slug>/cover.png and
 # the file path is written into the post's frontmatter as `coverImage:`.
-# Cost (DALL-E 3 standard, May 2026): 1792x1024 = $0.08 / image. At one
-# post per week that's ~$4.16/year. Square (1024x1024) is half the cost
-# but looks wrong as a 16:9 blog header.
+# Cost (DALL-E 3, May 2026): 1792x1024 standard = $0.08 / image,
+# 1792x1024 HD = $0.12 / image. We use HD: ~$6.24/year at one cover/week,
+# crisper lines and cleaner edges (closer to the vector look we want).
 cover_image:
   enabled: true
   model: "dall-e-3"
   size: "1792x1024"                 # landscape — matches the blog header aspect
-  quality: "standard"               # "hd" doubles the cost
+  quality: "hd"                     # HD: crisper lines, closer to vector look (+$0.04/img)
   style: "natural"                  # "vivid" pushes more saturation; we don't want that
   output_dir: "public/blog-images/{slug}"
 

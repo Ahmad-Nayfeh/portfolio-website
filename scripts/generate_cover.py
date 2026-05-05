@@ -43,12 +43,21 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # A fixed style suffix that defines the "look" of every cover. Edit this in
 # one place to re-skin the entire stream.
+# Locked editorial-vector style. Every cover in the AI papers stream uses
+# this exact suffix so the whole series reads as one visual family. Cribbed
+# from the look of Quanta Magazine, Distill.pub, and MIT Technology Review.
+# When you change this, update the comment in cover_image_brief in the
+# stream YAML so the brief stage stays aligned.
 STYLE_SUFFIX = (
-    "Editorial magazine cover illustration. Minimal, abstract, conceptual. "
-    "Clean composition with negative space. Restrained color palette: warm "
-    "off-white background, deep navy, with a single electric cobalt blue "
-    "accent. Soft analog texture. Geometric and graphic, not photorealistic. "
-    "No text, no letters, no captions, no logos. Engineering-notebook aesthetic."
+    "Flat editorial vector illustration in the style of Quanta Magazine and "
+    "Distill.pub. Geometric and abstract. Minimal composition with generous "
+    "negative space. Strict three-color palette: warm off-white background "
+    "(approximately #fbf6ec), deep navy primary (approximately #0c1e3e), "
+    "and a single electric cobalt blue accent (approximately #2754d8). "
+    "Crisp vector shapes with clean edges. No gradients, no shading, no "
+    "rasterized textures, no photorealism. No people, no faces, no human "
+    "figures. No text, no letters, no captions, no logos. Scientific "
+    "magazine cover energy, not infographic."
 )
 
 
