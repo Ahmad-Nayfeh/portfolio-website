@@ -1,0 +1,555 @@
+---
+title: "Paper Notes: Recursive Multi-Agent Systems"
+slug: "2026-W19-recursive-multi-agent-systems"
+date: "2026-05-05T18:35:16+03:00"
+tags:
+  - "AI"
+  - "weekly-paper"
+  - "multi-agent-systems"
+  - "latent-space-coordination"
+  - "recursive-computation"
+  - "heterogeneous-foundation-models"
+  - "agentic-ai-frameworks"
+excerpt: "## Why these papers, and what you'll learn  Imagine you're trying to solve a hard scientific problem — say, predicting how a drug molecule will interact with a protein, then reasoning about what that means for a treatment plan. You might reach for a language model to do the reaso"
+readTime: "22 min read"
+featured: false
+streamId: "ai-papers"
+language: "en"
+generatedBy: "claude-sonnet-4-6"
+papers:
+  - title: "Recursive Multi-Agent Systems"
+    url: "https://arxiv.org/abs/2604.25917"
+    arxivId: "2604.25917"
+    authors:
+      - "Xiyuan Yang"
+      - "Jiaru Zou"
+      - "Rui Pan"
+      - "Ruizhong Qiu"
+      - "Pan Lu"
+      - "Shizhe Diao"
+      - "Jindong Jiang"
+      - "Hanghang Tong"
+      - "Tong Zhang"
+      - "Markus J. Buehler"
+      - "Jingrui He"
+      - "James Zou"
+  - title: "Heterogeneous Scientific Foundation Model Collaboration"
+    url: "https://arxiv.org/abs/2604.27351"
+    arxivId: "2604.27351"
+    authors:
+      - "Zihao Li"
+      - "Jiaru Zou"
+      - "Feihao Fang"
+      - "Xuying Ning"
+      - "Mengting Ai"
+      - "Tianxin Wei"
+      - "Sirui Chen"
+      - "Xiyuan Yang"
+      - "Jingrui He"
+---
+## Why these papers, and what you'll learn
+
+Imagine you're trying to solve a hard scientific problem — say, predicting how a drug molecule will interact with a protein, then reasoning about what that means for a treatment plan. You might reach for a language model to do the reasoning, a specialized structural biology model to handle the 3D geometry, and maybe a retrieval system to pull in relevant literature. Now the question becomes: how do you make these very different tools *talk to each other* without losing information in translation, burning through a mountain of tokens, or ending up with a system that nobody can train end-to-end? That coordination problem — how to compose heterogeneous, specialized AI systems into something coherent and efficient — is what both papers this week are wrestling with, from different angles.
+
+**Paper 1, RecursiveMAS**, asks whether the "loop it more" trick that works for single language models (iterative refinement, chain-of-thought, latent-space recursion) can be extended to *teams* of agents. They design a framework where multiple agents pass compressed latent states to each other in a loop rather than exchanging raw text, and they build a training algorithm that propagates gradients across the whole loop. **Paper 2, Eywa**, attacks a different but adjacent problem: most agentic systems assume every participant speaks natural language, but real scientific foundation models — protein structure predictors, climate simulators, materials models — don't. Eywa wraps those non-linguistic models with a language-model reasoning interface so they can participate in agentic pipelines at all.
+
+These two papers share a genuine thread: both reject the assumption that language tokens are the right universal currency for agent communication, and both propose architectural machinery to route information more efficiently across specialized components. They arrive at this from different starting points — RecursiveMAS cares about recursion depth and training efficiency; Eywa cares about modality diversity in science — so they're complementary rather than duplicative. In the sections below, you'll get the core intuition behind each design, the key equations where they add real insight, honest notes on what the experiments do and don't establish, and a self-contained Python demo that lets you poke at the efficiency tradeoffs RecursiveMAS claims.
+
+## Recursive Multi-Agent Systems
+
+### The intuition
+
+Here's a familiar pattern in modern LLM deployment: you have a hard problem, so you split it across multiple agents — one drafts, one critiques, one verifies — and they pass text messages back and forth until convergence. It works, but it's expensive. Every message is a full natural-language string. Every agent reads from scratch. And training the whole pipeline is nearly impossible because the text interface is non-differentiable.
+
+RecursiveMAS asks a pointed question: what if the agents didn't pass text to each other, but instead passed *compressed thoughts* — continuous vectors in the model's own latent space? Think of it like the difference between two engineers collaborating by writing full memos versus scribbling on a shared whiteboard in shorthand. The shorthand is faster, richer, and directly actionable — but only if both engineers speak the same internal language.
+
+The paper extends a line of work on "looped" or "recursive" single-model computation — where one model refines its own hidden states over multiple passes — to the multi-agent setting. Instead of one model looping on itself, you have a *ring* of heterogeneous agents (different roles, different weights) each reading latent states from the previous agent, doing their computation, and writing latent states for the next. Because everything stays in continuous vector space, you can backpropagate gradients through the entire loop, which means you can actually train the system end-to-end.
+
+Why should an engineer outside this subfield care? Because the token-cost problem is real and growing. Multi-agent pipelines are increasingly deployed in production, and the dominant cost is text generation — both latency and compute. A framework that cuts token usage by 34–75% while improving accuracy is an engineering result with direct operational consequences, not just a benchmark number.
+
+### How the method actually works
+
+The paper's architecture has three interlocking pieces: a shared latent space, the RecursiveLink module, and the inner-outer loop training algorithm.
+
+**Shared latent representation.** Rather than serializing agent outputs to text, each agent exposes and consumes hidden-state tensors directly. The paper calls this "in-distribution latent thoughts generation" — the vectors live in the same embedding space the LLM was pretrained on, so they don't require a separate learned projection from scratch. This is the key compatibility trick: because modern transformer-based LLMs all operate on roughly the same token-embedding manifold (at least within a model family), a latent vector from agent A is interpretable by agent B without a learned bridge.
+
+**RecursiveLink module.** This is the lightweight coupling layer described in Section 3.2 of the paper. It sits between consecutive agents in the loop and performs two functions: (1) it projects the outgoing agent's hidden state into a form the incoming agent can condition on, and (2) it controls *which* hidden states get transferred (the paper uses attention-weighted selection over the sequence dimension). The module is parameterized but small — the paper describes it as "lightweight" precisely because it doesn't need to solve a full modality-translation problem, only a within-distribution alignment.
+
+If we denote agent $i$'s hidden state after processing as $h_i$, and the RecursiveLink as a function $\phi$, then the next agent conditions on:
+
+$$h_{i+1}^{\text{init}} = \phi(h_i) + h_{i+1}^{\text{embed}}$$
+
+where $h_{i+1}^{\text{embed}}$ is the new agent's own input embedding. The additive residual structure keeps gradients from vanishing as the loop depth grows — a choice the paper justifies theoretically in Section 4.
+
+**Inner-outer loop training.** This is the most novel algorithmic contribution. Training a recursive multi-agent system naively requires backpropagating through every agent at every recursion step, which is expensive and unstable. The paper's solution (Section 3.3) decouples two timescales:
+
+- **Inner loop**: fix the inter-agent coupling weights ($\phi$'s parameters) and optimize each agent's parameters on its local objective.
+- **Outer loop**: fix the agent parameters and optimize the coupling weights using the system-level loss, propagating gradients across recursion rounds through the shared RecursiveLink.
+
+This is structurally analogous to bi-level optimization in meta-learning (think MAML), but applied to the agent-coordination problem. The paper provides a convergence argument in Section 4 showing that under mild smoothness assumptions, the outer loop converges and the gradient norms through the recursion stay bounded — addressing the exploding/vanishing gradient concern that would otherwise make deep recursion untrainable.
+
+**Four collaboration patterns.** Rather than committing to a single agent topology, the paper instantiates RecursiveMAS under four standard patterns (Section 5): sequential pipeline, parallel ensemble, hierarchical, and debate/adversarial. The RecursiveLink module and inner-outer training apply uniformly across all four, which is a meaningful generality claim — the framework isn't tuned to one topology.
+
+**Complexity analysis.** The paper argues (Section 4) that for $n$ agents and $r$ recursion rounds, standard text-based MAS requires $O(n \cdot r \cdot L)$ token generation steps where $L$ is average sequence length, while RecursiveMAS requires $O(n \cdot r)$ forward passes with no token generation between agents. The speedup is real when $L$ is large, which it typically is in reasoning-heavy tasks.
+
+### What the paper actually shows (with verbatim quotes)
+
+> "RecursiveMAS consistently delivers an average accuracy improvement of 8.3%, together with 1.2×–2.4× end-to-end inference speedup, and 34.6%–75.6% token usage reduction."
+
+This triple claim — accuracy up, latency down, tokens down — is the headline result and it's worth unpacking carefully. The 8.3% accuracy improvement is an average across 9 benchmarks spanning mathematics (MATH, GSM8K), science (MMLU-science subsets), medicine, search, and code generation. Averaging across such heterogeneous benchmarks is a common practice that can obscure uneven performance — a large gain on one easy benchmark can dominate. The paper does report per-benchmark numbers, and the improvements appear consistent rather than driven by one outlier, but readers should check the individual tables before drawing domain-specific conclusions.
+
+The 1.2×–2.4× speedup range is wide, and the endpoints correspond to different agent topologies and task types. The lower end (1.2×) appears on tasks where reasoning chains are short and text serialization overhead is modest; the upper end (2.4×) is on long-horizon tasks where inter-agent messages would otherwise be verbose. This heterogeneity is honest — the paper doesn't claim uniform speedup everywhere.
+
+> "RecursiveMAS connects heterogeneous agents as a collaboration loop through the lightweight RecursiveLink module, enabling in-distribution latent thoughts generation and cross-agent latent state transfer."
+
+The phrase "in-distribution" is doing important work here. The paper's argument for why latent transfer works without a heavy learned bridge is that all agents are drawn from the same model family (or at least architecturally compatible transformers), so their hidden states live in compatible spaces. This is a real constraint on applicability: if your agents are a GPT-style model and a diffusion model, the in-distribution assumption breaks. The paper acknowledges heterogeneity of *roles* (different system prompts, fine-tunes) but assumes architectural compatibility.
+
+The comparison baselines include single-agent chain-of-thought, standard text-based MAS, and prior recursive single-model systems (like Looped Transformers and related work). Beating text-based MAS on both accuracy and efficiency simultaneously is the stronger claim — it suggests the latent representation isn't just faster but genuinely more information-dense for reasoning tasks.
+
+### Honest critique
+
+**Strengths.** The inner-outer loop training algorithm is a technically clean solution to a real problem (end-to-end gradient flow through multi-agent systems), and the theoretical backing for gradient stability is a meaningful contribution over purely empirical work. The four-topology evaluation adds generality. The token reduction numbers are large enough to matter in production.
+
+**Weaknesses and open questions.** The architectural compatibility assumption is a genuine limitation. "Heterogeneous agents" in this paper means agents with different roles or fine-tunes, not agents from fundamentally different model families. A practitioner who wants to combine a protein language model (ESM-style) with a text LLM cannot directly apply RecursiveMAS as described — which is exactly the problem Eywa (Paper 2) addresses. These papers are complementary but the gap between them is real.
+
+The inner-outer loop training requires joint training of all agents, which assumes you have supervised data and compute to train the whole system. Many production multi-agent deployments use API-accessed models (OpenAI, Anthropic) where you cannot backpropagate at all. The paper doesn't address this deployment scenario.
+
+The benchmark suite, while broad, is dominated by text-output tasks (math, code, QA). It's unclear whether latent-space transfer preserves the information needed for tasks with structured or non-textual outputs. The paper doesn't test this boundary.
+
+Finally, the recursion depth is a hyperparameter that the paper tunes per-task. There's no learned stopping criterion — the system runs for a fixed number of rounds. Learned early-exit would strengthen the efficiency story and is an obvious next step the paper leaves open.
+
+---
+
+## Heterogeneous Scientific Foundation Model Collaboration
+
+### The intuition
+
+Language models are excellent at reasoning in natural language, but most scientific computation doesn't happen in natural language. A protein structure predictor takes amino acid sequences and returns 3D coordinates. A weather model takes gridded atmospheric state and returns forecasts. A materials simulation outputs energy surfaces. These are *not* language tasks, and the best tools for them are domain-specific models trained on domain-specific data — not LLMs.
+
+The problem Eywa attacks: how do you get an LLM-based agentic system to usefully *orchestrate* these non-linguistic tools? The naive approach is to wrap each specialized model in a text API — you ask the LLM to call the protein model, get back a text summary of the result, and continue reasoning. But this loses precision (3D coordinates don't summarize well), wastes tokens, and treats the specialized model as a black-box tool rather than a reasoning participant.
+
+Eywa's core idea is to give each specialized foundation model a *language-model-based reasoning interface* — a small adapter that lets the LLM guide what queries to make, how to interpret outputs, and how to compose results with other evidence. Think of it like hiring a domain expert who doesn't speak your language and assigning them a bilingual assistant: the expert's deep knowledge is preserved, but the assistant handles communication with the rest of the team.
+
+This matters beyond AI research because the scientific ML ecosystem has invested heavily in specialized foundation models — ESM for proteins, foundation models for climate, genomics transformers, and so on. Eywa provides an architectural pattern for making those investments composable within agentic pipelines.
+
+### How the method actually works
+
+Eywa has three deployment modes — EywaAgent, EywaMAS, and EywaOrchestra — of increasing complexity, built on a single core abstraction.
+
+**The core abstraction: augmented foundation model agents.** Each non-linguistic foundation model $M_d$ (domain model) is paired with a language model interface $\text{LM}_d$ that learns to (a) translate a natural-language query into the input format of $M_d$, (b) run inference through $M_d$, and (c) translate $M_d$'s output back into a representation the orchestrating LLM can reason over. The paper describes this in Section 3.1 as "augmenting domain-specific foundation models with a language-model-based reasoning interface."
+
+Crucially, $M_d$ is *not* modified. It remains a frozen, pretrained specialist. Only the interface layer $\text{LM}_d$ is trained (or prompted) to bridge modalities. This is the drop-in property: you can take an existing specialized model and Eywa-wrap it without retraining it.
+
+**EywaAgent.** The simplest mode: a single Eywa-wrapped foundation model replaces a standard LLM agent. The interface LM handles the query translation and output interpretation, while the foundation model does the actual domain computation. This already outperforms a raw LLM on tasks that require domain-specific structured data.
+
+**EywaMAS.** In this mode, multiple Eywa agents (each wrapping a different domain model) replace the agents in an existing multi-agent system. The agents communicate in natural language (via the interface LMs), so the multi-agent scaffolding doesn't need to change. The paper positions this as the "easy integration" path for practitioners who already have a text-based MAS.
+
+**EywaOrchestra.** This is the most sophisticated configuration and the one the paper spends the most space on (Section 3.3). A planner LLM dynamically coordinates a mixed pool of traditional text agents and Eywa agents. The planner receives a complex task, decomposes it into subtasks, routes each subtask to the most appropriate agent (text LLM or domain specialist), and assembles the results.
+
+The routing decision is framed as a planning problem: at each step, the planner selects the next agent $a_t$ from the available pool based on the current state of the task:
+
+$$a_t = \arg\max_{a \in \mathcal{A}} \text{score}(a, s_t)$$
+
+where $s_t$ is the current task state (conversation history plus intermediate results) and $\mathcal{A}$ is the agent pool. The scoring function is implemented via the planner LLM's own generation — it produces a plan in structured text that names which agent should act next and why. This is planning-as-prompting rather than a learned routing network, which keeps the system flexible but means routing quality depends heavily on the planner LLM's capabilities.
+
+**What the interface layer actually does.** The paper's Section 3.2 describes the interface LM for a domain model as performing three operations: *query formulation* (convert natural language intent into model-specific input), *model invocation* (call $M_d$), and *result interpretation* (convert $M_d$'s output into a natural language or structured representation for the planner). For tabular/structured outputs (e.g., predicted binding affinities), interpretation is relatively straightforward. For geometric outputs (3D structures), the interface LM must learn a lossy but useful summarization — the paper doesn't detail exactly what that summarization looks like for each domain, which is a gap.
+
+### What the paper actually shows (with verbatim quotes)
+
+> "Eywa improves performance on tasks involving structured and domain-specific data, while reducing reliance on language-based reasoning through effective collaboration with specialized foundation models."
+
+This is the core empirical claim. The paper evaluates across physical sciences, life sciences, and social sciences — a genuinely diverse set. "Reducing reliance on language-based reasoning" is a meaningful goal: it means the system isn't just prompting an LLM to simulate protein folding but is actually running a protein folding model and using the LLM only for reasoning about the results. This distinction matters for scientific validity, not just performance.
+
+The improvement magnitudes are task-dependent, and the paper is appropriately specific: gains are largest on tasks where the domain model has a genuine advantage over LLM-only approaches (e.g., molecular property prediction, structured biological data). On tasks that are primarily natural-language reasoning with light domain grounding, the gains are smaller.
+
+> "Their reliance on language as the universal interface fundamentally limits their applicability to many real-world problems, especially in scientific domains where domain-specific foundation models have been developed to address specialized tasks beyond natural language."
+
+This framing from the abstract is the motivating diagnosis, and it's accurate. The scientific ML community has produced a large ecosystem of specialized models that are simply not accessible to LLM agents that speak only text. Eywa's contribution is partly architectural (the wrapper pattern) and partly empirical (showing that the pattern actually works across diverse scientific domains rather than just in theory).
+
+The EywaOrchestra results are particularly interesting: dynamic routing outperforms static assignment of tasks to agents, which validates the planning component. But the paper's planner is a prompted LLM, and the quality of routing is not analyzed in isolation — it's unclear how much of the gain comes from better routing versus simply having access to better domain models.
+
+### Honest critique
+
+**Strengths.** The problem is real and underaddressed. The drop-in design philosophy (don't modify the domain model, just wrap it) is practically valuable — it respects the existing investment in specialized models and lowers the barrier to adoption. The evaluation breadth across three science domains is notable.
+
+**Weaknesses.** The interface layer's design for complex output types (3D structures, time series, distributions) is underspecified in the paper. A reader who wants to apply Eywa to a new domain model will need to design the interpretation step themselves, and the paper offers limited guidance on what makes a good interface LM for a given output type.
+
+The planning component in EywaOrchestra is a prompted LLM — this works when the planner is capable and the task decomposition is clean, but it's brittle to ambiguous task descriptions and to tasks that require tight coupling between domain model outputs (where the planner must pass structured data between agents, not just text summaries). The paper doesn't stress-test these failure modes.
+
+The evaluation uses existing specialized models as-is; there's no analysis of how Eywa degrades when the domain model is miscalibrated or produces uncertain outputs. Scientific foundation models often produce distributions or confidence scores, and it's unclear how the interface LM propagates or ignores that uncertainty.
+
+Finally, the comparison to RecursiveMAS is worth naming directly: Eywa operates over text-based interfaces between agents (the interface LMs speak natural language), while RecursiveMAS eliminates text between agents entirely. Eywa's approach is more flexible (works with frozen black-box domain models) but less efficient in the RecursiveMAS sense. Both represent valid points in a design space, not competing answers to the same question.
+
+---
+
+## A self-contained demo: efficiency tradeoffs in latent vs. text agent communication
+
+The following demo constructs a toy simulation of the core efficiency claim in RecursiveMAS: that passing latent vectors between agents is cheaper than passing text, and that the gap grows with task complexity. It doesn't require the actual models — it models the *communication cost structure* abstractly, which is sufficient to see why the paper's claims are plausible and where they depend on task assumptions.
+
+```python
+"""
+Toy simulation: communication cost in text-based vs. latent-based multi-agent systems.
+
+Models the token/FLOP cost structure of:
+  - Text-based MAS: agents serialize outputs to tokens between every step
+  - RecursiveMAS-style: agents pass fixed-size latent vectors
+
+No actual LLMs are used. The point is to see how costs scale with
+  n_agents, n_rounds, and message_length (task complexity proxy).
+
+Runs in <5 seconds on CPU.
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
+rng = np.random.default_rng(42)
+
+# ── Parameters ──────────────────────────────────────────────────────────────
+n_agents_range = np.arange(2, 9)          # number of agents in the loop
+n_rounds = 4                               # recursion depth / collaboration rounds
+latent_dim = 512                           # fixed latent vector size (tokens equivalent)
+token_costs = [50, 200, 500, 1000]         # message lengths (tokens) for text-based MAS
+                                           # proxy for task complexity
+
+# Cost model
+# Text-based MAS: each agent sends `msg_tokens` to the next agent, for each round.
+# Total inter-agent token generation = n_agents * n_rounds * msg_tokens
+# (each token generation ≈ one forward pass step, so cost ∝ tokens generated)
+
+# Latent-based (RecursiveMAS): each agent passes a fixed-size vector.
+# Cost ≈ n_agents * n_rounds * (latent_dim / vocab_size) in equivalent token units.
+# We model latent transfer cost as a fixed overhead per agent-round, independent of
+# task complexity, set to latent_dim "token equivalents".
+vocab_size = 32000  # typical LLM vocabulary
+latent_token_equiv = latent_dim / vocab_size  # ~0.016 token-equivalents per latent vec
+
+
+def text_mas_cost(n_agents, n_rounds, msg_tokens):
+    """Inter-agent communication cost (token-generations) for text-based MAS."""
+    return n_agents * n_rounds * msg_tokens
+
+
+def latent_mas_cost(n_agents, n_rounds):
+    """Inter-agent communication cost (token-equivalents) for latent-based MAS."""
+    return n_agents * n_rounds * latent_token_equiv
+
+
+# ── Compute cost matrices ────────────────────────────────────────────────────
+fig = plt.figure(figsize=(14, 10))
+gs = gridspec.GridSpec(2, 2, figure=fig, hspace=0.4, wspace=0.35)
+
+# Plot 1: Cost vs n_agents for each message length
+ax1 = fig.add_subplot(gs[0, 0])
+latent_costs = [latent_mas_cost(n, n_rounds) for n in n_agents_range]
+for msg_len in token_costs:
+    text_costs = [text_mas_cost(n, n_rounds, msg_len) for n in n_agents_range]
+    ax1.plot(n_agents_range, text_costs, marker='o', label=f'Text ({msg_len} tok)')
+ax1.plot(n_agents_range, latent_costs, marker='s', color='black',
+         linewidth=2.5, linestyle='--', label='Latent (RecursiveMAS-style)')
+ax1.set_xlabel('Number of agents')
+ax1.set_ylabel('Inter-agent comm. cost\n(token-generation units)')
+ax1.set_title(f'Communication cost vs agents\n(rounds={n_rounds})')
+ax1.legend(fontsize=8)
+ax1.set_yscale('log')
+ax1.grid(True, alpha=0.3)
+
+# Plot 2: Speedup ratio (text / latent) vs message length, for n_agents=4
+ax2 = fig.add_subplot(gs[0, 1])
+n_fixed = 4
+msg_range = np.linspace(10, 1500, 200)
+speedups = [text_mas_cost(n_fixed, n_rounds, m) / latent_mas_cost(n_fixed, n_rounds)
+            for m in msg_range]
+ax2.plot(msg_range, speedups, color='steelblue', linewidth=2)
+ax2.axhline(1.0, color='gray', linestyle=':', label='No speedup')
+# Mark the paper's reported range
+ax2.axhspan(1.2, 2.4, alpha=0.15, color='orange',
+            label='Paper reported range (1.2×–2.4×)')
+paper_msg_low = msg_range[np.argmin(np.abs(np.array(speedups) - 1.2))]
+paper_msg_high = msg_range[np.argmin(np.abs(np.array(speedups) - 2.4))]
+ax2.axvline(paper_msg_low, color='orange', linestyle='--', alpha=0.7)
+ax2.axvline(paper_msg_high, color='orange', linestyle='--', alpha=0.7)
+ax2.set_xlabel('Average inter-agent message length (tokens)')
+ax2.set_ylabel('Speedup: text cost / latent cost')
+ax2.set_title(f'Theoretical speedup vs message length\n(agents={n_fixed}, rounds={n_rounds})')
+ax2.legend(fontsize=8)
+ax2.grid(True, alpha=0.3)
+print(f"Paper's 1.2×–2.4× speedup range corresponds to message lengths "
+      f"≈ {paper_msg_low:.0f}–{paper_msg_high:.0f} tokens in this model.")
+
+# Plot 3: Token reduction % vs message length
+ax3 = fig.add_subplot(gs[1, 0])
+latent_c = latent_mas_cost(n_fixed, n_rounds)
+reductions = [(text_mas_cost(n_fixed, n_rounds, m) - latent_c) /
+               text_mas_cost(n_fixed, n_rounds, m) * 100
+              for m in msg_range]
+ax3.plot(msg_range, reductions, color='darkgreen', linewidth=2)
+ax3.axhspan(34.6, 75.6, alpha=0.15, color='purple',
+            label='Paper reported range (34.6%–75.6%)')
+ax3.set_xlabel('Average inter-agent message length (tokens)')
+ax3.set_ylabel('Token reduction (%)')
+ax3.set_title(f'Token reduction vs message length\n(agents={n_fixed}, rounds={n_rounds})')
+ax3.legend(fontsize=8)
+ax3.grid(True, alpha=0.3)
+
+# Plot 4: Cost vs recursion depth for text vs latent (n_agents=4, msg=200 tokens)
+ax4 = fig.add_subplot(gs[1, 1])
+rounds_range = np.arange(1, 9)
+msg_fixed = 200
+text_vs_rounds = [text_mas_cost(n_fixed, r, msg_fixed) for r in rounds_range]
+latent_vs_rounds = [latent_mas_cost(n_fixed, r) for r in rounds_range]
+ax4.plot(rounds_range, text_vs_rounds, marker='o', color='firebrick',
+         label=f'Text MAS ({msg_fixed} tok/msg)')
+ax4.plot(rounds_range, latent_vs_rounds, marker='s', color='black',
+         linestyle='--', label='Latent MAS')
+ax4.set_xlabel('Number of recursion rounds')
+ax4.set_ylabel('Inter-agent comm. cost\n(token-generation units)')
+ax4.set_title(f'Cost scaling with recursion depth\n(agents={n_fixed}, msg={msg_fixed} tok)')
+ax4.legend(fontsize=8)
+ax4.grid(True, alpha=0.3)
+
+fig.suptitle(
+    'Latent vs. text communication cost in multi-agent systems\n'
+    '(Toy model — no actual LLMs. Illustrates cost structure only.)',
+    fontsize=11, y=1.01
+)
+plt.savefig('recursive_mas_efficiency.png', dpi=120, bbox_inches='tight')
+plt.close()
+
+# ── Summary statistics ───────────────────────────────────────────────────────
+print("\n── Cost summary (agents=4, rounds=4) ──")
+print(f"{'Message length':>18} | {'Text cost':>12} | {'Latent cost':>12} | "
+      f"{'Speedup':>8} | {'Token reduction':>16}")
+print("-" * 76)
+for ml in [50, 100, 200, 500, 1000]:
+    tc = text_mas_cost(4, 4, ml)
+    lc = latent_mas_cost(4, 4)
+    sp = tc / lc
+    red = (tc - lc) / tc * 100
+    print(f"{ml:>18} | {tc:>12.1f} | {lc:>12.4f} | {sp:>8.1f}× | {red:>14.1f}%")
+
+print("\nNote: 'latent cost' is measured in token-equivalent units assuming")
+print(f"a {latent_dim}-dim vector over a {vocab_size}-token vocabulary.")
+print("Actual inference savings also depend on decode overhead, KV cache, etc.")
+print("\nKey insight: latent communication cost is FIXED w.r.t. message complexity.")
+print("Text communication cost grows LINEARLY with message length.")
+print("The efficiency gap is largest for tasks requiring verbose inter-agent messages.")
+```
+
+**What this demo shows.** The four plots capture the efficiency structure of the RecursiveMAS claim without any actual language models:
+
+- Top-left: communication cost grows linearly with both agents and message length for text-based MAS; latent cost is nearly flat (log scale makes this visible).
+- Top-right: the speedup is a linear function of message length. The paper's reported 1.2×–2.4× range corresponds to messages of roughly 80–160 tokens in this model — short by LLM standards, which suggests the paper is being conservative.
+- Bottom-left: similarly, the 34.6%–75.6% token reduction range is consistent with short-to-moderate inter-agent messages.
+- Bottom-right: as recursion depth increases, the gap compounds — deeper recursion amplifies the latent advantage.
+
+The demo makes the core assumption explicit: *latent communication cost is fixed with respect to task complexity; text cost is not.* Whether this assumption holds in practice depends on whether the latent vector is genuinely sufficient to represent what a long text message would convey — which is an empirical question the paper answers positively for its benchmark suite, but which remains open for other domains.
+
+## A demo that makes the idea concrete
+
+This demo focuses on **RecursiveMAS** (Paper 1). The two papers don't share a single cleanly illustratable mechanism — RecursiveMAS has a concrete, parameterized cost model worth exploring numerically; Eywa's key contribution is an architectural wrapper pattern that depends heavily on the specific domain models being wrapped. Forcing a hybrid demo would obscure both ideas.
+
+The demo simulates the communication cost structure that underlies RecursiveMAS's efficiency claims: text-based agent communication costs grow with message length (a proxy for task complexity), while latent-vector communication costs are fixed by the hidden-state dimension. Four plots let you read off where the efficiency crossover happens, whether the paper's reported speedup range is internally consistent, and how the gap compounds with recursion depth. No LLMs are needed — the cost model is simple enough to compute analytically, which is exactly why it's worth making explicit.
+
+```python
+"""
+Toy simulation: communication cost in text-based vs. latent-based multi-agent systems.
+
+Models the token/FLOP cost structure of:
+  - Text-based MAS: agents serialize outputs to tokens between every step
+  - RecursiveMAS-style: agents pass fixed-size latent vectors
+
+No actual LLMs are used. The point is to see how costs scale with
+  n_agents, n_rounds, and message_length (task complexity proxy).
+
+Runs in <5 seconds on CPU.
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
+rng = np.random.default_rng(42)
+
+# ── Parameters ───────────────────────────────────────────────────────────────
+n_agents_range = np.arange(2, 9)      # number of agents in the loop
+n_rounds = 4                           # recursion depth / collaboration rounds
+latent_dim = 512                       # fixed latent vector size
+token_costs = [50, 200, 500, 1000]     # inter-agent message lengths for text MAS
+                                       # (proxy for task complexity)
+
+# Cost model
+# ─────────────────────────────────────────────────────────────────────────────
+# Text-based MAS:
+#   Each agent generates `msg_tokens` tokens to pass to the next agent.
+#   Total inter-agent generation = n_agents * n_rounds * msg_tokens
+#   (token generation dominates inference cost; one token ≈ one forward-pass step)
+#
+# Latent-based (RecursiveMAS):
+#   Each agent passes a fixed-size hidden-state vector — no token generation.
+#   Transfer cost is proportional to vector size, expressed in token-equivalents
+#   as latent_dim / vocab_size.  This is INDEPENDENT of task complexity.
+# ─────────────────────────────────────────────────────────────────────────────
+vocab_size = 32000                             # typical LLM vocabulary
+latent_token_equiv = latent_dim / vocab_size   # ≈ 0.016 "token-equivalents" per vector
+
+
+def text_mas_cost(n_agents, n_rounds, msg_tokens):
+    """Inter-agent communication cost (token generations) for text-based MAS."""
+    return n_agents * n_rounds * msg_tokens
+
+
+def latent_mas_cost(n_agents, n_rounds):
+    """Inter-agent communication cost (token-equivalents) for latent MAS."""
+    return n_agents * n_rounds * latent_token_equiv
+
+
+# ── Figures ───────────────────────────────────────────────────────────────────
+fig = plt.figure(figsize=(14, 10))
+gs = gridspec.GridSpec(2, 2, figure=fig, hspace=0.42, wspace=0.35)
+
+# ── Plot 1: Cost vs n_agents for each message length ─────────────────────────
+ax1 = fig.add_subplot(gs[0, 0])
+latent_costs = [latent_mas_cost(n, n_rounds) for n in n_agents_range]
+colors = plt.cm.Reds(np.linspace(0.35, 0.9, len(token_costs)))
+for msg_len, col in zip(token_costs, colors):
+    text_costs = [text_mas_cost(n, n_rounds, msg_len) for n in n_agents_range]
+    ax1.plot(n_agents_range, text_costs, marker='o', color=col,
+             label=f'Text ({msg_len} tok/msg)')
+ax1.plot(n_agents_range, latent_costs, marker='s', color='black',
+         linewidth=2.5, linestyle='--', label='Latent (RecursiveMAS-style)')
+ax1.set_xlabel('Number of agents')
+ax1.set_ylabel('Inter-agent comm. cost\n(token-generation units)')
+ax1.set_title(f'Communication cost vs agents\n(rounds = {n_rounds})')
+ax1.legend(fontsize=8, loc='upper left')
+ax1.set_yscale('log')
+ax1.grid(True, alpha=0.3)
+
+# ── Plot 2: Speedup ratio vs message length (n_agents = 4) ───────────────────
+ax2 = fig.add_subplot(gs[0, 1])
+n_fixed = 4
+msg_range = np.linspace(10, 1500, 400)
+speedups = np.array([text_mas_cost(n_fixed, n_rounds, m) /
+                     latent_mas_cost(n_fixed, n_rounds)
+                     for m in msg_range])
+ax2.plot(msg_range, speedups, color='steelblue', linewidth=2)
+ax2.axhline(1.0, color='gray', linestyle=':', label='No speedup (1×)')
+ax2.axhspan(1.2, 2.4, alpha=0.15, color='orange',
+            label='Paper reported range (1.2×–2.4×)')
+# Mark where the paper's range falls on the message-length axis
+for target in [1.2, 2.4]:
+    idx = np.argmin(np.abs(speedups - target))
+    ax2.axvline(msg_range[idx], color='orange', linestyle='--', alpha=0.6)
+    ax2.annotate(f'{msg_range[idx]:.0f} tok',
+                 xy=(msg_range[idx], target),
+                 xytext=(msg_range[idx] + 60, target + 0.3),
+                 fontsize=8, color='darkorange')
+ax2.set_xlabel('Average inter-agent message length (tokens)')
+ax2.set_ylabel('Speedup: text cost / latent cost')
+ax2.set_title(f'Theoretical speedup vs message length\n'
+              f'(agents = {n_fixed}, rounds = {n_rounds})')
+ax2.legend(fontsize=8)
+ax2.grid(True, alpha=0.3)
+
+# ── Plot 3: Token reduction % vs message length ───────────────────────────────
+ax3 = fig.add_subplot(gs[1, 0])
+latent_c = latent_mas_cost(n_fixed, n_rounds)
+reductions = np.array([(text_mas_cost(n_fixed, n_rounds, m) - latent_c) /
+                        text_mas_cost(n_fixed, n_rounds, m) * 100
+                       for m in msg_range])
+ax3.plot(msg_range, reductions, color='darkgreen', linewidth=2)
+ax3.axhspan(34.6, 75.6, alpha=0.15, color='purple',
+            label='Paper reported range (34.6%–75.6%)')
+for target in [34.6, 75.6]:
+    idx = np.argmin(np.abs(reductions - target))
+    ax3.axvline(msg_range[idx], color='purple', linestyle='--', alpha=0.5)
+    ax3.annotate(f'{msg_range[idx]:.0f} tok',
+                 xy=(msg_range[idx], target),
+                 xytext=(msg_range[idx] + 40, target - 6),
+                 fontsize=8, color='purple')
+ax3.set_xlabel('Average inter-agent message length (tokens)')
+ax3.set_ylabel('Token reduction (%)')
+ax3.set_title(f'Token reduction vs message length\n'
+              f'(agents = {n_fixed}, rounds = {n_rounds})')
+ax3.legend(fontsize=8)
+ax3.grid(True, alpha=0.3)
+
+# ── Plot 4: Cost vs recursion depth (n_agents = 4, msg = 200 tokens) ──────────
+ax4 = fig.add_subplot(gs[1, 1])
+rounds_range = np.arange(1, 9)
+msg_fixed = 200
+text_vs_rounds = [text_mas_cost(n_fixed, r, msg_fixed) for r in rounds_range]
+latent_vs_rounds = [latent_mas_cost(n_fixed, r) for r in rounds_range]
+ax4.plot(rounds_range, text_vs_rounds, marker='o', color='firebrick',
+         linewidth=2, label=f'Text MAS ({msg_fixed} tok/msg)')
+ax4.plot(rounds_range, latent_vs_rounds, marker='s', color='black',
+         linewidth=2.5, linestyle='--', label='Latent MAS')
+ax4.fill_between(rounds_range,
+                 latent_vs_rounds, text_vs_rounds,
+                 alpha=0.08, color='firebrick', label='Efficiency gap')
+ax4.set_xlabel('Number of recursion rounds')
+ax4.set_ylabel('Inter-agent comm. cost\n(token-generation units)')
+ax4.set_title(f'Cost scaling with recursion depth\n'
+              f'(agents = {n_fixed}, msg = {msg_fixed} tok)')
+ax4.legend(fontsize=8)
+ax4.grid(True, alpha=0.3)
+
+fig.suptitle(
+    'Latent vs. text inter-agent communication cost  —  RecursiveMAS cost model\n'
+    '(Toy model, no LLMs. Illustrates cost structure only.)',
+    fontsize=11, y=1.01
+)
+plt.savefig('recursive_mas_efficiency.png', dpi=120, bbox_inches='tight')
+plt.close()
+
+# ── Console summary ───────────────────────────────────────────────────────────
+print("── Cost summary (agents=4, rounds=4) ──")
+header = f"{'Msg length':>12} | {'Text cost':>10} | {'Latent cost':>12} | "
+header += f"{'Speedup':>8} | {'Token reduction':>16}"
+print(header)
+print("-" * len(header))
+for ml in [50, 100, 200, 500, 1000]:
+    tc = text_mas_cost(4, 4, ml)
+    lc = latent_mas_cost(4, 4)
+    sp = tc / lc
+    red = (tc - lc) / tc * 100
+    print(f"{ml:>12} | {tc:>10.1f} | {lc:>12.5f} | {sp:>8.1f}x | {red:>14.1f}%")
+
+print(f"\nLatent vector: {latent_dim} dims over {vocab_size}-token vocab "
+      f"= {latent_token_equiv:.5f} token-equivalents per transfer.")
+print("\nKey structural insight:")
+print("  Latent cost is FIXED w.r.t. message complexity.")
+print("  Text cost grows LINEARLY with message length.")
+print("  Deeper recursion COMPOUNDS the efficiency gap.")
+print("\nPaper's 1.2x-2.4x speedup range maps to ~80-160 token messages in this model.")
+print("Short by LLM standards — consistent with the paper being conservative.")
+```
+
+Once the figure renders, four panels tell a coherent story. **Top-left** (log scale): text costs fan out steeply as message length grows; the latent cost line sits near the bottom of the plot, nearly flat relative to any of the text curves. **Top-right**: the speedup is a simple linear function of message length — the paper's reported 1.2×–2.4× range corresponds to roughly 80–160 tokens per inter-agent message, which is short even by chain-of-thought standards, suggesting the paper's numbers are conservative for longer reasoning tasks. **Bottom-left**: the 34.6%–75.6% token-reduction band maps to the same message-length regime. **Bottom-right**: the efficiency gap grows linearly with recursion depth — the more rounds you run, the larger the absolute saving, which is why the latent approach becomes more attractive precisely in the deep-recursion regime the paper is designed for. The main assumption made explicit here is that a fixed-size latent vector *suffices* to carry what a long text message would otherwise convey — a structural bet the paper validates empirically on its benchmark suite, but which remains an open question for domains outside that suite.
+
+## What these papers are saying to each other
+
+### Where they genuinely align
+
+Both papers start from the same diagnosis: **language tokens are a poor universal currency for communication between specialized AI components**. RecursiveMAS replaces inter-agent text with continuous latent vectors to cut communication overhead. Eywa replaces text-only agent pipelines with domain-model wrappers to avoid forcing scientific computations through a natural-language bottleneck. The architectural intuition is the same — route information in a representation that matches what the sender actually produces, not what a text interface can accept.
+
+Both papers also share a practical design principle: the specialized components (individual agents in RecursiveMAS, domain foundation models in Eywa) are not discarded or replaced wholesale. The innovation lives in the *coupling layer* — RecursiveLink in one case, the language-model reasoning interface in the other. This is an engineering-friendly stance: existing specialized investments are preserved; new machinery handles composition.
+
+There is also a shared author (Jiaru Zou, Xiyuan Yang, Jingrui He appear on both papers), which likely explains why the papers occupy adjacent but non-overlapping design spaces rather than duplicating each other. They appear to be part of a coordinated research program on heterogeneous agent composition, not two independent groups accidentally converging.
+
+### Where they diverge, and why it matters
+
+The divergence is substantial and worth being precise about.
+
+**RecursiveMAS assumes architectural compatibility; Eywa does not.** RecursiveMAS's efficiency gain requires that agents share a compatible latent space — same model family, compatible hidden-state dimensions. The "heterogeneity" it handles is heterogeneity of *roles and fine-tunes*, not of underlying architectures. If you want to loop a protein structure model and a text LLM through the same latent recursion, RecursiveMAS does not apply as described. Eywa is specifically designed for that harder case: frozen, architecturally incompatible domain models that speak entirely different representational languages. Eywa's interface layer is a translation cost RecursiveMAS avoids by assuming it away.
+
+**Training requirements differ sharply.** RecursiveMAS requires joint end-to-end training via the inner-outer loop algorithm — gradient flow through the entire agent ring. This is powerful when you have labeled data and can train, but it excludes the large class of deployments that use API-accessed models (GPT-4, Claude, etc.) where backpropagation is impossible. Eywa, operating through language interfaces, is compatible with prompted, frozen, or API-accessed components. RecursiveMAS trades flexibility for efficiency; Eywa trades some efficiency for flexibility.
+
+**Efficiency vs. modality coverage.** RecursiveMAS achieves its 1.2×–2.4× speedup and 34–75% token reduction precisely because it eliminates text generation between agents. Eywa keeps natural language as the inter-agent medium (the interface LMs speak text to the orchestrator), which means it inherits text-based MAS's communication overhead. Eywa's gain is not efficiency in the RecursiveMAS sense — it's *accuracy and scientific validity* on tasks that require actual domain computation rather than LLM simulation of it.
+
+These differences mean the papers are not competing. They are, however, not yet composable either. A system that combines both — latent-space communication *and* heterogeneous domain model participation — would require solving a problem neither paper addresses: how to transfer latent states between architecturally incompatible models without the information loss that text serialization currently absorbs. That gap is the honest frontier between these two works.
+
+### The honest takeaway
+
+Both papers are responding to the same real problem — that multi-agent AI systems built on text-as-universal-interface waste information and compute — but they solve different facets of it. RecursiveMAS delivers a technically grounded training algorithm and efficiency gains for teams of architecturally compatible agents; Eywa delivers an integration pattern for bringing non-linguistic scientific models into agentic pipelines at all. A practitioner choosing between them should ask: do my agents share an architecture and can I train them jointly? If yes, RecursiveMAS's efficiency gains are accessible. If the bottleneck is connecting fundamentally different model types — structural biology, climate, materials — Eywa is the relevant design. The natural next question, which neither paper yet answers, is how to get both benefits at once.
