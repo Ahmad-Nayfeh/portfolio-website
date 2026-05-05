@@ -156,6 +156,19 @@ generation:
 
         500–800 words total for this section.
 
+        CRITICAL — NO CODE BLOCKS IN THIS SECTION:
+        - Do NOT include any ```python fenced code blocks. The runnable
+          demo lives in the previous stage (`unified_demo`). Repeating
+          code here creates a duplicate demo section that confuses the
+          reader and breaks the post layout.
+        - Do NOT include any other fenced code blocks (```text, ```bash,
+          etc.) either. This is a prose synthesis section.
+        - Inline code spans (single backticks, like `softmax`) are fine
+          when referring to a specific function or variable name.
+        - If you feel the urge to show code to make a point, you don't
+          need to — describe what the code would do in plain language
+          and refer the reader back to the demo above.
+
     - name: tag_extraction
       role: metadata             # NOT included in post body
       task: |
