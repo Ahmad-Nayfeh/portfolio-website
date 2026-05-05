@@ -21,7 +21,9 @@ pillow==11.0.0
 # NOTE on the version: openai 1.55.0 broke when httpx>=0.28 dropped its
 # `proxies` argument — the SDK was passing it through unconditionally and
 # the runner crashed at OpenAI() construction. Fixed in openai>=1.55.3.
-# Pinning to 1.59.0 (a well-tested point release) and bounding httpx as a
-# defensive belt-and-suspenders so a future SDK update can't surprise us.
-openai==1.59.0
+# Pinning to 1.59.6 (1.59.0 / 1.59.1 were never published to PyPI; the
+# 1.59.x series begins at 1.59.2 and .6 is a mid-series patch well past
+# the proxies fix). httpx is range-bounded as a defensive
+# belt-and-suspenders so a future SDK update can't surprise us.
+openai==1.59.6
 httpx>=0.27,<0.29
