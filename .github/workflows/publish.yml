@@ -292,4 +292,38 @@ jobs:
           } > failure-body.md
 
       - name: Open failure issue
-        if: fail
+        if: failure()
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "publish pipeline failed (run ${{ github.run_id }})"
+          content-filepath: failure-body.md
+          labels: |
+            pipeline-failure
+            auto-generated
+
+      - name: Send failure email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          from: "Portfolio Pipeline <${{ secrets.GMAIL_USER }}>"
+          to: ${{ secrets.GMAIL_USER }}
+          subject: "[portfolio] Pipeline FAILED (run ${{ github.run_id }})"
+          body: |
+            The publish pipeline failed.
+
+            Workflow run:   ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Pipeline exit:  ${{ steps.pipeline.outputs.exit_code }}
+            Triggered by:   ${{ github.event_name }} (${{ github.actor }})
+
+            A failure issue has been opened with the run summary attached.
+            Click the workflow run link above to see logs.
+
+            If the failure was the cost-ceiling abort, the run summary will
+            tell you which stage tripped the limit and what the cumulative
+            cost was at that point. Re-running the workflow will start a
+            fresh run from zero.
