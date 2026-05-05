@@ -1,9 +1,7 @@
 import type { Metadata } from "next"
 import Image from "next/image"
-import Link from "next/link"
 import { FileDown } from "lucide-react"
 import { getAboutContent } from "@/lib/content"
-import { Button } from "@/components/ui/button"
 import Skills from "@/components/Skills"
 import Experience from "@/components/Experience"
 import Education from "@/components/Education"
@@ -11,45 +9,73 @@ import MarkdownRenderer from "@/components/MarkdownRenderer"
 
 export const metadata: Metadata = {
   title: "About | Ahmad Nayfeh",
-  description: "Learn more about me, my skills, and my experience",
+  description: "Design engineer at Alfanar's RMU factory in Saudi Arabia.",
 }
 
 export default async function AboutPage() {
   const aboutContent = await getAboutContent()
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">About Me</h1>
+    <div className="mx-auto w-full max-w-[1400px] px-6 pb-24 pt-12 md:px-10 lg:px-16">
+      {/* Editorial masthead */}
+      <header className="mb-14 border-b border-border pb-10">
+        <div className="mb-5 flex items-center gap-3 animate-fade-up">
+          <span aria-hidden className="h-px w-8 bg-accent" />
+          <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+            Profile · About the engineer
+          </span>
+        </div>
+        <h1
+          className="font-display text-display-xl text-balance animate-fade-up [animation-delay:60ms]"
+          style={{ animationFillMode: "both" }}
+        >
+          Hello, I&apos;m {aboutContent.name}
+        </h1>
+        {aboutContent.tagline && (
+          <p
+            className="font-display mt-6 max-w-2xl text-xl italic leading-snug text-muted-foreground md:text-2xl animate-fade-up [animation-delay:120ms]"
+            style={{ animationFillMode: "both" }}
+          >
+            {aboutContent.tagline}
+          </p>
+        )}
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-16">
-        <div className="lg:col-span-1">
-          <div className="relative aspect-square rounded-lg overflow-hidden mb-6">
-            <Image src="/images/profile.jpg" alt="Profile Photo" fill className="object-cover" priority />
+      {/* Bio + portrait spread */}
+      <section className="grid grid-cols-12 gap-x-8 gap-y-10">
+        <div className="col-span-12 lg:col-span-4">
+          <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
+            <Image
+              src="/images/profile.jpg"
+              alt="Portrait of Ahmad Nayfeh"
+              fill
+              className="object-cover grayscale-[0.1]"
+              priority
+              sizes="(max-width: 1024px) 100vw, 33vw"
+            />
           </div>
-
-          <Button asChild className="w-full">
-            <a href="/resume.pdf" target="_blank">
-              <FileDown size={16} className="mr-2" />
-              Download Resume
-            </a>
-          </Button>
+          <a
+            href="/resume.pdf"
+            target="_blank"
+            rel="noreferrer"
+            className="group mt-5 inline-flex w-full items-center justify-center gap-2 bg-foreground px-5 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-background transition-colors hover:bg-accent"
+          >
+            <FileDown size={14} />
+            Download resume
+          </a>
         </div>
 
-        <div className="lg:col-span-2">
-          <div className="prose dark:prose-invert max-w-none">
-            <h2>Hello, I&apos;m {aboutContent.name}</h2>
-            <p className="text-xl mb-6">{aboutContent.tagline}</p>
+        <div className="col-span-12 lg:col-span-8">
+          <div className="prose prose-lg dark:prose-invert max-w-none">
             <MarkdownRenderer content={aboutContent.bio} />
           </div>
         </div>
-      </div>
+      </section>
 
       <Skills skills={aboutContent.skills} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-16">
-        <Experience experience={aboutContent.experience} />
-        <Education education={aboutContent.education} />
-      </div>
+      <Experience experience={aboutContent.experience} />
+      <Education education={aboutContent.education} />
     </div>
   )
 }

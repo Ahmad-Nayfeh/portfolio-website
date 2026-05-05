@@ -1,6 +1,5 @@
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
 import ProjectCard from "@/components/ProjectCard"
+import SectionMasthead from "@/components/editorial/SectionMasthead"
 import type { Project } from "@/types"
 
 interface FeaturedProjectsProps {
@@ -9,21 +8,17 @@ interface FeaturedProjectsProps {
 
 export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   return (
-    <section className="py-16">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold">Featured Projects</h2>
-        <Link
-          href="/projects"
-          className="flex items-center text-muted-foreground hover:text-foreground transition-colors"
-        >
-          View all
-          <ArrowRight className="ml-1 h-4 w-4" />
-        </Link>
-      </div>
+    <section className="py-16 md:py-24">
+      <SectionMasthead
+        kicker="Selected Work"
+        title="Things I have built and broken"
+        description="A short list of systems, models, and side experiments — picked because each taught me something I still use."
+        link={{ href: "/projects", label: "View all projects" }}
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project) => (
-          <ProjectCard key={project.slug} project={project} />
+      <div className="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
+        {projects.map((project, idx) => (
+          <ProjectCard key={project.slug} project={project} index={idx} />
         ))}
       </div>
     </section>

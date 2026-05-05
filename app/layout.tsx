@@ -1,18 +1,42 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Newsreader, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import "katex/dist/katex.min.css"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { ThemeProvider } from "@/components/theme-provider"
 
-const inter = Inter({ subsets: ["latin"] })
+// Body / UI sans — Inter, tuned for screens.
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+})
+
+// Editorial display serif — Newsreader. Variable axes for weight + optical size,
+// gives the magazine-style headline voice without feeling antique.
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+})
+
+// Monospace — JetBrains Mono. Slightly humanist; good ligatures for code blocks.
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
+})
 
 export const metadata: Metadata = {
-  title: "Portfolio | Ahmad Nayfeh",
-  description: "Personal portfolio website showcasing my projects and blog posts",
-    generator: 'v0.dev'
+  title: "Ahmad Nayfeh — Design Engineer",
+  description:
+    "Notes on engineering, AI, and systems thinking from a design engineer at Alfanar's RMU factory.",
+  generator: "Next.js",
 }
 
 export default function RootLayout({
@@ -21,13 +45,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      {/* 👇 هذا هو القسم الجديد الذي تمت إضافته */}
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
+    >
       <head>
         <meta name="google-site-verification" content="TRmiP4XM7rQHNMBz7LJs_ZTRzVb46pLD0LJlJ-hz8QU" />
       </head>
 
-      <body className={inter.className}>
+      <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <div className="flex min-h-screen flex-col">
             <Navbar />

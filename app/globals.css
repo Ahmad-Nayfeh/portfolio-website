@@ -10,78 +10,116 @@
   .text-balance {
     text-wrap: balance;
   }
+  .text-pretty {
+    text-wrap: pretty;
+  }
 }
 
+/* =========================================================================
+ * Engineering Editorial — design tokens (May 2026 redesign).
+ *
+ * Light mode: warm ivory paper, deep slate ink, electric cobalt accent.
+ * Dark mode:  midnight navy ground, bone-white text, same cobalt accent.
+ *
+ * Colors are HSL triplets so Tailwind can wrap them with `hsl(var(--x))`
+ * and apply opacity modifiers like `bg-primary/80`.
+ * ========================================================================= */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%; /* Used for light mode code background */
-    --secondary-foreground: 240 5.9% 10%; /* Used for light mode code text */
-    --muted: 240 4.8% 95.9%; /* Used for inline code background */
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Surfaces — a hint of warmth in the background; not paper-white. */
+    --background: 38 30% 97%;            /* warm ivory */
+    --foreground: 222 30% 14%;           /* deep slate ink */
+    --card: 38 30% 99%;
+    --card-foreground: 222 30% 14%;
+    --popover: 38 30% 99%;
+    --popover-foreground: 222 30% 14%;
+
+    /* Primary = the deep ink; used for headings and high-contrast UI. */
+    --primary: 222 30% 14%;
+    --primary-foreground: 38 30% 97%;
+
+    /* Secondary = subtle warm panel — used for code blocks, cards, etc. */
+    --secondary: 38 22% 92%;
+    --secondary-foreground: 222 30% 14%;
+
+    /* Muted = even gentler; used for backgrounds of inline code and pills. */
+    --muted: 38 18% 90%;
+    --muted-foreground: 222 14% 38%;
+
+    /* Accent = electric cobalt. The single signature color of the site —
+     * use sparingly so it actually means something when it shows up. */
+    --accent: 222 88% 52%;
+    --accent-foreground: 38 30% 99%;
+
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 38 30% 99%;
+
+    --border: 38 18% 86%;
+    --input: 38 18% 86%;
+    --ring: 222 88% 52%;
+    --radius: 0.375rem;                  /* tighter than default; editorial */
+
+    /* Chart palette — kept analogous to the cobalt accent. */
+    --chart-1: 222 88% 52%;
+    --chart-2: 195 70% 45%;
+    --chart-3: 30 85% 55%;
+    --chart-4: 268 60% 55%;
+    --chart-5: 152 50% 42%;
+
+    /* Sidebar tokens (kept for shadcn compatibility). */
+    --sidebar-background: 38 30% 97%;
+    --sidebar-foreground: 222 14% 38%;
+    --sidebar-primary: 222 30% 14%;
+    --sidebar-primary-foreground: 38 30% 97%;
+    --sidebar-accent: 38 22% 92%;
+    --sidebar-accent-foreground: 222 30% 14%;
+    --sidebar-border: 38 18% 86%;
+    --sidebar-ring: 222 88% 52%;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%; /* Used for dark mode inline code background */
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%; /* Re-using secondary for muted */
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Midnight navy ground — slightly blue, not flat black. */
+    --background: 222 35% 8%;
+    --foreground: 38 25% 94%;            /* warm bone */
+    --card: 222 32% 11%;
+    --card-foreground: 38 25% 94%;
+    --popover: 222 32% 11%;
+    --popover-foreground: 38 25% 94%;
+
+    --primary: 38 25% 94%;
+    --primary-foreground: 222 35% 8%;
+
+    --secondary: 222 25% 16%;
+    --secondary-foreground: 38 25% 94%;
+
+    --muted: 222 25% 16%;
+    --muted-foreground: 38 12% 65%;
+
+    /* Slightly lifted cobalt for dark mode contrast. */
+    --accent: 222 88% 62%;
+    --accent-foreground: 222 35% 8%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 38 25% 94%;
+
+    --border: 222 25% 18%;
+    --input: 222 25% 18%;
+    --ring: 222 88% 62%;
+
+    --chart-1: 222 88% 62%;
+    --chart-2: 195 75% 55%;
+    --chart-3: 30 85% 62%;
+    --chart-4: 268 65% 65%;
+    --chart-5: 152 55% 52%;
+
+    --sidebar-background: 222 35% 8%;
+    --sidebar-foreground: 38 12% 75%;
+    --sidebar-primary: 38 25% 94%;
+    --sidebar-primary-foreground: 222 35% 8%;
+    --sidebar-accent: 222 25% 16%;
+    --sidebar-accent-foreground: 38 25% 94%;
+    --sidebar-border: 222 25% 18%;
+    --sidebar-ring: 222 88% 62%;
   }
 }
 
@@ -91,6 +129,46 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv11", "cv02";  /* Inter humanist tweaks */
+  }
+
+  /* Editorial display headings — applied selectively via .font-display. */
+  .font-display {
+    font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+    font-feature-settings: "ss01", "ss02";
+    letter-spacing: -0.015em;
+  }
+
+  /* Subtle selection color — uses the cobalt accent at low alpha. */
+  ::selection {
+    background-color: hsl(var(--accent) / 0.22);
+    color: hsl(var(--foreground));
+  }
+}
+
+/* Reusable editorial components.
+ * Kept as utility classes (not @apply'd into HTML elements globally) so
+ * they only affect places we deliberately opt in. */
+@layer components {
+  /* Eyebrow / kicker label above an editorial title. */
+  .editorial-eyebrow {
+    @apply inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground;
+  }
+
+  /* Thin rule used to mark section starts. */
+  .editorial-rule {
+    @apply h-px w-12 bg-foreground/40;
+  }
+
+  /* Drop cap for the first letter of an article body. */
+  .editorial-dropcap::first-letter {
+    font-family: var(--font-serif), Georgia, serif;
+    float: left;
+    font-size: 4.5rem;
+    line-height: 0.9;
+    padding: 0.35rem 0.6rem 0 0;
+    font-weight: 600;
+    color: hsl(var(--accent));
   }
 }
 
@@ -127,7 +205,19 @@
 /* --- END OF MODIFIED MARKDOWN STYLES --- */
 
 
-/* Animation classes */
+/* =========================================================================
+ * Motion — editorial micro-interactions.
+ *
+ * Two principles:
+ *   1. Motion should feel like type setting itself, not bouncing into place.
+ *      Short durations (180–360ms), easing curves with a slight settle, and
+ *      modest distances (no more than ~12px of translate).
+ *   2. Always honor prefers-reduced-motion. If the reader has asked the OS to
+ *      reduce motion, we strip animations entirely — the layout still works
+ *      because every element is composed for the static state first.
+ * ========================================================================= */
+
+/* Legacy fade-in — kept for any existing usages. */
 .fade-in {
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -140,6 +230,84 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Editorial fade-up — small offset, soft easing, 360ms. Used as an entrance
+ * animation on hero content, mastheads, and the first row of cards. Pair with
+ * the `.delay-*` utilities to stagger sibling elements. */
+.fade-up {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: editorialFadeUp 360ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes editorialFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.delay-60   { animation-delay:  60ms; }
+.delay-120  { animation-delay: 120ms; }
+.delay-180  { animation-delay: 180ms; }
+.delay-240  { animation-delay: 240ms; }
+.delay-300  { animation-delay: 300ms; }
+.delay-360  { animation-delay: 360ms; }
+
+/* Underline-grow — a 1px rule under inline links that animates from 0 to
+ * 100% of the link's width on hover. Cleaner than border-bottom because the
+ * width can be animated. Apply via `.link-underline` on an inline element. */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background-color: hsl(var(--accent));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Lift — a featherweight hover lift used on cards and tiles. 2px of motion,
+ * paired with a subtle shadow shift handled in component CSS where needed. */
+.editorial-lift {
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.editorial-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Honor prefers-reduced-motion globally — short-circuit every transition and
+ * animation to a single frame so nothing moves but the static layout still
+ * holds. We override Tailwind's transition-* helpers via attribute selectors
+ * so the override actually wins. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .fade-up {
+    opacity: 1;
+    transform: none;
   }
 }
 

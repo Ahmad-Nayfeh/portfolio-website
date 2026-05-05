@@ -1,6 +1,5 @@
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
 import BlogCard from "@/components/BlogCard"
+import SectionMasthead from "@/components/editorial/SectionMasthead"
 import type { Post } from "@/types"
 
 interface RecentPostsProps {
@@ -9,18 +8,17 @@ interface RecentPostsProps {
 
 export default function RecentPosts({ posts }: RecentPostsProps) {
   return (
-    <section className="py-16">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold">Recent Posts</h2>
-        <Link href="/blog" className="flex items-center text-muted-foreground hover:text-foreground transition-colors">
-          View all
-          <ArrowRight className="ml-1 h-4 w-4" />
-        </Link>
-      </div>
+    <section className="py-16 md:py-24">
+      <SectionMasthead
+        kicker="From the Notebook"
+        title="Recent writing"
+        description="Notes on engineering, AI papers, and the small surprises that come from building real systems."
+        link={{ href: "/blog", label: "Open the notebook" }}
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <BlogCard key={post.slug} post={post} />
+      <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post, idx) => (
+          <BlogCard key={post.slug} post={post} index={idx} />
         ))}
       </div>
     </section>

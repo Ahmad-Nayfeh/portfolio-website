@@ -3,7 +3,7 @@
 import { useState } from "react"
 import ProjectCard from "@/components/ProjectCard"
 import type { Project } from "@/types"
-import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 interface ProjectGridProps {
   projects: Project[]
@@ -12,45 +12,61 @@ interface ProjectGridProps {
 export default function ProjectGrid({ projects }: ProjectGridProps) {
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
 
-  // Extract all unique tags from projects
-  const allTags = Array.from(new Set(projects.flatMap((project) => project.tags))).sort()
-
-  // Filter projects by selected tag
-  const filteredProjects = selectedTag ? projects.filter((project) => project.tags.includes(selectedTag)) : projects
+  const allTags = Array.from(new Set(projects.flatMap((p) => p.tags))).sort()
+  const filtered = selectedTag
+    ? projects.filter((p) => p.tags.includes(selectedTag))
+    : projects
 
   return (
     <div>
-      <div className="mb-8">
-        <div className="flex flex-wrap gap-2">
-          <Badge
-            variant={selectedTag === null ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setSelectedTag(null)}
-          >
-            All
-          </Badge>
-          {allTags.map((tag) => (
-            <Badge
-              key={tag}
-              variant={selectedTag === tag ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => setSelectedTag(tag)}
+      {allTags.length > 0 && (
+        <div className="mb-12 border-b border-border pb-8">
+          <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            Filter by stack
+          </div>
+          <div className="flex flex-wrap gap-x-3 gap-y-1.5 font-mono text-[11px] uppercase tracking-[0.18em]">
+            <button
+              type="button"
+              className={cn(
+                "transition-colors",
+                selectedTag === null
+                  ? "text-accent"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+              onClick={() => setSelectedTag(null)}
             >
-              {tag}
-            </Badge>
-          ))}
+              All
+            </button>
+            {allTags.map((tag) => (
+              <button
+                type="button"
+                key={tag}
+                className={cn(
+                  "transition-colors",
+                  selectedTag === tag
+                    ? "text-accent"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+                onClick={() => setSelectedTag(tag)}
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProjects.map((project) => (
-          <ProjectCard key={project.slug} project={project} />
+      <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((project, idx) => (
+          <ProjectCard key={project.slug} project={project} index={idx} />
         ))}
       </div>
 
-      {filteredProjects.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">No projects found with the selected tag.</p>
+      {filtered.length === 0 && (
+        <div className="border-y border-border py-20 text-center">
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+            No projects match the current filter.
+          </p>
         </div>
       )}
     </div>
