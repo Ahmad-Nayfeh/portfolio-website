@@ -84,6 +84,23 @@ class Demo(_Looser):
     on_failure: str = "strip_demo_section"
 
 
+class CoverImage(_Looser):
+    """DALL-E 3 cover image generation config (used by generate_cover.py).
+
+    Disabled by default so a stream that doesn't want covers (e.g. a future
+    text-only stream) just leaves it unset.
+    """
+
+    enabled: bool = False
+    model: str = "dall-e-3"
+    # Landscape blog cover. 1792x1024 = $0.08 standard; square would be cheaper
+    # but looks wrong as a 16:9 header. Override per-stream if needed.
+    size: str = "1792x1024"
+    quality: str = "standard"
+    style: str = "natural"
+    output_dir: str = "public/blog-images/{slug}"
+
+
 class Approval(_Looser):
     method: str = "github_pr"
     reviewers: list[str] = Field(default_factory=list)
@@ -107,6 +124,7 @@ class StreamConfig(BaseModel):
     content: Content = Field(default_factory=Content)
     generation: Generation = Field(default_factory=Generation)
     demo: Demo = Field(default_factory=Demo)
+    cover_image: CoverImage = Field(default_factory=CoverImage)
     approval: Approval = Field(default_factory=Approval)
     quality_gates: QualityGates = Field(default_factory=QualityGates)
 

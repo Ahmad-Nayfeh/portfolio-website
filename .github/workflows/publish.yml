@@ -1,23 +1,33 @@
 name: publish
 
-# Runs every 30 minutes. Each stream's YAML decides whether IT is due, via its
-# own cron expression — this workflow just provides a steady ticking clock.
-# A stream is "due" when its cron fires within the current 30-min window
-# (see scripts/load_streams.py:cron_matches).
+# ---------------------------------------------------------------------------
+# Trigger configuration
+# ---------------------------------------------------------------------------
 #
-# Manual triggering: workflow_dispatch with an optional `stream_id` input runs
-# that specific stream regardless of its cron — handy for testing a new stream
-# YAML without waiting for its scheduled slot.
-
+# This workflow is currently **manual-only** for testing. To run the pipeline,
+# go to the Actions tab → "publish" → "Run workflow".
+#
+# When you're confident the pipeline is healthy and you want to go back to
+# automatic weekly publishing, uncomment the `schedule:` block below. The
+# tick-rate determines the *resolution* — the per-stream cron in
+# streams/*.yaml decides what actually runs. A 30-minute tick combined with
+# a "Sunday 10:00 Riyadh" stream cron means the pipeline checks every 30 min
+# whether the Sunday-10:00 slot is in the current window.
+#
+# To go back to weekly automatic publishing:
+#   1. Uncomment the `schedule:` block.
+#   2. Make sure your stream's cron (e.g. ai-papers.yaml: schedule.cron) is
+#      set to "0 7 * * 0"  (= 10:00 Riyadh = 07:00 UTC, every Sunday).
+#
 on:
-  schedule:
-    - cron: "*/30 * * * *"
+  # schedule:
+  #   - cron: "*/30 * * * *"   # ← Uncomment this block to resume auto runs.
   workflow_dispatch:
     inputs:
       stream_id:
-        description: "Run only this stream id (skips cron check). Leave blank to run all due streams."
+        description: "Run only this stream id (skips cron check). Leave blank to run all DUE streams (which, on a manual run, may be none)."
         required: false
-        default: ""
+        default: "ai-papers"
       dry_run:
         description: "Discover papers and print the plan, but don't call the model or write files."
         required: false
@@ -73,6 +83,10 @@ jobs:
         id: pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # OpenAI is used by scripts/generate_cover.py for DALL-E 3 cover
+          # images. If the secret is unset, generate_cover.py logs a warning
+          # and the post ships without a cover — non-fatal.
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           set +e
           ARGS="--output-summary run-summary.json"
@@ -108,8 +122,31 @@ jobs:
           # We open at most one PR per workflow run; multiple-stream scenarios
           # are vanishingly rare in practice and easier to debug as separate runs.
           posted = next((s for s in data if s.get("status") in {"ok", "flagged"}), None)
+
+          def _fmt_cost(v):
+              # main.py emits cost_usd as a float (or None if the meter never
+              # initialized). Format to 4 decimals — the email template wraps
+              # it in `$...`. Empty string means "not tracked", which the
+              # email's fallback expression renders as "(not tracked)".
+              if v is None:
+                  return ""
+              try:
+                  return f"{float(v):.4f}"
+              except (TypeError, ValueError):
+                  return ""
+
+          # Total spend across every stream the run touched. Useful for the
+          # failure email path even when no post shipped (e.g. cost_aborted).
+          total_cost = sum(
+              float(s.get("cost_usd") or 0) for s in data
+              if isinstance(s.get("cost_usd"), (int, float))
+          )
+
           out = pathlib.Path(os.environ["GITHUB_OUTPUT"])
           with out.open("a") as f:
+              # Always emit total_cost_usd so failure emails / debug logs can
+              # see how much was burned even when no post was produced.
+              f.write(f"total_cost_usd={total_cost:.4f}\n")
               if not posted:
                   f.write("has_post=false\n")
               else:
@@ -124,6 +161,12 @@ jobs:
                   f.write(f"quote_failed={'true' if quote_failed else 'false'}\n")
                   # Auto-merge eligibility: only when nothing was flagged.
                   f.write(f"auto_merge={'true' if posted['status'] == 'ok' else 'false'}\n")
+                  # Cost recorded by scripts/cost_meter.py during this stream.
+                  # Empty string -> success email shows "(not tracked)".
+                  f.write(f"cost_usd={_fmt_cost(posted.get('cost_usd'))}\n")
+                  ceiling = posted.get("cost_ceiling_usd")
+                  if ceiling is not None:
+                      f.write(f"cost_ceiling_usd={_fmt_cost(ceiling)}\n")
           PY
 
       - name: Read post title for PR
@@ -191,6 +234,41 @@ jobs:
           path: run-summary.json
           retention-days: 30
 
+      # ---- Success email: a post was generated and a PR was opened ----
+      #
+      # Sends a short notification when the pipeline produced a post. We send
+      # this on PR-creation, not on merge, so you can review the PR while the
+      # email is still fresh. If you'd rather be notified on merge instead,
+      # move this step into a separate workflow listening on `pull_request`
+      # closed-with-merged.
+      - name: Send success email
+        if: success() && steps.summary.outputs.has_post == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          from: "Portfolio Pipeline <${{ secrets.GMAIL_USER }}>"
+          to: ${{ secrets.GMAIL_USER }}
+          subject: "[portfolio] New post: ${{ steps.post.outputs.title }}"
+          body: |
+            A new post was just generated by the publish pipeline.
+
+            Title:    ${{ steps.post.outputs.title }}
+            Stream:   ${{ steps.summary.outputs.stream_name }}
+            Slug:     ${{ steps.summary.outputs.slug }}
+            Status:   ${{ steps.summary.outputs.status }}
+            Cost:     ${{ steps.summary.outputs.cost_usd != '' && format('${0}', steps.summary.outputs.cost_usd) || '(not tracked)' }}
+
+            Pull request: ${{ steps.cpr.outputs.pull-request-url }}
+            Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            If status is "ok", auto-merge will fire once the Vercel preview is green.
+            If status is "flagged", a quality gate caught something — review the PR
+            manually before merging.
+
       # ---- Failure path: pipeline crashed (exit code 1) ----------------
       - name: Prepare failure issue body
         if: failure()
@@ -214,11 +292,4 @@ jobs:
           } > failure-body.md
 
       - name: Open failure issue
-        if: failure()
-        uses: peter-evans/create-issue-from-file@v5
-        with:
-          title: "publish pipeline failed (run ${{ github.run_id }})"
-          content-filepath: failure-body.md
-          labels: |
-            pipeline-failure
-            auto-generated
+        if: fail

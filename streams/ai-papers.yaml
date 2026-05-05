@@ -1,12 +1,25 @@
 # streams/ai-papers.yaml
 #
-# The first stream — weekly AI paper deep dives. Picks 1–2 recent papers from
-# Hugging Face Daily Papers, asks Claude to write a structured analysis with
-# math + a small Python demo, and opens a PR that auto-merges on a green
-# Vercel preview build.
+# Weekly AI paper deep dives — picks 1–2 recent papers from Hugging Face Daily
+# Papers, then writes a structured, accessible analysis with intuition-first
+# explanation, runnable demo code, and an honest closing synthesis.
 #
-# To pause this stream: set enabled to false, or move this file into
-# streams/_disabled/.
+# Stage structure (C7 redesign — May 2026):
+#   1. intro_framing       — opens the post, frames why these papers were
+#                            selected. May or may not connect them — only
+#                            an honest connection is allowed.
+#   2. per_paper_section   — for each paper, a self-contained section:
+#                            intuition first, method, critique, quotes.
+#   3. unified_demo        — Python demo that illustrates the central idea,
+#                            connecting the papers' ideas where honest.
+#   4. closing_synthesis   — alignment / divergence / what each is NOT saying.
+#   5. tag_extraction      — metadata-only. Output is parsed for the post's
+#                            `tags:` frontmatter, NOT included in the body.
+#   6. cover_image_brief   — metadata-only. Output is a one-sentence visual
+#                            brief used by generate_cover.py to prompt
+#                            DALL-E 3 for the post's cover image.
+#
+# To pause this stream: set enabled to false, or move into streams/_disabled/.
 
 stream:
   id: ai-papers
@@ -19,63 +32,226 @@ schedule:
   timezone: "Asia/Riyadh"          # informational; cron evaluated UTC
 
 discovery:
-  source: huggingface_daily_papers # huggingface_daily_papers | arxiv | semantic_scholar | manual
+  source: huggingface_daily_papers
   lookback_days: 7
   top_n: 10
   filters:
-    # HF Daily Papers is already curated to AI/ML papers — no need to filter
-    # by arXiv categories (cs.LG, cs.CL, ...). HF tags papers with its own
-    # taxonomy (computer_vision, natural_language_processing, ...) which
-    # doesn't match arXiv codes, so any explicit category list here would
-    # reject everything. Re-add only if we switch source to `arxiv`.
     categories: []
     min_upvotes: 5
   selection:
-    method: claude_picks            # claude_picks | top_voted | manual
+    method: claude_picks
     count: 2
 
 content:
   output_path: "content/blog"
   slug_pattern: "{year}-W{week}-{topic-slug}"
+  # Title prefix for posts in this stream. Future streams (history, logic,
+  # etc.) define their own. Use {topic} as a placeholder for the first
+  # paper's title (or a stream-relevant root for non-paper streams).
+  title_template: "Paper Notes: {topic}"
+  # Base tags merged with the dynamic `tag_extraction` output. Keep these
+  # broad — specific tags come from per-post extraction.
   tags: ["AI", "weekly-paper"]
 
 generation:
   model: "claude-sonnet-4-6"
-  # Multi-stage generation. Each sub-task has narrow scope to reduce
-  # hallucination — the orchestrator in scripts/generate_post.py runs these
-  # stages in order and stitches the result.
+  fallback_model: "claude-haiku-4-5"
+  max_output_tokens: 16000
+
+  # ----- Stages -----
+  # Each stage is a separate Claude call with narrow scope. Output is
+  # appended to the post body in the order listed below, except for stages
+  # tagged `role: metadata` (those are parsed for frontmatter only, never
+  # included in the body).
   stages:
-    - name: paper_summary
-      task: "Restate each paper's contribution in plain language. Cite section numbers."
-    - name: method_explanation
-      task: "Explain the method, with key equations in $$...$$. Use only what's actually in the paper."
-    - name: quote_extraction
-      task: "Pull verbatim quotes from each paper that support the analysis. Mark each quote with section/page."
-    - name: critique
-      task: "Honest strengths and weaknesses. No hype. Acknowledge what the paper doesn't claim."
-    - name: demo_code
-      task: "Write a minimal didactic Python demo (numpy/matplotlib/sklearn/scipy/CPU-pytorch). Pick the right tool."
-    - name: synthesis
-      task: "Closing section connecting the papers. Only honest connections."
+    - name: intro_framing
+      task: |
+        Write a SHORT opening section (≈250–400 words) that frames the post.
+
+        Structure:
+        - 1 paragraph: a vivid, concrete entry point — a question the reader
+          might have, a familiar phenomenon, or a problem someone in an
+          adjacent field would recognize. Avoid jargon.
+        - 1 paragraph: introduce the papers selected. State what each is
+          about in plain language (2–3 sentences each). DO NOT force a
+          connection. If the papers genuinely share a thread, name it
+          honestly. If they don't, say something like: "I selected these
+          two because they were the highest-upvoted papers this week and
+          each is worth understanding on its own terms."
+        - 1 paragraph: tell the reader what they'll get out of the post —
+          which intuitions, which methods, which code experiments.
+
+        Use a section heading: "## Why these papers, and what you'll learn"
+
+    - name: per_paper_section
+      task: |
+        For EACH paper from the source list, write one self-contained
+        section. Use the paper title as the section heading (h2).
+
+        Within each paper section, use these subsections (h3):
+
+        ### The intuition
+        Plain-language explanation. Imagine an engineer who works in a
+        DIFFERENT subfield of AI/ML — they understand the basics of neural
+        networks but not this specific area. Use one analogy. Lead with the
+        problem the paper solves, why anyone should care, then sketch how
+        the method works without symbols. Aim for 200–350 words.
+
+        ### How the method actually works
+        Get specific. Include the key equations in $$...$$ blocks ONLY when
+        they add real insight (not for decoration). Reference section
+        numbers from the paper when you can. Aim for 400–700 words.
+
+        ### What the paper actually shows (with verbatim quotes)
+        Inline at least 2 verbatim blockquotes from the paper's abstract or
+        summary, attributing each one. Discuss the empirical claims around
+        each quote. Format: blockquote line `> ...` then your discussion.
+        Aim for 300–500 words.
+
+        ### Honest critique
+        Strengths AND weaknesses. No hype. Acknowledge what the paper does
+        not claim. State open questions and likely failure modes. 200–400
+        words.
+
+    - name: unified_demo
+      task: |
+        Write one Python demo (≤120 lines) that illustrates the central
+        idea(s) of the selected papers.
+
+        Constraints (CRITICAL — the code is run in CI):
+        - Allowed libraries ONLY: numpy, matplotlib, scikit-learn, scipy.
+          NEVER torch, tensorflow, transformers, or any GPU library.
+        - Must produce at least 1 matplotlib figure (plt.figure or
+          fig, ax = plt.subplots).
+        - DO NOT call plt.show() — figures are auto-saved by the runner.
+        - Self-contained: no external files, no network calls, no input().
+        - Runs in under 60 seconds on a CPU.
+
+        Structure the section as:
+        ## A demo that makes the idea concrete
+
+        Open with 1 paragraph explaining what the demo simulates and what
+        the reader should look at in the figure. Then the code in a
+        ```python fenced block. Then 1 short paragraph interpreting the
+        figure once it appears.
+
+        If the two papers don't share a single illustratable concept, pick
+        ONE paper's idea and demo that. Say so explicitly in the opening
+        paragraph. Do not force a hybrid demo.
+
+    - name: closing_synthesis
+      task: |
+        Closing section. Use heading: "## What these papers are saying to
+        each other"
+
+        Structure (use h3 subheadings):
+        - "### Where they genuinely align" — only honest alignments,
+          stated plainly. If there's no real alignment, say so and skip
+          this subsection.
+        - "### Where they diverge, and why it matters" — substantive
+          differences in scope, method, or claims.
+        - "### The honest takeaway" — 1 short paragraph. What does the
+          reader walk away with? Avoid hype phrases like "paradigm shift",
+          "revolutionary", "groundbreaking".
+
+        500–800 words total for this section.
+
+    - name: tag_extraction
+      role: metadata             # NOT included in post body
+      task: |
+        Output ONLY a single line of 3 to 5 specific, kebab-case tags
+        describing the technical topics of this post. Tags should reflect
+        the actual papers' subfields and methods, NOT generic terms.
+
+        Format: one line, comma-separated, lowercase, hyphens for
+        multi-word tags. NO other text, NO heading, NO explanation.
+
+        Good examples: "multi-agent-systems, latent-space-coordination, recursive-computation"
+        Bad: "AI, machine learning, weekly-paper" (too generic)
+        Bad: "Multi-Agent Systems, RL" (wrong format)
+
+        Output the line and nothing else.
+
+    - name: cover_image_brief
+      role: metadata             # NOT included in post body
+      task: |
+        Write ONE sentence describing the abstract scene that should appear
+        on the cover image for this post. The image goes at the top of the
+        blog page as a 16:9 editorial illustration — like the cover of a
+        research magazine.
+
+        Constraints:
+          - One sentence only. 25 words maximum.
+          - Be VISUAL. Describe shapes, textures, composition — not the
+            paper's title, not technical jargon. Translate the central
+            idea into an image a designer could draw.
+          - Do NOT mention text, words, letters, captions, or labels.
+            (DALL-E will render garbled text otherwise.)
+          - Do NOT name a real person, brand, or copyrighted character.
+          - Avoid hype words like "revolutionary" or "powerful" — they
+            don't help an illustrator.
+
+        The pipeline appends a fixed style suffix automatically (minimal,
+        warm off-white background, deep navy, single cobalt accent, no
+        text). Don't repeat that — focus only on the SUBJECT of the image.
+
+        Good example (multi-agent paper): "Three abstract glowing nodes
+        passing translucent threads of light to each other across an
+        empty grid, with a faint orbit pattern around them."
+        Bad example: "An illustration about agentic AI systems."
+        Bad example: "A cover image for our paper on multi-agent RL."
+
+        Output the sentence and nothing else.
 
   system_prompt: |
-    You are a technical writer for a portfolio blog by an engineer who values
-    rigor and clarity. Write a deep, structured analysis of the selected
-    papers. Length follows depth — there is no artificial cap.
+    You are a technical writer for a portfolio blog by an engineer who
+    values rigor, clarity, and accessibility. Your readers are working
+    engineers and applied researchers — many are NOT specialists in the
+    paper's subfield. Your job is to make rigorous AI/ML papers reachable
+    for a smart engineer in an adjacent area, without dumbing down.
 
-    Hard rules, in order of precedence:
-      1. Never invent quotes, authors, results, or numbers. If you cannot find
-         it in the paper, say so explicitly.
-      2. Verbatim quotes must be wrapped in markdown blockquotes and labelled
-         with a paper reference (e.g. "— Smith et al., §3.2").
-      3. Math goes in $$...$$ for blocks and $...$ for inline. Use standard
-         KaTeX syntax.
-      4. Code examples must be self-contained and runnable on CPU.
-      5. Avoid hype. Connect papers to broader trends only when the connection
-         is honest, not decorative.
+    Voice and structure rules:
+      1. INTUITION FIRST. Before any equation, before any technical term,
+         the reader should know what problem the paper attacks and why a
+         non-specialist should care. Use one strong analogy when it helps.
+      2. PROGRESSIVE DEPTH. Open accessible, then formalize. Math goes in
+         $$...$$ blocks for display and $...$ inline. Use math ONLY when
+         it adds insight — never for decoration.
+      3. SHOW, DON'T SUMMARIZE. Where possible, anchor claims to specific
+         section numbers in the paper, verbatim quotes, and concrete code.
+      4. NO INVENTION. Never fabricate quotes, authors, results, or
+         section numbers. If you cannot find it in the paper, say so
+         explicitly. Verbatim quotes must be wrapped in markdown
+         blockquotes (`> ...`) with attribution.
+      5. CODE THAT RUNS. The demo executes in CI on Python 3.12 with
+         numpy / matplotlib / scikit-learn / scipy installed. NO other
+         libraries. CPU only. Under 60 seconds wall time.
+      6. CONNECT HONESTLY. If two papers share a real thread, name it.
+         If they do not, say "these are two strong but unrelated papers"
+         and treat each on its own terms. Do not manufacture themes.
+      7. NO HYPE. Avoid "revolutionary", "paradigm shift", "game-changer",
+         "groundbreaking". Let the work speak for itself.
+      8. LENGTH FOLLOWS DEPTH. There is no artificial cap. A short
+         honest section beats a long padded one.
 
 demo:
   enabled: true
+  output_dir: "public/blog-images/{slug}"
+  on_failure: "strip_demo_section"
+
+# DALL-E 3 cover image (C6 — May 2026).
+# Each generated post gets a cover rendered from the `cover_image_brief`
+# stage above. The image is saved to public/blog-images/<slug>/cover.png and
+# the file path is written into the post's frontmatter as `coverImage:`.
+# Cost (DALL-E 3 standard, May 2026): 1792x1024 = $0.08 / image. At one
+# post per week that's ~$4.16/year. Square (1024x1024) is half the cost
+# but looks wrong as a 16:9 blog header.
+cover_image:
+  enabled: true
+  model: "dall-e-3"
+  size: "1792x1024"                 # landscape — matches the blog header aspect
+  quality: "standard"               # "hd" doubles the cost
+  style: "natural"                  # "vivid" pushes more saturation; we don't want that
   output_dir: "public/blog-images/{slug}"
 
 quality_gates:
