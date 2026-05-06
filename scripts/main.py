@@ -51,6 +51,7 @@ import generate_cover  # noqa: E402
 import generate_post  # noqa: E402
 import load_streams  # noqa: E402
 import run_demo  # noqa: E402
+import select_papers  # noqa: E402
 import validate_build  # noqa: E402
 
 log = logging.getLogger("publish")
@@ -226,11 +227,41 @@ def _run_stream(
         summary["status"] = "no_candidates"
         return worst_exit
 
-    # Apply selection.count (if set) — keep the top N for the post.
-    sel = (cfg.discovery.selection or {}).get("count")
-    if sel and isinstance(sel, int):
-        papers = papers[:sel]
+    # Selection. Two paths:
+    #   1. claude_umbrella_picks  -> ask Claude to pick 2-3 papers under
+    #      one umbrella, OR a single best paper. This is the path we want
+    #      for the AI-papers stream after the H1 redesign — it gives
+    #      thematic coherence instead of stapled-together summaries.
+    #   2. anything else (incl. unset / "claude_picks") -> legacy: keep
+    #      the top `selection.count` candidates by upvotes. Same as the
+    #      pre-H1 behaviour.
+    selection_cfg = cfg.discovery.selection or {}
+    method = (selection_cfg.get("method") or "").strip().lower()
+    if method == "claude_umbrella_picks":
+        try:
+            picked = select_papers.select_umbrella_picks(
+                stream_cfg=cfg, candidates=papers,
+            )
+        except cost_meter.CostCeilingExceeded:
+            raise
+        except Exception as e:
+            log.warning("Umbrella selector crashed (%s) — falling back to top-1.", e)
+            picked = papers[:1]
+        # The selector clamps to [1, MAX_PICKED_PAPERS] internally; an empty
+        # result means it had nothing to work with, in which case we keep
+        # `papers` empty so the no-candidates branch below trips.
+        papers = picked
+    else:
+        sel = selection_cfg.get("count")
+        if sel and isinstance(sel, int):
+            papers = papers[:sel]
     summary["selected_count"] = len(papers)
+    summary["selected_arxiv_ids"] = [p.get("arxiv_id", "") for p in papers]
+
+    if not papers:
+        log.warning("Selector produced 0 papers for %s; skipping post.", cfg.stream.id)
+        summary["status"] = "no_candidates"
+        return worst_exit
 
     if args.dry_run:
         log.info("[dry-run] Would generate post from %d papers; stopping here.", len(papers))
@@ -324,6 +355,19 @@ def _run_stream(
     slug = mdx_path.stem
     summary["slug"] = slug
     summary["mdx_path"] = str(mdx_path.relative_to(load_streams.REPO_ROOT))
+
+    # 4b) Mark each picked paper as used so a future run won't re-feature it.
+    # Done AFTER write_post succeeds so a crash mid-generation doesn't burn
+    # a paper. Wrapped defensively — a ledger-update failure shouldn't fail
+    # the post; the duplicate-in-future-runs is a soft cost we'd rather pay
+    # than ship a broken post.
+    try:
+        for p in papers:
+            discover_papers.mark_paper_as_used(
+                cfg, p, slug=slug, when=now,
+            )
+    except Exception as e:  # pragma: no cover — defensive
+        log.warning("Failed to update used-papers ledger: %s", e)
 
     # 3b) Quality gate: verbatim quotes (final check after retry).
     quote_count = generate_post.count_verbatim_quotes(mdx_path.read_text(encoding="utf-8"))

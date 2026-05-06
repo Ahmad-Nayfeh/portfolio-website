@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "_doc": "Append-only ledger of papers that have already shipped in a blog post. The discovery layer reads this file and filters out any candidate whose arxiv_id is already listed, so the same paper never gets a second writeup. Updated by scripts/discover_papers.py:mark_paper_as_used after a successful write_post.",
+  "papers": []
+}

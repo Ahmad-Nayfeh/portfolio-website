@@ -57,6 +57,11 @@ class Discovery(_Looser):
     top_n: int = 10
     filters: dict[str, Any] = Field(default_factory=dict)
     selection: dict[str, Any] = Field(default_factory=dict)
+    # Path (relative to repo root, or absolute) to the JSON ledger that
+    # tracks which papers have already been featured. Read by discovery to
+    # filter candidates and appended-to by main.py after a successful
+    # publish. None = no dedup, which is the legacy behaviour.
+    dedup_state_file: str | None = None
 
 
 class Content(_Looser):
