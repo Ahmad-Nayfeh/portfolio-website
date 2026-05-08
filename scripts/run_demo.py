@@ -1,34 +1,26 @@
 """scripts/run_demo.py
 
-Extract the Python demo from a generated MDX post, run it in a subprocess
-under a timeout, capture any matplotlib figures it produces, and rewrite
-the demo section in the MDX to reference the rendered images and the
+Extract Python demo blocks from a generated MDX post, run each in its own
+subprocess under a timeout, capture the matplotlib figures each block
+produces, and rewrite the MDX in place to reference the rendered images and
 captured stdout.
 
-Demo output capture (May 2026 rewrite):
-  We run the demo subprocess with its CWD set to the per-post image
-  folder (public/blog-images/<slug>/). That way ANY PNG the demo writes
-  — whether via our wrapped `figure_<n>.png` autosave OR the demo's own
-  `plt.savefig('whatever.png')` call — lands in the right folder. We
-  then sweep the folder for `*.png` and inject them all under the demo
-  block in the MDX.
+H5 extension (May 2026): supports MULTIPLE python blocks per post. The
+closing_demo_and_critique stage has the main big experimental block; the
+dialectical_walk stage may now include up to 3 shorter (<=40 line) blocks
+at natural beats in the argument. Each block runs in its own subdir of the
+per-post image folder so figure names never collide (demo_0/, demo_1/, ...).
+MDX rewriting proceeds from the last block to the first so that inserting
+content at position `end` never shifts the offsets of earlier blocks.
 
-  The previous implementation only captured figures still open at the
-  end of the demo via `plt.get_fignums()`. That broke any demo that
-  called `plt.savefig(...); plt.close()` (which is most of them — that
-  is the standard matplotlib idiom). The new approach is forgiving: as
-  long as the demo writes PNGs to the CWD, we pick them up.
+Demo output capture design:
+  The subprocess CWD is set to the block's own subdir. ANY PNG the demo
+  writes -- via plt.savefig() or our autosave footer -- lands there. We
+  sweep the subdir for *.png after the subprocess exits and inject them
+  all under the code block.
 
-Outputs:
-  - public/blog-images/<slug>/<any>.png  (everything the demo wrote)
-  - The MDX is updated with:
-      a. a "Demo output" markdown image block per figure (in filename
-         order, so the demo controls ordering by naming)
-      b. a fenced text block with the captured stdout (cleaned of our
-         internal SAVED_FIGURE: marker lines).
-
-On failure (timeout, non-zero exit) the demo section is either kept (with
-a warning) or stripped, depending on stream_cfg.demo.on_failure.
+On failure (timeout, non-zero exit): the failed block is replaced with a
+short warning note. Other blocks still run.
 """
 from __future__ import annotations
 
@@ -46,8 +38,8 @@ log = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-# Match a fenced python block. We capture the body so we can rewrite the
-# original block with figures + stdout appended underneath.
+# Match any fenced python block. Capture the body for execution + position
+# tracking.
 _PY_BLOCK_RE = re.compile(
     r"^```python(?:[^\n]*)\n([\s\S]*?)\n```",
     re.MULTILINE,
@@ -55,25 +47,37 @@ _PY_BLOCK_RE = re.compile(
 
 
 # ---------------------------------------------------------------------------
-# Demo extraction + rewriting
+# Block extraction
 # ---------------------------------------------------------------------------
 
 
+def extract_all_python_blocks(mdx: str) -> list[tuple[str, int, int]]:
+    """Find all ```python ... ``` blocks. Return [(code, start, end), ...].
+
+    Ordered by position in the document (earliest first). The caller uses
+    this ordering to run blocks in document order, then rewrites the MDX
+    from last to first to preserve byte offsets.
+    """
+    return [(m.group(1), m.start(), m.end()) for m in _PY_BLOCK_RE.finditer(mdx)]
+
+
 def extract_first_python_block(mdx: str) -> tuple[str, int, int] | None:
-    """Find the first ```python ... ``` block. Return (code, start, end) or None."""
-    m = _PY_BLOCK_RE.search(mdx)
-    if not m:
-        return None
-    return m.group(1), m.start(), m.end()
+    """Compatibility alias -- returns only the first block, or None."""
+    blocks = extract_all_python_blocks(mdx)
+    return blocks[0] if blocks else None
+
+
+# ---------------------------------------------------------------------------
+# Demo wrapper
+# ---------------------------------------------------------------------------
 
 
 def _read_plot_style_source() -> str:
     """Read scripts/plot_style.py and return its source text.
 
     We inline the module body into the demo wrapper rather than rely on
-    PYTHONPATH because the subprocess CWD is the per-post image folder,
-    not scripts/. Inlining is heavier but bulletproof — there's no
-    runtime path config that can drift out of sync.
+    PYTHONPATH because the subprocess CWD is the per-block image subdir,
+    not scripts/. Inlining is heavier but bulletproof.
     """
     style_path = Path(__file__).resolve().parent / "plot_style.py"
     try:
@@ -87,26 +91,13 @@ def _wrap_demo_for_capture(code: str) -> str:
     """Wrap user demo code so matplotlib figures are auto-saved AND styled.
 
     The wrapper:
-      1. Forces a non-interactive backend so the demo can't open a GUI
-         window.
-      2. Inlines scripts/plot_style.py BEFORE the demo body runs. That
-         applies the editorial palette (warm off-white background, deep
-         navy ink, cobalt accent) at module-import time, so even demo
-         code that knows nothing about the style still inherits it.
-         The PALETTE / CYCLE / figure() / annotate_callout() / lead_color()
-         names are also exposed in the global namespace, so demo code can
-         opt into the editorial helpers explicitly when it wants to.
-      3. After the demo runs, saves every still-open figure as
-         figure_<n>.png in the CURRENT WORKING DIRECTORY. The caller
-         (run_demo_for_post) sets CWD to the per-post image folder so
-         these files land where Next.js can serve them.
-
-    NOTE: We deliberately don't try to prevent the demo from calling
-    plt.savefig() / plt.close() itself. Most matplotlib code does. The
-    new design simply sweeps the CWD for ALL .png files after the
-    subprocess exits, so we catch both the demo's own saves and our
-    fallback autosaves.
+      1. Forces a non-interactive backend.
+      2. Inlines scripts/plot_style.py BEFORE the demo runs, exposing
+         PALETTE / figure() / lead_color() / annotate_callout() in scope.
+      3. After the demo runs, saves any still-open figures as figure_<n>.png
+         in the current working directory (the per-block subdir).
     """
+    plot_style = _read_plot_style_source()
     header = (
         "import os, sys\n"
         "import matplotlib\n"
@@ -114,7 +105,7 @@ def _wrap_demo_for_capture(code: str) -> str:
         "import matplotlib.pyplot as _plt_demo_capture\n"
         "\n"
         "# --- Editorial style (inlined from scripts/plot_style.py) ----\n"
-        + _read_plot_style_source()
+        + plot_style
         + "\n"
         "# --- End editorial style. Demo code follows. -----------------\n"
         "\n"
@@ -139,8 +130,7 @@ def _run_subprocess(
 ) -> tuple[int, str, str]:
     """Run `code` in a fresh Python subprocess with a hard timeout.
 
-    The subprocess is launched with `cwd` set to the per-post image
-    folder so any PNG the demo writes lands there directly.
+    CWD is set to the per-block image subdir so figures land there.
     """
     with tempfile.TemporaryDirectory(prefix="demo_") as tmp:
         script = Path(tmp) / "demo.py"
@@ -160,12 +150,11 @@ def _run_subprocess(
 
 
 def _clean_stdout_for_display(stdout: str) -> str:
-    """Strip our internal SAVED_FIGURE marker lines from stdout."""
+    """Strip internal SAVED_FIGURE: marker lines from stdout."""
     keep = [
         ln for ln in stdout.splitlines()
         if not ln.strip().startswith("SAVED_FIGURE:")
     ]
-    # Trim trailing blank lines but preserve internal whitespace.
     while keep and not keep[-1].strip():
         keep.pop()
     return "\n".join(keep)
@@ -175,28 +164,19 @@ def _build_output_section(
     image_paths: list[Path],
     cleaned_stdout: str,
     slug: str,
+    subdir_name: str,
 ) -> str:
-    """Compose the markdown that gets injected after the demo code block.
+    """Compose the markdown injected after a code block.
 
-    Layout:
-        ## Output
-        ![Generated figure](/blog-images/<slug>/foo.png)
-        ![Generated figure](/blog-images/<slug>/bar.png)
-
-        ```text
-        <captured stdout, with marker lines removed>
-        ```
-
-    If there are no figures and no stdout, return empty string so we
-    don't inject a blank "## Output" header.
+    Images are served from /blog-images/<slug>/<subdir>/<file>.
+    Returns empty string if there is nothing to show.
     """
     if not image_paths and not cleaned_stdout.strip():
         return ""
 
     lines: list[str] = ["", "**Demo output**", ""]
     for p in image_paths:
-        # Public path used by Next.js: /blog-images/<slug>/<file>
-        public_url = f"/blog-images/{slug}/{p.name}"
+        public_url = f"/blog-images/{slug}/{subdir_name}/{p.name}"
         lines.append(f"![Generated figure]({public_url})")
         lines.append("")
     if cleaned_stdout.strip():
@@ -208,7 +188,7 @@ def _build_output_section(
 
 
 # ---------------------------------------------------------------------------
-# Public entry
+# Public entry point
 # ---------------------------------------------------------------------------
 
 
@@ -218,13 +198,16 @@ def run_demo_for_post(
     mdx_path: Path,
     slug: str,
 ) -> dict[str, Any]:
-    """Run the demo embedded in `mdx_path`. Mutate the file in-place.
+    """Run every Python demo block in `mdx_path`. Mutate the file in-place.
+
+    Each block runs in its own subdir (demo_0/, demo_1/, ...) of the
+    per-post image folder so figure filenames never collide.
 
     Returns: {
         'ran': bool,
-        'success': bool,
-        'figures': [Path, ...],
-        'stdout': str,
+        'success': bool,         # True if ALL blocks succeeded
+        'figures': [Path, ...],  # all PNGs produced across all blocks
+        'stdout': str,           # concatenated stdout from all blocks
         'stderr': str,
         'reason': str | None,
     }
@@ -234,79 +217,115 @@ def run_demo_for_post(
         return {"ran": False, "success": False, "figures": [], "stdout": "", "stderr": "", "reason": "disabled"}
 
     mdx = mdx_path.read_text(encoding="utf-8")
-    block = extract_first_python_block(mdx)
-    if block is None:
-        log.info("No python demo block found in %s; skipping", mdx_path.name)
+    blocks = extract_all_python_blocks(mdx)
+    if not blocks:
+        log.info("No python demo blocks found in %s; skipping", mdx_path.name)
         return {"ran": False, "success": False, "figures": [], "stdout": "", "stderr": "", "reason": "no_block"}
-    code, _, end = block
+
+    log.info("Found %d python block(s) in %s", len(blocks), mdx_path.name)
 
     out_dir_template = stream_cfg.demo.output_dir or "public/blog-images/{slug}"
     out_dir = REPO_ROOT / out_dir_template.replace("{slug}", slug)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Snapshot pre-existing PNGs (e.g. cover.png) so we don't include
-    # them in the demo-output section.
-    pre_existing = {p.name for p in out_dir.glob("*.png")}
-
     timeout_seconds = (stream_cfg.demo.timeout_minutes or 15) * 60
-    wrapped = _wrap_demo_for_capture(code)
-    rc, stdout, stderr = _run_subprocess(wrapped, timeout_seconds, cwd=out_dir)
-    log.info("Demo subprocess rc=%d stdout=%d stderr=%d cwd=%s",
-             rc, len(stdout), len(stderr), out_dir)
 
-    # Pick up everything new the demo wrote — either via its own
-    # plt.savefig(...) OR via our autosave footer.
-    new_pngs = sorted(
-        p for p in out_dir.glob("*.png")
-        if p.name not in pre_existing
-    )
+    # Run every block in document order, capturing results. We separate
+    # execution from MDX rewriting so that later rewriting (which modifies
+    # string offsets) doesn't interfere with block position tracking.
+    block_results: list[dict] = []
+    for i, (code, _start, _end) in enumerate(blocks):
+        subdir_name = f"demo_{i}"
+        subdir = out_dir / subdir_name
+        subdir.mkdir(parents=True, exist_ok=True)
 
-    if rc != 0:
-        log.warning("Demo failed (rc=%d). Policy: %s", rc, stream_cfg.demo.on_failure)
-        # Clean up anything the failed demo wrote so a half-rendered
-        # demo doesn't leak into the post.
-        for p in new_pngs:
-            p.unlink(missing_ok=True)
-        if stream_cfg.demo.on_failure == "strip_demo_section":
-            new_mdx = _strip_demo_block(mdx)
-            mdx_path.write_text(new_mdx, encoding="utf-8")
-        return {
-            "ran": True,
-            "success": False,
-            "figures": [],
-            "stdout": stdout,
-            "stderr": stderr,
-            "reason": "nonzero_exit" if rc != 124 else "timeout",
-        }
+        wrapped = _wrap_demo_for_capture(code)
+        rc, stdout, stderr = _run_subprocess(wrapped, timeout_seconds, cwd=subdir)
+        log.info(
+            "Block %d/%d: rc=%d stdout=%d stderr=%d cwd=%s",
+            i + 1, len(blocks), rc, len(stdout), len(stderr), subdir,
+        )
 
-    # Success: inject figures + cleaned stdout right after the demo block.
-    cleaned = _clean_stdout_for_display(stdout)
-    section = _build_output_section(new_pngs, cleaned, slug)
-    if section:
-        new_mdx = mdx[:end] + "\n" + section + mdx[end:]
-        mdx_path.write_text(new_mdx, encoding="utf-8")
-        log.info("Demo output: injected %d figure(s) and %d chars stdout",
-                 len(new_pngs), len(cleaned))
-    else:
-        log.info("Demo output: nothing to inject (no figures, no stdout)")
+        new_pngs = sorted(subdir.glob("*.png"))
+
+        if rc != 0:
+            log.warning("Block %d failed (rc=%d). Policy: %s", i, rc, stream_cfg.demo.on_failure)
+            for p in new_pngs:
+                p.unlink(missing_ok=True)
+            block_results.append({
+                "success": False,
+                "figures": [],
+                "stdout": stdout,
+                "stderr": stderr,
+                "reason": "timeout" if rc == 124 else "nonzero_exit",
+                "subdir_name": subdir_name,
+                "section": None,
+            })
+        else:
+            cleaned = _clean_stdout_for_display(stdout)
+            section = _build_output_section(new_pngs, cleaned, slug, subdir_name)
+            block_results.append({
+                "success": True,
+                "figures": new_pngs,
+                "stdout": stdout,
+                "stderr": stderr,
+                "reason": None,
+                "subdir_name": subdir_name,
+                "section": section,
+            })
+
+    # Rewrite the MDX from LAST block to FIRST so inserting content at
+    # position `end` doesn't shift the start/end offsets of earlier blocks.
+    current_mdx = mdx
+    for (code, start, end), result in reversed(list(zip(blocks, block_results))):
+        if result["success"]:
+            section = result["section"] or ""
+            if section:
+                current_mdx = current_mdx[:end] + "\n" + section + current_mdx[end:]
+        else:
+            # Failed block: replace with warning note if policy says strip.
+            if stream_cfg.demo.on_failure == "strip_demo_section":
+                note = (
+                    "\n> _A code demo for this section failed in CI and has "
+                    "been removed. The text above still describes the method._\n"
+                )
+                current_mdx = current_mdx[:start] + note + current_mdx[end:]
+
+    if current_mdx != mdx:
+        mdx_path.write_text(current_mdx, encoding="utf-8")
+
+    all_figures = [p for r in block_results for p in r["figures"]]
+    all_stdout = "\n".join(r["stdout"] for r in block_results)
+    all_stderr = "\n".join(r["stderr"] for r in block_results)
+    all_success = all(r["success"] for r in block_results)
 
     return {
         "ran": True,
-        "success": True,
-        "figures": new_pngs,
-        "stdout": stdout,
-        "stderr": stderr,
-        "reason": None,
+        "success": all_success,
+        "figures": all_figures,
+        "stdout": all_stdout,
+        "stderr": all_stderr,
+        "reason": None if all_success else "some_blocks_failed",
     }
 
 
 def _strip_demo_block(mdx: str) -> str:
-    """Remove the first python fenced block + a one-line note explaining why."""
-    m = _PY_BLOCK_RE.search(mdx)
-    if not m:
+    """Remove ALL python fenced blocks + insert a short warning note.
+
+    Used as a fallback when the entire demo phase needs to be stripped
+    (e.g. when the stream config says to strip on failure).
+    """
+    note = (
+        "\n> _The runnable demo for this post failed in CI and has been "
+        "removed. The text above still describes the method._\n"
+    )
+    # Replace from the start of the first block to the end of the last block.
+    blocks = extract_all_python_blocks(mdx)
+    if not blocks:
         return mdx
-    note = "\n> _The runnable demo for this post failed in CI and has been removed. The text above still describes the method._\n"
-    return mdx[: m.start()] + note + mdx[m.end() :]
+    first_start = blocks[0][1]
+    last_end = blocks[-1][2]
+    return mdx[:first_start] + note + mdx[last_end:]
 
 
 # ---------------------------------------------------------------------------

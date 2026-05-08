@@ -172,9 +172,21 @@ generation:
             it sharpens the point -- every equation should be earning
             its space.
           - Inline code spans (single backticks) when referring to a
-            specific function name or variable. Do NOT include fenced
-            code blocks (```python ... ```) here -- runnable code lives
-            in the closing demo stage.
+            specific function name or variable.
+          - SHORT CODE BLOCKS (H5): you MAY include up to 3 small
+            ```python fenced blocks in this stage, each no longer than
+            40 lines and each producing 1-2 matplotlib figures. Place
+            each block at a natural beat where a visual would sharpen
+            the argument (e.g. right after introducing a key equation,
+            right before a transition to a new paper). Each block must
+            be self-contained: import what it needs, save its figures
+            with descriptive filenames (e.g. attention_weights.png),
+            do NOT call plt.show(). Use the same editorial helpers
+            (figure(), PALETTE, lead_color()) that are available in
+            the main closing demo -- they are pre-imported. Keep these
+            blocks tight: they illustrate a single point, not the
+            full experiment. The full experiment lives in the closing
+            demo stage.
           - Analogies: when introducing a hard concept, reach for an
             analogy from cooking, traffic, biology, evolution, signal
             processing, navigation, or another non-AI domain. One per
