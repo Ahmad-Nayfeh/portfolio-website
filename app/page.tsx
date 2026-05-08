@@ -1,7 +1,7 @@
 import Hero from "@/components/layout/Hero"
 import FeaturedProjects from "@/components/FeaturedProjects"
 import RecentPosts from "@/components/RecentPosts"
-import Skills from "@/components/Skills"
+import Manifesto from "@/components/Manifesto"
 import CTA from "@/components/CTA"
 import { getHomeContent, getFeaturedProjects, getRecentPosts } from "@/lib/content"
 
@@ -19,8 +19,4 @@ export default async function Home() {
           long-form magazine spread does. */}
       <FeaturedProjects projects={featuredProjects} />
       <RecentPosts posts={recentPosts} />
-      <Skills />
-      <CTA />
-    </div>
-  )
-}
+      {/* Manifesto replaces the chip-clou
