@@ -138,21 +138,58 @@ generation:
         idea(s) of the selected papers.
 
         Constraints (CRITICAL — the code is run in CI):
-        - Allowed libraries ONLY: numpy, matplotlib, scikit-learn, scipy.
+        - Allowed libraries: numpy, matplotlib, scipy, scikit-learn, seaborn.
           NEVER torch, tensorflow, transformers, or any GPU library.
-        - Must produce at least 1 matplotlib figure (plt.figure or
-          fig, ax = plt.subplots).
+        - Must produce at least 1 matplotlib figure.
         - DO NOT call plt.show() — figures are auto-saved by the runner.
         - Self-contained: no external files, no network calls, no input().
         - Runs in under 60 seconds on a CPU.
+
+        EDITORIAL STYLE (auto-applied — DO NOT redefine):
+        The runner pre-imports an editorial style pack, so every figure
+        you create automatically uses a warm off-white background, deep
+        navy primary, and electric cobalt accent. The following names
+        are already in scope when your code starts — use them instead
+        of hard-coded colors:
+
+          - `figure(width=W, height=H)` -> returns (fig, ax) with the
+            editorial style guaranteed to apply. Prefer this over
+            `plt.subplots(...)` — it's a thin wrapper.
+          - `PALETTE["ink"]`, `PALETTE["accent"]`, `PALETTE["muted"]`,
+            `PALETTE["soft"]`, `PALETTE["warm"]`, `PALETTE["danger"]`,
+            `PALETTE["background"]` — named hex colors. Use the rust
+            `warm` and earthy `danger` SPARINGLY (one highlight per
+            chart at most).
+          - `lead_color(i)` -> i-th color from the editorial cycle.
+          - `annotate_callout(ax, (x, y), "label")` -> editorial-style
+            arrow + text annotation for highlighting a single point.
+
+        Plot quality bar (this matters):
+        - Aim for editorial / scientific-magazine quality, not a
+          tutorial screenshot. Fewer colors, more whitespace, careful
+          labeling.
+        - Use serif axis labels (already the default).
+        - When a histogram, density plot, or heatmap would communicate
+          better than a line chart, use it. seaborn (`import seaborn as
+          sns`) is available for distributions, KDE plots, heatmaps,
+          and pair plots.
+        - Always set descriptive `set_xlabel`, `set_ylabel`, and
+          `set_title` — never ship a chart without them.
+        - Prefer multiple smaller figures (each illustrating one idea)
+          over one giant subplot grid. The post template injects them
+          inline as separate images.
+        - Save figures with explicit names like `loss_curve.png`,
+          `attention_weights.png` so the runner's image ordering is
+          predictable. Use `fig.savefig("name.png")` — bbox is
+          handled by the editorial style's constrained_layout.
 
         Structure the section as:
         ## A demo that makes the idea concrete
 
         Open with 1 paragraph explaining what the demo simulates and what
-        the reader should look at in the figure. Then the code in a
+        the reader should look at in the figure(s). Then the code in a
         ```python fenced block. Then 1 short paragraph interpreting the
-        figure once it appears.
+        figure(s) once they appear.
 
         If the two papers don't share a single illustratable concept, pick
         ONE paper's idea and demo that. Say so explicitly in the opening
@@ -249,43 +286,3 @@ generation:
       2. PROGRESSIVE DEPTH. Open accessible, then formalize. Math goes in
          $$...$$ blocks for display and $...$ inline. Use math ONLY when
          it adds insight — never for decoration.
-      3. SHOW, DON'T SUMMARIZE. Where possible, anchor claims to specific
-         section numbers in the paper, verbatim quotes, and concrete code.
-      4. NO INVENTION. Never fabricate quotes, authors, results, or
-         section numbers. If you cannot find it in the paper, say so
-         explicitly. Verbatim quotes must be wrapped in markdown
-         blockquotes (`> ...`) with attribution.
-      5. CODE THAT RUNS. The demo executes in CI on Python 3.12 with
-         numpy / matplotlib / scikit-learn / scipy installed. NO other
-         libraries. CPU only. Under 60 seconds wall time.
-      6. CONNECT HONESTLY. If two papers share a real thread, name it.
-         If they do not, say "these are two strong but unrelated papers"
-         and treat each on its own terms. Do not manufacture themes.
-      7. NO HYPE. Avoid "revolutionary", "paradigm shift", "game-changer",
-         "groundbreaking". Let the work speak for itself.
-      8. LENGTH FOLLOWS DEPTH. There is no artificial cap. A short
-         honest section beats a long padded one.
-
-demo:
-  enabled: true
-  output_dir: "public/blog-images/{slug}"
-  on_failure: "strip_demo_section"
-
-# DALL-E 3 cover image (C6 — May 2026).
-# Each generated post gets a cover rendered from the `cover_image_brief`
-# stage above. The image is saved to public/blog-images/<slug>/cover.png and
-# the file path is written into the post's frontmatter as `coverImage:`.
-# Cost (DALL-E 3, May 2026): 1792x1024 standard = $0.08 / image,
-# 1792x1024 HD = $0.12 / image. We use HD: ~$6.24/year at one cover/week,
-# crisper lines and cleaner edges (closer to the vector look we want).
-cover_image:
-  enabled: true
-  model: "dall-e-3"
-  size: "1792x1024"                 # landscape — matches the blog header aspect
-  quality: "hd"                     # HD: crisper lines, closer to vector look (+$0.04/img)
-  style: "natural"                  # "vivid" pushes more saturation; we don't want that
-  output_dir: "public/blog-images/{slug}"
-
-quality_gates:
-  build_validation: true
-  require_verbatim_quotes: 2       # at least 2 quoted blocks per paper

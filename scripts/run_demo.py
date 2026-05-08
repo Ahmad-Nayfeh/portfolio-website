@@ -67,13 +67,36 @@ def extract_first_python_block(mdx: str) -> tuple[str, int, int] | None:
     return m.group(1), m.start(), m.end()
 
 
+def _read_plot_style_source() -> str:
+    """Read scripts/plot_style.py and return its source text.
+
+    We inline the module body into the demo wrapper rather than rely on
+    PYTHONPATH because the subprocess CWD is the per-post image folder,
+    not scripts/. Inlining is heavier but bulletproof — there's no
+    runtime path config that can drift out of sync.
+    """
+    style_path = Path(__file__).resolve().parent / "plot_style.py"
+    try:
+        return style_path.read_text(encoding="utf-8")
+    except OSError as e:
+        log.warning("plot_style.py not readable (%s); demos will run with bare matplotlib.", e)
+        return ""
+
+
 def _wrap_demo_for_capture(code: str) -> str:
-    """Wrap user demo code so matplotlib figures are auto-saved.
+    """Wrap user demo code so matplotlib figures are auto-saved AND styled.
 
     The wrapper:
       1. Forces a non-interactive backend so the demo can't open a GUI
          window.
-      2. After the demo runs, saves every still-open figure as
+      2. Inlines scripts/plot_style.py BEFORE the demo body runs. That
+         applies the editorial palette (warm off-white background, deep
+         navy ink, cobalt accent) at module-import time, so even demo
+         code that knows nothing about the style still inherits it.
+         The PALETTE / CYCLE / figure() / annotate_callout() / lead_color()
+         names are also exposed in the global namespace, so demo code can
+         opt into the editorial helpers explicitly when it wants to.
+      3. After the demo runs, saves every still-open figure as
          figure_<n>.png in the CURRENT WORKING DIRECTORY. The caller
          (run_demo_for_post) sets CWD to the per-post image folder so
          these files land where Next.js can serve them.
@@ -90,6 +113,11 @@ def _wrap_demo_for_capture(code: str) -> str:
         "matplotlib.use('Agg')\n"
         "import matplotlib.pyplot as _plt_demo_capture\n"
         "\n"
+        "# --- Editorial style (inlined from scripts/plot_style.py) ----\n"
+        + _read_plot_style_source()
+        + "\n"
+        "# --- End editorial style. Demo code follows. -----------------\n"
+        "\n"
     )
     footer = (
         "\n"
@@ -98,7 +126,7 @@ def _wrap_demo_for_capture(code: str) -> str:
         "for _i, _num in enumerate(_plt.get_fignums(), start=1):\n"
         "    _fig = _plt.figure(_num)\n"
         "    _path = f'figure_{_i}.png'\n"
-        "    _fig.savefig(_path, dpi=120, bbox_inches='tight')\n"
+        "    _fig.savefig(_path, dpi=160, bbox_inches='tight')\n"
         "    print(f'SAVED_FIGURE:{_path}')\n"
     )
     return header + code + footer
