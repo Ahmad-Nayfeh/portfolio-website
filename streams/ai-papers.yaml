@@ -1,37 +1,34 @@
 # streams/ai-papers.yaml
 #
-# Weekly AI paper deep dives — picks 1-3 recent papers under one honest
+# Weekly AI paper deep dives -- picks 1-3 recent papers under one honest
 # umbrella from the last 30 days of Hugging Face Daily Papers, then writes
 # a Socratic, dialectical analysis with intuition-first explanation, math
 # where it adds insight, multiple verbatim quotes, and a closing demo that
 # scientifically tests the central claim against a dummy dataset.
 #
-# Stage structure (H3 + H6 redesign — May 2026):
-#   1. umbrella_opening           — opens with a vivid question and an
-#                                   analogy from everyday life or another
-#                                   scientific domain. Frames the umbrella
-#                                   theme as a question, not a topic.
-#   2. dialectical_walk           — main body. Walks through the papers as
-#                                   one continuous Socratic dialogue:
-#                                   claim -> counter-question -> answer ->
-#                                   deeper question -> next paper's claim.
-#                                   Each paper gets >=2 verbatim quotes,
-#                                   key math, and a small illustrative
-#                                   code block (rendered as a figure).
-#   3. closing_demo_and_critique  — the honest scientific test. Apply the
-#                                   general algorithm to a dummy dataset.
-#                                   Plot the results. Comment honestly on
-#                                   what worked, what didn't, and where
-#                                   the experiment contradicts the paper's
-#                                   claims.
-#   4. honest_takeaway            — short closing prose. What does the
-#                                   reader walk away with that's true?
-#   5. tag_extraction             — metadata-only. Parsed for the post's
-#                                   `tags:` frontmatter, not included in
-#                                   the body.
-#   6. cover_image_brief          — metadata-only. One-sentence visual
-#                                   brief used by generate_cover.py to
-#                                   prompt DALL-E 3 for the cover image.
+# Stage structure (H3 + H6 + H4 redesign -- May 2026):
+#   1. umbrella_opening           -- opens with a vivid question and an
+#                                    analogy from everyday life or another
+#                                    scientific domain. Frames the umbrella
+#                                    theme as a question, not a topic.
+#                                    Drops {{IMG:OPENING}} placeholder.
+#   2. dialectical_walk           -- main body. Walks through the papers as
+#                                    one continuous Socratic dialogue.
+#                                    Drops {{IMG:DIALECTIC_1}} and optionally
+#                                    {{IMG:DIALECTIC_2}} at act-breaks.
+#   3. closing_demo_and_critique  -- the honest scientific test. Apply the
+#                                    general algorithm to a dummy dataset.
+#                                    Plot the results. Comment honestly on
+#                                    what worked, what didn't, and where
+#                                    the experiment contradicts the paper's
+#                                    claims.
+#   4. honest_takeaway            -- short closing prose.
+#   5. tag_extraction             -- metadata-only.
+#   6. cover_image_brief          -- metadata-only. DALL-E 3 cover brief.
+#   7. inline_image_briefs        -- metadata-only. JSON array of 2-4
+#                                    inline illustration briefs, rendered
+#                                    by generate_inline_images.py after
+#                                    write_post.
 #
 # To pause this stream: set enabled to false, or move into streams/_disabled/.
 
@@ -47,43 +44,20 @@ schedule:
 
 discovery:
   source: huggingface_daily_papers
-  # Look back a full month so the umbrella selector has enough range to
-  # find a coherent thematic group. The pre-H1 setting was 7 days, which
-  # often produced "two unrelated bangers" rather than a thread.
   lookback_days: 30
-  # Wider candidate pool than the pre-H1 setting (was 10). The umbrella
-  # selector hard-caps how many it actually feeds to Claude
-  # (MAX_CANDIDATES_FOR_SELECTION in select_papers.py), but anything past
-  # that cap is still useful as a fallback if the dedup filter eats half
-  # the top of the list on a slow week.
   top_n: 30
   filters:
     categories: []
     min_upvotes: 5
   selection:
-    # claude_umbrella_picks: ask Claude to pick 2-3 papers under one
-    # honest theme, OR fall back to a single best paper. The legacy
-    # "claude_picks" / "count: N" behaviour is preserved in main.py for
-    # any future stream that wants the older shape.
     method: claude_umbrella_picks
-    # `count` is informational under claude_umbrella_picks — the selector
-    # is hard-clamped to [1, 3] internally. We keep it here as a hint.
     count: 3
-  # Append-only ledger of papers already shipped in past posts. The
-  # discovery layer reads this and drops candidates that are already in
-  # it, so the same paper is never written up twice. Updated by
-  # discover_papers.mark_paper_as_used after write_post succeeds.
   dedup_state_file: pipeline-state/used-papers.json
 
 content:
   output_path: "content/blog"
   slug_pattern: "{year}-W{week}-{topic-slug}"
-  # Title prefix for posts in this stream. Future streams (history, logic,
-  # etc.) define their own. Use {topic} as a placeholder for the first
-  # paper's title (or a stream-relevant root for non-paper streams).
   title_template: "Paper Notes: {topic}"
-  # Base tags merged with the dynamic `tag_extraction` output. Keep these
-  # broad — specific tags come from per-post extraction.
   tags: ["AI", "weekly-paper"]
 
 generation:
@@ -91,11 +65,6 @@ generation:
   fallback_model: "claude-haiku-4-5"
   max_output_tokens: 16000
 
-  # ----- Stages -----
-  # Each stage is a separate Claude call with narrow scope. Output is
-  # appended to the post body in the order listed below, except for stages
-  # tagged `role: metadata` (those are parsed for frontmatter only, never
-  # included in the body).
   stages:
     - name: umbrella_opening
       task: |
@@ -109,7 +78,7 @@ generation:
 
         Structure:
 
-        Paragraph 1 — A vivid, concrete entry point. Open with one of:
+        Paragraph 1 -- A vivid, concrete entry point. Open with one of:
           - a familiar phenomenon from everyday life (cooking, traffic,
             biology, navigation, music)
           - a phenomenon from a DIFFERENT scientific domain (physics,
@@ -117,9 +86,9 @@ generation:
           - a question the reader has likely asked themselves but
             doesn't have a name for
         Avoid jargon. Avoid the words "paper", "model", or "AI" in the
-        first sentence — those should arrive in paragraph 2.
+        first sentence -- those should arrive in paragraph 2.
 
-        Paragraph 2 — Name the umbrella. State the question that the
+        Paragraph 2 -- Name the umbrella. State the question that the
         selected paper(s) are reaching toward, in one sentence. Then
         introduce the papers themselves in plain language: 1-2 sentences
         per paper, framed as "this paper offers ONE answer to the
@@ -127,7 +96,7 @@ generation:
         For a single-paper post: introduce the paper as one sustained
         attempt at the question.
 
-        Paragraph 3 — Tell the reader what they'll get from the post:
+        Paragraph 3 -- Tell the reader what they'll get from the post:
         which intuitions they'll leave with, which math will show up,
         which experiment you'll run at the end. Be specific: "by the
         end of this post you'll understand X, you'll have seen Y, and
@@ -141,11 +110,31 @@ generation:
         For a single-paper post the heading should still be a question
         that the paper is the candidate answer to.
 
+        INLINE IMAGE PLACEHOLDER -- place exactly ONE of these tokens in
+        the text, on its own line, surrounded by blank lines, after the
+        first paragraph (before or after the section heading, but NOT
+        inside a heading line):
+
+          {{IMG:OPENING}}
+
+        This token will be replaced with an editorial illustration before
+        the post is published. It must be on its own line, blank line
+        above AND below, like this:
+
+          ...end of paragraph.
+
+          {{IMG:OPENING}}
+
+          ## The question heading or next paragraph...
+
+        Do NOT use any other IMG token in this stage. Do NOT write the
+        token inside a heading, blockquote, or code block.
+
     - name: dialectical_walk
       task: |
         Write the MAIN BODY of the post as one continuous Socratic
         dialectic across the selected paper(s). This is the place where
-        most of the post's depth lives — aim for 1500-3000 words total
+        most of the post's depth lives -- aim for 1500-3000 words total
         across this stage. Length should follow what the papers
         actually require; do not pad.
 
@@ -153,22 +142,22 @@ generation:
         through a single argument that moves like this:
 
           (1) Restate the umbrella question from the opening, sharper.
-          (2) Paper A's first claim — what does it propose as an answer?
+          (2) Paper A's first claim -- what does it propose as an answer?
               Use plain language first, then formalize.
-          (3) Socratic question — the question a careful reader should
+          (3) Socratic question -- the question a careful reader should
               ask after reading (2). Examples: "but does this hold when
               X?"  "how does the method behave at the boundary?"  "isn't
               this just a renaming of an older idea?"
-          (4) Paper A's response in detail — including key math in $$...$$
+          (4) Paper A's response in detail -- including key math in $$...$$
               blocks ONLY where it adds insight, and at least 2 verbatim
               blockquotes from the paper's abstract or summary, attributed.
-          (5) Limitation acknowledged — where Paper A's answer falls short.
+          (5) Limitation acknowledged -- where Paper A's answer falls short.
           (6) IF a second / third paper exists in the umbrella: introduce
               it as the continuation of the dialectic, not as a separate
               paper. Phrase the transition like: "this is exactly where
               <Paper B> picks up the thread". Then repeat (2)-(5) for
               Paper B, with at least 2 verbatim quotes for each new paper.
-          (7) Synthesis question — what's the deeper question both
+          (7) Synthesis question -- what's the deeper question both
               papers leave unresolved? State it clearly. Don't answer it
               yet (the closing demo will probe it).
 
@@ -178,20 +167,20 @@ generation:
             breaks"). Do NOT use the paper title as a heading.
           - Use h3 sub-headings sparingly for the dialectical beats.
           - Verbatim quotes: at least 2 per paper, each as a markdown
-            blockquote (`> ...`) with attribution on the next line.
+            blockquote (> ...) with attribution on the next line.
           - Math: $$...$$ for display, $...$ for inline. Use ONLY when
-            it sharpens the point — every equation should be earning
+            it sharpens the point -- every equation should be earning
             its space.
           - Inline code spans (single backticks) when referring to a
             specific function name or variable. Do NOT include fenced
-            code blocks (```python ... ```) here — runnable code lives
+            code blocks (```python ... ```) here -- runnable code lives
             in the closing demo stage.
           - Analogies: when introducing a hard concept, reach for an
             analogy from cooking, traffic, biology, evolution, signal
             processing, navigation, or another non-AI domain. One per
             new concept, no more.
           - DO NOT use the words "intuition", "actually works", or
-            "honest critique" as section headings — those were the old
+            "honest critique" as section headings -- those were the old
             template. Write headings that name the dialectic.
 
         For a SINGLE-PAPER post the structure is the same minus the
@@ -199,10 +188,34 @@ generation:
         question -> response with quotes/math -> limitation ->
         deeper-question hand-off to the demo.
 
+        INLINE IMAGE PLACEHOLDERS -- place 1-2 of the following tokens
+        at natural act-breaks in the dialectic (e.g. right before you
+        introduce a new paper, or right after you land a key synthesis).
+        Each token must be on its own line, blank line above AND below:
+
+          {{IMG:DIALECTIC_1}}   -- use at the first major act-break
+          {{IMG:DIALECTIC_2}}   -- use at a second act-break if the post
+                                   has two or more distinct dialectical
+                                   moves. Skip if the post is short.
+
+        Example placement:
+
+          ...where Paper A's approach breaks down.
+
+          {{IMG:DIALECTIC_1}}
+
+          ## How Paper B picks up the thread
+
+          ...
+
+        Do NOT use {{IMG:OPENING}} in this stage -- that token belongs
+        only in the umbrella_opening stage. Do NOT place tokens inside
+        headings, blockquotes, or code blocks.
+
     - name: closing_demo_and_critique
       task: |
         Write the closing experimental section. This is the post's
-        "scientific test" — apply the general algorithm or central
+        "scientific test" -- apply the general algorithm or central
         idea to a dummy dataset, plot results scientifically, and
         comment honestly.
 
@@ -212,7 +225,7 @@ generation:
 
         Structure:
 
-        Opening paragraph (~120 words) — Restate the deeper question
+        Opening paragraph (~120 words) -- Restate the deeper question
         the dialectical walk left open. Say what experiment you're
         running, what the experiment SHOULD show if the paper's central
         claim holds, and what it would show if the claim doesn't hold.
@@ -220,63 +233,52 @@ generation:
 
         Then the code in a single ```python fenced block (<=120 lines).
 
-        Demo constraints (CRITICAL — the code is run in CI):
+        Demo constraints (CRITICAL -- the code is run in CI):
         - Allowed libraries: numpy, matplotlib, scipy, scikit-learn,
           seaborn. NEVER torch, tensorflow, transformers, or any GPU
           library.
         - Must produce at least 2 matplotlib figures. Save each with
-          a descriptive filename (e.g. `comparison.png`,
-          `convergence.png`).
-        - DO NOT call plt.show() — figures are auto-saved by the runner.
+          a descriptive filename (e.g. comparison.png, convergence.png).
+        - DO NOT call plt.show() -- figures are auto-saved by the runner.
         - Self-contained: no external files, no network calls, no input().
         - Runs in under 60 seconds on a CPU.
 
-        EDITORIAL STYLE (auto-applied — DO NOT redefine):
+        EDITORIAL STYLE (auto-applied -- DO NOT redefine):
         The runner pre-imports an editorial style pack so every figure
         you create automatically uses a warm off-white background, deep
         navy primary, and electric cobalt accent. The following names
         are already in scope when your code starts:
 
-          - `figure(width=W, height=H)` -> returns (fig, ax) with the
+          - figure(width=W, height=H) -> returns (fig, ax) with the
             editorial style guaranteed to apply. Prefer this over
-            `plt.subplots(...)`.
-          - `PALETTE["ink"]`, `PALETTE["accent"]`, `PALETTE["muted"]`,
-            `PALETTE["soft"]`, `PALETTE["warm"]`, `PALETTE["danger"]`,
-            `PALETTE["background"]` — named hex colors. Use the rust
-            `warm` and earthy `danger` SPARINGLY (one highlight per
-            chart at most).
-          - `lead_color(i)` -> i-th color from the editorial cycle.
-          - `annotate_callout(ax, (x, y), "label")` -> editorial
+            plt.subplots(...).
+          - PALETTE["ink"], PALETTE["accent"], PALETTE["muted"],
+            PALETTE["soft"], PALETTE["warm"], PALETTE["danger"],
+            PALETTE["background"] -- named hex colors.
+          - lead_color(i) -> i-th color from the editorial cycle.
+          - annotate_callout(ax, (x, y), "label") -> editorial
             arrow + text annotation for highlighting one point.
 
         Plot quality bar:
         - Editorial / scientific-magazine quality, not a tutorial
           screenshot. Fewer colors, more whitespace, careful labeling.
-        - Always set descriptive `set_xlabel`, `set_ylabel`,
-          `set_title`. Never ship a chart without them.
-        - Use seaborn (`import seaborn as sns`) for distributions, KDE
-          plots, heatmaps, or pair plots when those communicate better
-          than a line chart.
+        - Always set descriptive set_xlabel, set_ylabel, set_title.
+        - Use seaborn for distributions, KDE plots, heatmaps, or pair
+          plots when those communicate better than a line chart.
 
-        Closing paragraph (200-400 words) — THIS IS THE KEY MOMENT.
+        Closing paragraph (200-400 words) -- THIS IS THE KEY MOMENT.
         Interpret the results scientifically and HONESTLY:
           - State what the experiment showed in one sentence.
           - Compare it to what the paper(s) claimed.
-          - If the experiment supports the claim, say so plainly and
-            explain WHY this is a meaningful confirmation (not just a
-            "we got the same numbers because we used the same setup").
-          - If the experiment contradicts the claim — say so plainly.
-            Don't apologize for the paper. Don't excuse the result.
-            Explain what the discrepancy might mean: a hidden
-            assumption, an overstated generalization, a regime where
-            the method does not apply.
-          - If the experiment is inconclusive, say that too. "I'd need
-            a larger sample / longer runtime / different metric to
-            tell" is a valid honest closing.
+          - If the experiment supports the claim, say so plainly.
+          - If the experiment contradicts the claim -- say so plainly.
+            Don't apologize for the paper. Explain what the discrepancy
+            might mean: a hidden assumption, an overstated generalization,
+            a regime where the method does not apply.
+          - If the experiment is inconclusive, say that too.
 
         Do NOT add a final "but the paper is still important" softener
-        if the experiment contradicted the claim. The reader can hold
-        both ideas at once.
+        if the experiment contradicted the claim.
 
     - name: honest_takeaway
       task: |
@@ -287,23 +289,17 @@ generation:
         ONE paragraph, no subheadings. Answer:
           - What is the smallest, truest sentence the reader should
             leave the post with?
-          - What is one thing this post did NOT settle (and why that's
-            OK)?
-          - What is one direction a curious reader could pursue next —
-            either another paper, a question worth running an
-            experiment on, or a connection to a different field?
+          - What is one thing this post did NOT settle (and why that's OK)?
+          - What is one direction a curious reader could pursue next?
 
         Voice rule: as if you were closing a long conversation with a
         colleague, not as if you were writing a textbook conclusion.
         Concise, slightly informal, but never self-important.
 
-        CRITICAL — NO CODE BLOCKS IN THIS SECTION:
+        CRITICAL -- NO CODE BLOCKS IN THIS SECTION:
         - Do NOT include any ```python or ```text or ```bash fenced
           code blocks. The runnable demo lives in the previous stage.
-          Repeating code here creates a duplicate demo section that
-          confuses the reader and breaks the post layout.
-        - Inline code spans (single backticks, like `softmax`) are
-          fine when referring to a specific function or variable name.
+        - Inline code spans (single backticks) are fine.
         - Do NOT use hype phrases like "paradigm shift", "revolutionary",
           "groundbreaking", or "game-changer".
 
@@ -328,41 +324,80 @@ generation:
       task: |
         Write ONE sentence describing the abstract scene that should appear
         on the cover image for this post. The image goes at the top of the
-        blog page as a 16:9 editorial illustration — like the cover of a
+        blog page as a 16:9 editorial illustration -- like the cover of a
         research magazine.
 
         Constraints:
           - One sentence only. 25 words maximum.
-          - Be VISUAL. Describe shapes, textures, composition — not the
-            paper's title, not technical jargon. Translate the central
-            idea into an image a designer could draw.
+          - Be VISUAL. Describe shapes, textures, composition -- not the
+            paper's title, not technical jargon.
           - Do NOT mention text, words, letters, captions, or labels.
-            (DALL-E will render garbled text otherwise.)
           - Do NOT name a real person, brand, or copyrighted character.
-          - Avoid hype words like "revolutionary" or "powerful" — they
-            don't help an illustrator.
+          - Avoid hype words like "revolutionary" or "powerful".
 
         The pipeline appends a fixed style suffix automatically (minimal,
         warm off-white background, deep navy, single cobalt accent, no
-        text). Don't repeat that — focus only on the SUBJECT of the image.
+        text). Don't repeat that -- focus only on the SUBJECT of the image.
 
         Good example (multi-agent paper): "Three abstract glowing nodes
         passing translucent threads of light to each other across an
         empty grid, with a faint orbit pattern around them."
         Bad example: "An illustration about agentic AI systems."
-        Bad example: "A cover image for our paper on multi-agent RL."
 
         Output the sentence and nothing else.
+
+    - name: inline_image_briefs
+      role: metadata             # NOT included in post body
+      task: |
+        Output a JSON object describing 2-4 inline illustrations for this
+        post. These illustrations will be rendered by DALL-E 3 and
+        substituted for the {{IMG:ID}} placeholder tokens that appear in
+        the prose stages.
+
+        The IDs MUST match the placeholder tokens used in the prose:
+          OPENING      -- the illustration placed after the first paragraph
+          DIALECTIC_1  -- the first major act-break in the dialectical walk
+          DIALECTIC_2  -- the second act-break (omit if the post is short)
+
+        Rules for briefs:
+          - Each brief is one sentence (20 words max). Be VISUAL and
+            CONCRETE -- describe shapes, structures, compositions.
+            Translate the concept into something a designer could draw.
+          - Each alt is a one-sentence screen-reader description of
+            the illustration (what it depicts, not what it means).
+          - NO text, letters, captions, logos, or faces in any brief.
+            (DALL-E will render garbled text -- never request it.)
+          - NO real people, no real brand names, no copyrighted characters.
+          - The style is automatically applied (warm off-white background,
+            deep navy, cobalt accent, flat vector, no gradients). Do NOT
+            describe the style -- describe only the subject.
+          - 2 images minimum; 3 is the typical target; 4 is the maximum.
+
+        Good brief examples:
+          OPENING -- "A single glowing node in a dark lattice, sending
+            a thin bright thread toward a cluster of dimmer nodes."
+          DIALECTIC_1 -- "Two stacks of abstract geometric shapes leaning
+            toward each other, one orderly, one irregular."
+
+        Output JSON ONLY. No markdown fences, no preamble, no explanation.
+
+        Required schema:
+        {"images": [{"id": "OPENING", "brief": "...", "alt": "..."}, {"id": "DIALECTIC_1", "brief": "...", "alt": "..."}, {"id": "DIALECTIC_2", "brief": "...", "alt": "..."}]}
+
+        Omit DIALECTIC_2 if the post has only one clear dialectical move.
+        Never include more than 4 images total.
+
+        Output the JSON object and nothing else.
 
   system_prompt: |
     You are a technical writer for a portfolio blog by an engineer who
     values rigor, clarity, and honest investigation. Your readers are
-    working engineers and applied researchers — many are NOT specialists
+    working engineers and applied researchers -- many are NOT specialists
     in the paper's subfield. Your job is to make rigorous AI/ML papers
     reachable for a smart engineer in an adjacent area, without dumbing
     down, AND to test the papers' claims rather than just summarize them.
 
-    Voice rules — Socratic dialectic:
+    Voice rules -- Socratic dialectic:
       1. THE POST IS A CONVERSATION. Every section either asks a question
          the reader is half-thinking, or answers one the previous section
          raised. Never present claims as a flat list. Always tee up the
@@ -375,7 +410,7 @@ generation:
          in isolation, reach for an analogy from cooking, traffic,
          biology, evolution, signal processing, navigation, or any
          non-AI scientific domain. One analogy per new concept. Do not
-         pile analogies — they cancel each other out.
+         pile analogies -- they cancel each other out.
       4. INTUITION FIRST, MATH SECOND. Before any equation, the reader
          should know what problem the math solves and why a non-specialist
          should care. Math goes in $$...$$ blocks for display and $...$
@@ -383,7 +418,7 @@ generation:
       5. SHOW, DON'T SUMMARIZE. Anchor claims to specific section numbers
          when you can, verbatim quotes from the paper, and concrete code.
          At least 2 verbatim blockquotes per paper, each wrapped as
-         `> ...` with attribution on the following line.
+         > ... with attribution on the following line.
       6. NO INVENTION. Never fabricate quotes, authors, results, or
          section numbers. If you cannot find it in the paper, say so
          explicitly. A clearly incomplete answer is more valuable than a
@@ -391,8 +426,8 @@ generation:
       7. CODE THAT RUNS. The closing demo executes in CI on Python 3.10+
          with numpy / matplotlib / scipy / scikit-learn / seaborn. NO
          other libraries. CPU only. Under 60 seconds wall time. The
-         editorial style pack is auto-imported — use `figure()`,
-         `PALETTE`, `lead_color()`, `annotate_callout()` instead of
+         editorial style pack is auto-imported -- use figure(),
+         PALETTE, lead_color(), annotate_callout() instead of
          redefining colors.
       8. THE HONEST SCIENTIST POSTURE. The closing demo is your chance
          to TEST the central claim, not validate it. If the experiment
@@ -401,7 +436,7 @@ generation:
          important". The reader can hold both ideas at once.
       9. CONNECT HONESTLY. If two papers share a real thematic thread,
          name it and weave them. If they don't share one, the umbrella
-         selector should not have grouped them — flag this as a problem
+         selector should not have grouped them -- flag this as a problem
          and treat each on its own terms.
      10. NO HYPE. Avoid "revolutionary", "paradigm shift", "game-changer",
          "groundbreaking", "powerful", "state-of-the-art" as a stand-alone
@@ -411,7 +446,7 @@ generation:
          honest section beats a long padded one. The dialectical walk
          can run 1500-3000 words; the closing prose should stay tight.
      12. NEVER OVERRIDE A PRIOR STAGE. The pipeline runs each stage as a
-         separate call. Build on what earlier stages wrote — don't
+         separate call. Build on what earlier stages wrote -- don't
          restate the opening at the start of the dialectic, don't
          restate the dialectic at the start of the closing demo. Earlier
          output is appended to your prompt as context; trust it.
@@ -421,21 +456,26 @@ demo:
   output_dir: "public/blog-images/{slug}"
   on_failure: "strip_demo_section"
 
-# DALL-E 3 cover image (C6 — May 2026).
-# Each generated post gets a cover rendered from the `cover_image_brief`
-# stage above. The image is saved to public/blog-images/<slug>/cover.png and
-# the file path is written into the post's frontmatter as `coverImage:`.
-# Cost (DALL-E 3, May 2026): 1792x1024 standard = $0.08 / image,
-# 1792x1024 HD = $0.12 / image. We use HD: ~$6.24/year at one cover/week,
-# crisper lines and cleaner edges (closer to the vector look we want).
+# DALL-E 3 cover image (G1 -- May 2026).
+# Each generated post gets a cover rendered from the cover_image_brief stage.
+# Cost: 1792x1024 HD = $0.12/image; ~$6.24/year at weekly cadence.
 cover_image:
   enabled: true
   model: "dall-e-3"
-  size: "1792x1024"                 # landscape — matches the blog header aspect
-  quality: "hd"                     # HD: crisper lines, closer to vector look (+$0.04/img)
-  style: "natural"                  # "vivid" pushes more saturation; we don't want that
+  size: "1792x1024"
+  quality: "hd"
+  style: "natural"
   output_dir: "public/blog-images/{slug}"
+
+# Inline DALL-E illustrations (H4 -- May 2026).
+# 2-4 small illustrations woven into the prose. Each is 1024x1024 standard
+# ($0.04/image). Three inline + one HD cover = $0.24/post; ~$12.48/year.
+# Use --skip-inline-images in test runs to skip.
+inline_images:
+  enabled: true
+  size: "1024x1024"
+  quality: "standard"
 
 quality_gates:
   build_validation: true
-  require_verbatim_quotes: 2       # at least 2 quoted blocks per paper
+  require_verbatim_quotes: 2

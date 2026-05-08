@@ -12,10 +12,11 @@ Per stream, the flow is:
     load_streams.load_due_streams
         -> discover_papers.discover_for_stream
         -> generate_post.run_stages
-        -> generate_post.regenerate_quote_stage   (if quote count is short)
-        -> generate_post.write_post               (writes content/blog/<slug>.mdx)
-        -> run_demo.run_demo_for_post             (optional, mutates the MDX)
-        -> validate_build.run_next_build          (optional, gates the PR)
+        -> generate_post.regenerate_quote_stage        (if quote count is short)
+        -> generate_post.write_post                    (writes content/blog/<slug>.mdx)
+        -> generate_inline_images.render_and_substitute (optional, mutates the MDX)
+        -> run_demo.run_demo_for_post                  (optional, mutates the MDX)
+        -> validate_build.run_next_build               (optional, gates the PR)
 
 The pipeline writes its outputs into the working tree. The GitHub Actions
 job is what creates the branch + PR after `main.py` exits (see
@@ -40,7 +41,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-# Local imports — these are siblings in scripts/.
+# Local imports -- these are siblings in scripts/.
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
@@ -48,6 +49,7 @@ if str(HERE) not in sys.path:
 import cost_meter  # noqa: E402
 import discover_papers  # noqa: E402
 import generate_cover  # noqa: E402
+import generate_inline_images  # noqa: E402
 import generate_post  # noqa: E402
 import load_streams  # noqa: E402
 import run_demo  # noqa: E402
@@ -87,6 +89,11 @@ def _parse_args() -> argparse.Namespace:
         "--skip-cover",
         action="store_true",
         help="Skip DALL-E cover image generation (saves OpenAI quota in test runs).",
+    )
+    p.add_argument(
+        "--skip-inline-images",
+        action="store_true",
+        help="Skip DALL-E inline illustration rendering (saves OpenAI quota in test runs).",
     )
     p.add_argument(
         "--output-summary",
@@ -143,9 +150,7 @@ def main() -> int:
         log.info("=" * 70)
         log.info("Stream %s (%s)", cfg.stream.id, cfg.stream.name)
 
-        # Fresh meter per stream — the ceiling is per-blog, not per-workflow.
-        # If a future change ever produces multiple posts in one workflow run,
-        # each gets its own $1 cap rather than sharing one.
+        # Fresh meter per stream -- the ceiling is per-blog, not per-workflow.
         cost_meter.init_meter(ceiling_usd=args.cost_ceiling)
         log.info("Cost ceiling: $%.2f USD (per stream)", args.cost_ceiling)
 
@@ -160,17 +165,11 @@ def main() -> int:
             stream_exit = _run_stream(cfg=cfg, args=args, now=now, summary=summary)
             worst_exit = max(worst_exit, stream_exit)
         except cost_meter.CostCeilingExceeded as e:
-            # The meter tripped. We treat this as a fatal error so the workflow
-            # opens a failure issue and emails — getting close to the ceiling
-            # almost always means a stage is misbehaving (runaway tokens,
-            # infinite retry, etc.) and silent retry would just waste more.
             log.error("Cost ceiling tripped on %s: %s", cfg.stream.id, e)
             summary["status"] = "cost_aborted"
             summary["error"] = str(e)
             worst_exit = max(worst_exit, 1)
 
-        # Capture cost data in the summary regardless of how the stream ended,
-        # so the success email and the failure issue both have visibility.
         meter = cost_meter.get_meter()
         if meter is not None:
             cost_summary = meter.to_summary()
@@ -183,7 +182,6 @@ def main() -> int:
         summary["finished_at"] = dt.datetime.utcnow().isoformat() + "Z"
         summaries.append(summary)
 
-        # Reset between streams so cost doesn't leak into the next run.
         cost_meter.reset_meter()
 
     _write_summary(args, summaries)
@@ -197,13 +195,7 @@ def _run_stream(
     now: dt.datetime,
     summary: dict,
 ) -> int:
-    """Run a single stream. Returns the worst exit code seen.
-
-    Pulled out of `main()` so the per-stream try/except for
-    `CostCeilingExceeded` has a single, obvious scope. Anything that calls
-    Claude or DALL-E lives below this function — that means cost-driven
-    aborts can happen mid-flight and unwind cleanly back to the for-loop.
-    """
+    """Run a single stream. Returns the worst exit code seen."""
     worst_exit = 0
 
     # 1) Discover.
@@ -227,14 +219,6 @@ def _run_stream(
         summary["status"] = "no_candidates"
         return worst_exit
 
-    # Selection. Two paths:
-    #   1. claude_umbrella_picks  -> ask Claude to pick 2-3 papers under
-    #      one umbrella, OR a single best paper. This is the path we want
-    #      for the AI-papers stream after the H1 redesign — it gives
-    #      thematic coherence instead of stapled-together summaries.
-    #   2. anything else (incl. unset / "claude_picks") -> legacy: keep
-    #      the top `selection.count` candidates by upvotes. Same as the
-    #      pre-H1 behaviour.
     selection_cfg = cfg.discovery.selection or {}
     method = (selection_cfg.get("method") or "").strip().lower()
     if method == "claude_umbrella_picks":
@@ -245,11 +229,8 @@ def _run_stream(
         except cost_meter.CostCeilingExceeded:
             raise
         except Exception as e:
-            log.warning("Umbrella selector crashed (%s) — falling back to top-1.", e)
+            log.warning("Umbrella selector crashed (%s) -- falling back to top-1.", e)
             picked = papers[:1]
-        # The selector clamps to [1, MAX_PICKED_PAPERS] internally; an empty
-        # result means it had nothing to work with, in which case we keep
-        # `papers` empty so the no-candidates branch below trips.
         papers = picked
     else:
         sel = selection_cfg.get("count")
@@ -272,7 +253,6 @@ def _run_stream(
     try:
         stage_outputs = generate_post.run_stages(stream_cfg=cfg, papers=papers)
     except cost_meter.CostCeilingExceeded:
-        # Bubble up — handled by main()'s per-stream try/except.
         raise
     except Exception as e:
         log.exception("Generation failed for %s: %s", cfg.stream.id, e)
@@ -280,10 +260,7 @@ def _run_stream(
         summary["error"] = str(e)
         return 1
 
-    # 2b) Quote-count retry. We assemble the body (without writing it),
-    # count quotes, and re-run the quote stage once if we're below target.
-    # Retrying BEFORE writing to disk keeps the published post clean if
-    # the retry succeeds — no rewrite, no second commit.
+    # 2b) Quote-count retry.
     required_quotes = cfg.quality_gates.require_verbatim_quotes or 0
     retried_quotes = False
     if required_quotes > 0:
@@ -307,12 +284,12 @@ def _run_stream(
             except cost_meter.CostCeilingExceeded:
                 raise
             except Exception as e:
-                log.warning("Quote retry crashed: %s — proceeding with original output.", e)
+                log.warning("Quote retry crashed: %s -- proceeding with original output.", e)
     summary["quote_retry_used"] = retried_quotes
 
     # 3) Compute slug + (optionally) generate the cover image BEFORE we
     # write the MDX, so the frontmatter can include the coverImage path
-    # in its first write — no second commit needed.
+    # in its first write -- no second commit needed.
     slug = generate_post.make_slug(cfg, papers, now)
     cover_image_path: str | None = None
     if args.skip_cover:
@@ -349,25 +326,42 @@ def _run_stream(
         summary["error"] = str(e)
         return 1
 
-    # `write_post` may have rewritten the slug (it builds it the same way
-    # we did above, so they should match — but assert and re-derive to
-    # be safe in case of a future refactor).
     slug = mdx_path.stem
     summary["slug"] = slug
     summary["mdx_path"] = str(mdx_path.relative_to(load_streams.REPO_ROOT))
 
     # 4b) Mark each picked paper as used so a future run won't re-feature it.
-    # Done AFTER write_post succeeds so a crash mid-generation doesn't burn
-    # a paper. Wrapped defensively — a ledger-update failure shouldn't fail
-    # the post; the duplicate-in-future-runs is a soft cost we'd rather pay
-    # than ship a broken post.
     try:
         for p in papers:
             discover_papers.mark_paper_as_used(
                 cfg, p, slug=slug, when=now,
             )
-    except Exception as e:  # pragma: no cover — defensive
+    except Exception as e:  # pragma: no cover -- defensive
         log.warning("Failed to update used-papers ledger: %s", e)
+
+    # 4c) Inline illustrations. Renders DALL-E images for {{IMG:ID}}
+    # placeholders in the prose and rewrites the MDX in place. Must run
+    # BEFORE the demo step because run_demo also mutates the MDX -- if
+    # inline images ran after the demo, figure ordering would be reversed.
+    #
+    # A crash here is non-fatal: render_and_substitute converts any
+    # un-rendered placeholder to an HTML comment, so the post ships
+    # without broken <img> tags regardless.
+    skip_inline = getattr(args, "skip_inline_images", False)
+    try:
+        inline_result = generate_inline_images.render_and_substitute(
+            stream_cfg=cfg,
+            stage_outputs=stage_outputs,
+            mdx_path=mdx_path,
+            slug=slug,
+            skip=skip_inline,
+        )
+        summary["inline_images"] = inline_result
+    except cost_meter.CostCeilingExceeded:
+        raise
+    except Exception as e:
+        log.exception("Inline image step crashed: %s", e)
+        summary["inline_images"] = {"ran": False, "reason": "crashed", "error": str(e)}
 
     # 3b) Quality gate: verbatim quotes (final check after retry).
     quote_count = generate_post.count_verbatim_quotes(mdx_path.read_text(encoding="utf-8"))

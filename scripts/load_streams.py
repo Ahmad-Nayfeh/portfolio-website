@@ -7,7 +7,7 @@ A stream is "due" when its cron expression would have fired since the last
 run for that stream. Since we don't store last-run state in the repo, we use
 a coarser rule that matches the way GitHub Actions schedules behave in
 practice: the stream is due if its cron matches the current 30-minute window
-(the workflow runs every 30 minutes — see .github/workflows/publish.yml).
+(the workflow runs every 30 minutes -- see .github/workflows/publish.yml).
 
 Importable: no top-level side effects. The orchestrator (main.py) calls
 `load_due_streams()` to drive the pipeline.
@@ -29,7 +29,7 @@ STREAMS_DIR = REPO_ROOT / "streams"
 
 
 # ---------------------------------------------------------------------------
-# Stream config models — kept loose. We validate the shape of what we use,
+# Stream config models -- kept loose. We validate the shape of what we use,
 # not every field. Fields the YAML may carry but Python doesn't read are
 # preserved on the model via `model_config = ConfigDict(extra="allow")`.
 # ---------------------------------------------------------------------------
@@ -106,6 +106,22 @@ class CoverImage(_Looser):
     output_dir: str = "public/blog-images/{slug}"
 
 
+class InlineImages(_Looser):
+    """Inline DALL-E illustration config (used by generate_inline_images.py -- H4).
+
+    2-4 small illustrations woven into the prose, rendered at 1024x1024
+    standard ($0.04/image). Disabled by default at the Pydantic level so
+    streams that don't define `inline_images:` get no charge and no
+    rendering. Enabled in ai-papers.yaml explicitly.
+    """
+
+    enabled: bool = False
+    # 1024x1024 standard balances cost vs visual quality at column width.
+    # Override per-stream if a future stream wants HD or landscape.
+    size: str = "1024x1024"
+    quality: str = "standard"
+
+
 class Approval(_Looser):
     method: str = "github_pr"
     reviewers: list[str] = Field(default_factory=list)
@@ -130,6 +146,7 @@ class StreamConfig(BaseModel):
     generation: Generation = Field(default_factory=Generation)
     demo: Demo = Field(default_factory=Demo)
     cover_image: CoverImage = Field(default_factory=CoverImage)
+    inline_images: InlineImages = Field(default_factory=InlineImages)
     approval: Approval = Field(default_factory=Approval)
     quality_gates: QualityGates = Field(default_factory=QualityGates)
 
@@ -140,7 +157,7 @@ class StreamConfig(BaseModel):
 
 
 def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
-    """Recursive dict merge — override wins on conflict, lists are replaced."""
+    """Recursive dict merge -- override wins on conflict, lists are replaced."""
     result = dict(base)
     for key, val in override.items():
         if key in result and isinstance(result[key], dict) and isinstance(val, dict):
