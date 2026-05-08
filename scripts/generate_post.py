@@ -225,13 +225,22 @@ def regenerate_quote_stage(
     `stage_outputs` and returns the new dict so the orchestrator can re-write
     the MDX from scratch.
 
-    The function looks for a stage whose name contains "quote" (case-
-    insensitive). If no such stage exists, it logs a warning and returns the
-    inputs unchanged — there's nothing to regenerate.
+    The function looks for a stage whose name contains one of "quote",
+    "dialect", "walk", or "paper" (case-insensitive), and that is NOT a
+    metadata-only stage. The "dialect"/"walk" matchers handle the H3
+    rename (per_paper_section -> dialectical_walk), where verbatim quotes
+    now live in the dialectical body rather than a dedicated quote
+    extraction stage. If no candidate stage exists, the function logs a
+    warning and returns the inputs unchanged.
     """
     stages = stream_cfg.generation.stages or []
+    _quote_keywords = ("quote", "dialect", "walk", "paper")
     quote_stage = next(
-        (s for s in stages if "quote" in (s.get("name") or "").lower()),
+        (
+            s for s in stages
+            if any(k in (s.get("name") or "").lower() for k in _quote_keywords)
+            and (s.get("role") or "").lower() != "metadata"
+        ),
         None,
     )
     if quote_stage is None:
