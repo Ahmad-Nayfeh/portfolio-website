@@ -35,6 +35,18 @@ const config: Config = {
         kicker: "0.18em",
       },
       colors: {
+        // ── Locked editorial palette ─────────────────────────────────────
+        // Exact hexes from the visual identity shared by blog cover images,
+        // inline figures (plot_style.py), and the website. Use these named
+        // tokens in new components; the semantic tokens below map to them.
+        cream:   "#fbf6ec",   // dominant background — warm off-white
+        navy:    "#0c1e3e",   // primary text + lines — deep navy
+        cobalt:  "#2754d8",   // electric cobalt — the single accent color
+        slate:   "#6b7a99",   // secondary text + muted elements
+        mist:    "#c9d2e3",   // fills, grid lines, soft backgrounds
+        rust:    "#d4884a",   // warm accent — use sparingly (one per page)
+        oxblood: "#a1322f",   // earthy red — error states, thresholds
+        // ── Semantic tokens (shadcn-compatible, HSL CSS variables) ───────
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -155,34 +167,4 @@ const config: Config = {
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-        // Subtle entrance for editorial blocks.
-        "fade-up": {
-          from: { opacity: "0", transform: "translateY(8px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
-        // Slow underline reveal used for inline links.
-        "underline-grow": {
-          from: { backgroundSize: "0% 1px" },
-          to: { backgroundSize: "100% 1px" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-up": "fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both",
-        "underline-grow": "underline-grow 0.35s ease-out forwards",
-      },
-    },
-  },
-  plugins: [
-    require("tailwindcss-animate"),
-    require("@tailwindcss/typography"),
-  ],
-}
-export default config
+          to: { height: "var(--radix-accordion-content-height
