@@ -20,7 +20,7 @@ from typing import Optional
 
 from anthropic import Anthropic
 
-from cost_meter import CostMeter
+import cost_meter
 
 logger = logging.getLogger(__name__)
 
@@ -163,7 +163,7 @@ def _call_claude(
     client: Anthropic,
     system: str,
     prompt: str,
-    cost_meter: CostMeter,
+    label: str,
     max_tokens: int = 16000,
     model: str = CLAUDE_MODEL,
 ) -> str:
@@ -174,13 +174,20 @@ def _call_claude(
             system=system,
             messages=[{"role": "user", "content": prompt}],
         )
-        cost_meter.add_usage(model, resp.usage)
+        meter = cost_meter.get_meter()
+        if meter and resp.usage:
+            meter.record_claude(
+                label=label,
+                model=model,
+                input_tokens=resp.usage.input_tokens,
+                output_tokens=resp.usage.output_tokens,
+            )
         return resp.content[0].text
     except Exception as e:
         logger.warning(f"Claude call failed with {model}: {e}")
         if model != FALLBACK_MODEL:
             logger.info("Falling back to haiku")
-            return _call_claude(client, system, prompt, cost_meter, max_tokens, FALLBACK_MODEL)
+            return _call_claude(client, system, prompt, label, max_tokens, FALLBACK_MODEL)
         raise
 
 
@@ -189,8 +196,8 @@ def check_feasibility(
     title: str,
     abstract: str,
     arxiv_url: str,
-    cost_meter: CostMeter,
 ) -> FeasibilityResult:
+    label = f"feasibility:{title[:40]}"
     prompt = f"Title: {title}\n\nAbstract: {abstract}\n\nURL: {arxiv_url}\n\n"
     prompt += "Evaluate feasibility per the criteria above."
 
@@ -198,7 +205,7 @@ def check_feasibility(
         client,
         system=FEASIBILITY_PROMPT,
         prompt=prompt,
-        cost_meter=cost_meter,
+        label=label,
         max_tokens=1000,
     )
 
@@ -223,8 +230,8 @@ def generate_code(
     abstract: str,
     arxiv_url: str,
     project_name: str,
-    cost_meter: CostMeter,
 ) -> dict[str, str]:
+    label = f"code_gen:{project_name}"
     prompt = (
         f"Paper title: {title}\n\n"
         f"Abstract: {abstract}\n\n"
@@ -239,7 +246,7 @@ def generate_code(
         client,
         system=system,
         prompt=prompt,
-        cost_meter=cost_meter,
+        label=label,
         max_tokens=32000,
     )
 
@@ -259,13 +266,12 @@ def run(
     title: str,
     abstract: str,
     arxiv_url: str,
-    cost_meter: CostMeter,
 ) -> Optional[GeneratedProject]:
     """Full pipeline: check feasibility -> generate -> return project."""
 
     # Stage 1: Feasibility
     logger.info("Checking feasibility for: %s", title)
-    feasibility = check_feasibility(client, title, abstract, arxiv_url, cost_meter)
+    feasibility = check_feasibility(client, title, abstract, arxiv_url)
 
     if not feasibility.feasible:
         logger.info("Paper not feasible: %s", feasibility.reasoning)
@@ -280,7 +286,7 @@ def run(
     )
 
     # Stage 2: Code generation
-    files = generate_code(client, title, abstract, arxiv_url, project_name, cost_meter)
+    files = generate_code(client, title, abstract, arxiv_url, project_name)
 
     # Sanity check: demo.py must exist and produce figures
     if "demo.py" not in files:

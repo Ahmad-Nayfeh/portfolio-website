@@ -23,7 +23,7 @@ from pathlib import Path
 from anthropic import Anthropic
 from openai import OpenAI
 
-from cost_meter import CostMeter
+import cost_meter
 from discover_papers import fetch_huggingface_daily
 from generate_project_code import check_feasibility
 
@@ -48,7 +48,7 @@ def main():
     work_dir = portfolio_root / ".project-work"
     work_dir.mkdir(parents=True, exist_ok=True)
 
-    cost_meter = CostMeter(cost_ceiling_usd=2.00)
+    cost_meter.init_meter(ceiling_usd=2.00)
 
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     openai_key = os.environ.get("OPENAI_API_KEY")
@@ -107,7 +107,6 @@ def main():
                 title=paper.get("title", ""),
                 abstract=paper.get("abstract", ""),
                 arxiv_url=paper.get("url", ""),
-                cost_meter=cost_meter,
             )
             if result.feasible:
                 selected = {**paper, "feasibility": result}
@@ -156,7 +155,6 @@ def main():
         title=selected["title"],
         abstract=selected.get("abstract", ""),
         arxiv_url=selected.get("url", ""),
-        cost_meter=cost_meter,
     )
 
     if not project:
@@ -236,7 +234,7 @@ def main():
         "tags": project.tags,
         "figure_count": validation["figure_count"],
         "duration_seconds": validation["duration_seconds"],
-        "cost_usd": cost_meter.total_cost,
+        "cost_usd": cost_meter.get_meter().total_usd if cost_meter.get_meter() else 0,
         "md_path": str(md_path),
     }]
 
