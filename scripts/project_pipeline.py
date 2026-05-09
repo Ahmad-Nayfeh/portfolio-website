@@ -2,18 +2,20 @@
 project_pipeline.py — Main orchestrator for the project automation pipeline.
 
 Flow:
-  1. Discover papers from Hugging Face Daily Papers
-  2. For each paper (sorted by upvotes), check feasibility
-  3. First feasible paper → generate project code
-  4. Validate: run demo.py, collect figures
-  5. Create GitHub repo with the code
-  6. Generate project page (cover + markdown)
-  7. Print run summary for the GitHub Action to consume
+  1. Discover papers from Hugging Face Daily Papers (14-day lookback)
+  2. For each paper (sorted by upvotes), check feasibility via Claude
+  3. If no HF paper is feasible, fall back to arXiv (diverse categories, 30-day lookback)
+  4. First feasible paper → generate project code
+  5. Validate: run demo.py, collect figures
+  6. Create GitHub repo with the code
+  7. Generate project page (cover + markdown)
+  8. Print run summary for the GitHub Action to consume
 """
 
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import logging
 import os
@@ -24,7 +26,7 @@ from anthropic import Anthropic
 from openai import OpenAI
 
 import cost_meter
-from discover_papers import fetch_huggingface_daily
+from discover_papers import fetch_arxiv, fetch_huggingface_daily
 from generate_project_code import check_feasibility
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -62,6 +64,10 @@ def main():
 
     # ── Stage 1: Discover papers ──────────────────────────────────────────
     candidates = []
+    used_path = portfolio_root / "pipeline-state" / "used-projects.json"
+    used_ids: set[str] = set()
+    if used_path.exists():
+        used_ids = _load_used_project_ids(used_path)
     if args.paper_url:
         logger.info("Specific paper URL provided: %s", args.paper_url)
         # We'll build a single-entry candidate from the URL.
@@ -72,12 +78,6 @@ def main():
     else:
         logger.info("Discovering papers from Hugging Face Daily Papers...")
         raw = fetch_huggingface_daily(lookback_days=14)
-        # Deduplicate against used-projects.json
-        used_path = Path(__file__).resolve().parent.parent / "pipeline-state" / "used-projects.json"
-        used_ids = set()
-        if used_path.exists():
-            import json as _json
-            used_ids = {e.get("arxiv_id") for e in _json.loads(used_path.read_text())}
         for p in raw:
             arxiv_id = p.get("arxiv_id", "")
             if arxiv_id and arxiv_id not in used_ids:
@@ -124,7 +124,71 @@ def main():
         return
 
     if not selected:
-        logger.info("No feasible paper found among %d candidates", len(candidates))
+        logger.info("No feasible paper from HF Daily Papers (%d checked). Trying arXiv fallback...", len(candidates))
+        arxiv_categories = [
+            # Signal processing — filtering, spectral analysis, compression
+            "eess.SP",
+            # Audio/speech processing — features, filtering, separation
+            "eess.AS",
+            # Statistical ML — kernel methods, Gaussian processes, Bayesian methods
+            "stat.ML",
+            # Optimization — convex, non-convex, gradient methods, submodular
+            "math.OC",
+            # Information theory — coding, compression, rate-distortion
+            "cs.IT",
+            # Numerical analysis — linear algebra, integration, approximation
+            "cs.NA", "math.NA",
+            # Computational statistics — MCMC, bootstrap, EM
+            "stat.CO",
+            # Statistical methodology — regression, testing, estimation
+            "stat.ME",
+            # Machine learning — theory papers, classical methods
+            "cs.LG",
+        ]
+        arxiv_candidates = fetch_arxiv(
+            categories=arxiv_categories,
+            lookback_days=30,
+            max_results=50,
+        )
+        # Deduplicate against used-projects.json
+        arxiv_added: list[dict] = []
+        for p in arxiv_candidates:
+            arxiv_id = p.get("arxiv_id", "")
+            if arxiv_id and arxiv_id not in used_ids:
+                entry = {
+                    "title": p.get("title", ""),
+                    "abstract": p.get("summary", ""),
+                    "url": p.get("url", ""),
+                    "arxiv_id": arxiv_id,
+                    "upvotes": 0,
+                }
+                candidates.append(entry)
+                arxiv_added.append(entry)
+        logger.info("arXiv fallback: %d additional candidates", len(arxiv_added))
+
+        for paper in arxiv_added:
+            if selected:
+                break
+            logger.info("Checking arXiv: %s", paper.get("title", "Unknown"))
+            try:
+                result = check_feasibility(
+                    anthropic_client,
+                    title=paper.get("title", ""),
+                    abstract=paper.get("abstract", ""),
+                    arxiv_url=paper.get("url", ""),
+                )
+                if result.feasible:
+                    selected = {**paper, "feasibility": result}
+                    logger.info("SELECTED (arXiv): %s (difficulty=%s)", paper["title"], result.difficulty)
+                    break
+                else:
+                    logger.info("Not feasible: %s", result.reasoning)
+            except Exception as e:
+                logger.warning("Feasibility check failed: %s", e)
+                continue
+
+    if not selected:
+        logger.info("No feasible paper found across all sources")
         _write_summary(args.output_summary, [{"status": "no_feasible_paper", "candidates_checked": len(candidates)}])
         return
 
@@ -223,6 +287,15 @@ def main():
         portfolio_root=portfolio_root,
     )
 
+    # ── Record the paper as used so it won't be picked again ──────────────
+    _mark_project_used(
+        path=used_path,
+        arxiv_id=selected.get("arxiv_id", ""),
+        title=selected.get("title", ""),
+        url=selected.get("url", ""),
+        slug=project.slug,
+    )
+
     # ── Write summary ─────────────────────────────────────────────────────
     summary = [{
         "status": "ok",
@@ -245,6 +318,52 @@ def main():
 def _write_summary(path: str, data: list[dict]):
     Path(path).write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
     logger.info("Summary written to %s", path)
+
+
+def _load_used_project_ids(path: Path) -> set[str]:
+    """Read used-projects.json, handling both list and dict formats."""
+    if not path.exists():
+        return set()
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        logger.warning("Could not parse %s (%s); treating as empty.", path, e)
+        return set()
+    if isinstance(raw, dict):
+        return {e.get("arxiv_id", "") for e in raw.get("papers", []) if isinstance(e, dict)}
+    if isinstance(raw, list):
+        return {e.get("arxiv_id", "") for e in raw if isinstance(e, dict)}
+    return set()
+
+
+def _mark_project_used(path: Path, arxiv_id: str, title: str, url: str, slug: str):
+    """Append a paper to used-projects.json so it won't be picked again."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data: dict = {"schema_version": 1, "papers": []}
+    if path.exists():
+        try:
+            existing = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(existing, list):
+                # Migrate old list format to dict format
+                data["papers"] = existing
+            elif isinstance(existing, dict):
+                data = existing
+        except Exception:
+            pass
+    # Check if already recorded
+    for entry in data.get("papers", []):
+        if isinstance(entry, dict) and entry.get("arxiv_id", "") == arxiv_id:
+            logger.info("Paper %s already in used-projects.json", arxiv_id)
+            return
+    data["papers"].append({
+        "arxiv_id": arxiv_id,
+        "title": title,
+        "url": url,
+        "slug": slug,
+        "added_at": datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+    })
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    logger.info("Recorded %s in %s", arxiv_id, path)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,10 @@
 # Weekly project generation stream. Picks the most interesting recent paper
 # that can be implemented without GPUs, creates a full GitHub repo with
 # working code and visualizations, then adds a project page to the portfolio.
+#
+# Discovery order:
+#   1. Hugging Face Daily Papers (14-day lookback, sorted by upvotes)
+#   2. arXiv fallback (30-day lookback, diverse categories) if HF yields none
 
 stream:
   id: projects

@@ -36,15 +36,22 @@ NOCTURNE_COLORS = """
 #8888a0  (muted cool grey)
 """
 
-FEASIBILITY_PROMPT = """You are a research engineer evaluating whether a paper can be implemented as a clean Python project.
+FEASIBILITY_PROMPT = """You are a research engineer evaluating whether a paper's core IDEA can be demonstrated as a clean Python project.
 
-Given the paper title, abstract, and URL below, decide if it meets ALL criteria:
-1. Core algorithm can be implemented with ONLY: numpy, matplotlib, scipy, scikit-learn, seaborn
-2. Does NOT require a GPU (no torch, tensorflow, jax, etc.)
-3. Does NOT require downloading a large dataset (>100MB)
-4. Can produce AT LEAST 4 informative visualizations (matplotlib figures)
-5. Can run in under 5 minutes on a CPU
-6. Has a clear, self-contained algorithm (not just a benchmark result or dataset paper)
+The goal is an EDUCATIONAL DEMONSTRATION — not a reproduction of the original results.
+We want to teach the core concept through simplified, pedagogical code and visualizations.
+
+Say YES ("feasible": true) when:
+
+1. The core CONCEPT can be demonstrated with ONLY: numpy, matplotlib, scipy, scikit-learn, seaborn
+   → Examples of concepts that work: adaptive filtering, spectral methods, kernel methods, PCA variants, manifold learning, optimization algorithms, MCMC sampling, compression algorithms, information-theoretic metrics, signal denoising, source separation, dimensionality reduction, clustering, change-point detection, graph algorithms, random walks, stochastic processes, numerical integration, root-finding, linear system solvers, statistical tests, bootstrapping, etc.
+2. Even if the original used GPUs/torch/tensorflow, a SIMPLIFIED CPU-ONLY pedagogical version is feasible — implement a toy version that illustrates the core idea using synthetic 2D/3D data, small-scale examples, or simplified problem settings.
+3. Does NOT require downloading a large dataset (>100MB) — synthetic data or sklearn.datasets is fine.
+4. Can produce AT LEAST 4 informative visualizations — parameter sweeps, convergence plots, comparison charts, ablation studies, statistical visualizations.
+5. Can run in under 5 minutes on a CPU.
+6. Has a clear, self-contained algorithm or technique worth demonstrating — NOT just a benchmark result, dataset release, survey/taxonomy, or purely empirical study with no algorithmic substance.
+
+Say NO only when the paper genuinely has no algorithmic core separable from its GPU implementation, or when it's purely a benchmark/dataset/survey paper.
 
 Output JSON ONLY with this schema:
 {

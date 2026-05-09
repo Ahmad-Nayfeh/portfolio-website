@@ -141,8 +141,7 @@ def generate_project_page(
     # Copy figures into portfolio
     figure_urls = _copy_figures_to_portfolio(work_dir, slug, portfolio_root)
 
-    from datetime import date
-
+    # Build frontmatter
     tags_yaml = "\n".join(f'  - "{t}"' for t in tags)
     frontmatter = f"""---
 title: "{project_name}"
