@@ -65,4 +65,21 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           </p>
         )}
 
-     
+        {tags.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            {tags.slice(0, 3).map((tag) => (
+              <Link
+                key={tag}
+                href={`/projects?tag=${tag}`}
+                className="transition-colors hover:text-accent"
+              >
+                #{tag}
+              </Link>
+            ))}
+            {tags.length > 3 && <span>+{tags.length - 3}</span>}
+          </div>
+        )}
+      </div>
+    </article>
+  )
+}

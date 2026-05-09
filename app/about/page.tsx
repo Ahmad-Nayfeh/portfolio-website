@@ -51,15 +51,11 @@ export default async function AboutPage() {
               Profile · About the engineer
             </span>
           </div>
-          <h1
-            className="font-display text-display-xl text-balance"
-          >
+          <h1 className="font-display text-display-xl text-balance">
             Hello, I&apos;m {aboutContent.name}
           </h1>
           {aboutContent.tagline && (
-            <p
-              className="font-display mt-6 max-w-2xl text-xl italic leading-snug text-muted-foreground md:text-2xl"
-            >
+            <p className="font-display mt-6 max-w-2xl text-xl italic leading-snug text-muted-foreground md:text-2xl">
               {aboutContent.tagline}
             </p>
           )}
@@ -81,4 +77,70 @@ export default async function AboutPage() {
               />
             </div>
             <a
-              href="/res
+              href="/resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="group mt-5 inline-flex w-full items-center justify-center gap-2 bg-foreground px-5 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-background transition-colors hover:bg-accent"
+            >
+              <FileDown size={14} />
+              Download resume
+            </a>
+          </div>
+
+          <div className="col-span-12 lg:col-span-8">
+            <div className="prose prose-lg dark:prose-invert max-w-none">
+              <MarkdownRenderer content={aboutContent.bio} />
+            </div>
+          </div>
+        </section>
+      </FadeIn>
+
+      <FadeIn delay={40}>
+        <Skills skills={aboutContent.skills} />
+      </FadeIn>
+
+      <FadeIn delay={40}>
+        <Experience experience={aboutContent.experience} />
+      </FadeIn>
+
+      <FadeIn delay={40}>
+        <Education education={aboutContent.education} />
+      </FadeIn>
+
+      {/* What I'm reading */}
+      <FadeIn delay={40}>
+        <section className="mt-24 border-t border-border pt-16">
+          <div className="mb-10 flex items-center gap-3">
+            <BookOpen size={16} className="text-accent" />
+            <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              What I&apos;m reading
+            </span>
+          </div>
+          <div className="grid grid-cols-1 gap-x-8 gap-y-0 md:grid-cols-2">
+            {READING.map(({ title, author, note }, i) => (
+              <div
+                key={title}
+                className="flex gap-4 border-b border-border py-6"
+              >
+                <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/60">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <p className="font-display text-base leading-snug text-foreground">
+                    {title}
+                  </p>
+                  <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                    {author}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {note}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </FadeIn>
+    </div>
+  )
+}

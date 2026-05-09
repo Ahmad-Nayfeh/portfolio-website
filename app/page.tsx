@@ -19,4 +19,10 @@ export default async function Home() {
           long-form magazine spread does. */}
       <FeaturedProjects projects={featuredProjects} />
       <RecentPosts posts={recentPosts} />
-      {/* Manifesto replaces the chip-clou
+      {/* Manifesto replaces the chip-cloud Skills on this page —
+          editorial pillars over a tag salad. */}
+      <Manifesto />
+      <CTA />
+    </div>
+  )
+}

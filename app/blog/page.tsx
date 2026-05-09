@@ -9,6 +9,21 @@ export const metadata: Metadata = {
     "Notes on engineering, AI papers, and what I learn from building real systems.",
 }
 
+function BlogGridSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="flex flex-col gap-4">
+          <div className="aspect-[4/3] w-full animate-pulse bg-secondary" />
+          <div className="h-3 w-1/3 animate-pulse bg-secondary" />
+          <div className="h-5 w-3/4 animate-pulse bg-secondary" />
+          <div className="h-3 w-full animate-pulse bg-secondary" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default async function BlogPage() {
   const posts = await getAllPosts()
 
@@ -40,4 +55,10 @@ export default async function BlogPage() {
         </div>
       </header>
 
-      {/* BlogGri
+      {/* BlogGrid needs Suspense because it calls useSearchParams internally. */}
+      <Suspense fallback={<BlogGridSkeleton />}>
+        <BlogGrid posts={posts} />
+      </Suspense>
+    </div>
+  )
+}

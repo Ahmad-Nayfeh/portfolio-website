@@ -175,4 +175,29 @@ export default async function BlogPostPage({ params }: PageProps) {
           {/* Sticky ToC — only rendered when the post has enough headings */}
           <aside className="hidden xl:block">
             <TableOfContents headings={tocHeadings} />
-          
+          </aside>
+        </div>
+      </article>
+
+      {relatedPosts.length > 0 && (
+        <section className="mt-24 border-t border-border pt-16">
+          <div className="mb-10 flex items-center gap-3">
+            <span aria-hidden className="h-px w-8 bg-accent" />
+            <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              Keep reading
+            </span>
+          </div>
+          <h2 className="font-display text-display-md mb-10 text-balance">
+            Related entries from the notebook
+          </h2>
+          <RelatedPosts posts={relatedPosts} />
+        </section>
+      )}
+    </div>
+  )
+}
+
+type PageProps = {
+  params: Promise<{ slug: string }>
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+}

@@ -11,7 +11,7 @@
 
 import { useState, useCallback } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { Search } from "lucide-react"
+import { Search, X } from "lucide-react"
 import BlogCard from "@/components/BlogCard"
 import type { Post } from "@/types"
 import { cn } from "@/lib/utils"
@@ -102,4 +102,56 @@ export default function BlogGrid({ posts, initialTag = null }: BlogGridProps) {
               >
                 All
               </button>
-              {all
+              {allTags.map((tag) => (
+                <button
+                  type="button"
+                  key={tag}
+                  className={cn(
+                    "transition-colors",
+                    selectedTag === tag
+                      ? "text-accent"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                  onClick={() => setTag(tag)}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Active tag pill */}
+      {selectedTag && (
+        <div className="mb-8 flex items-center gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            Filtered by:
+          </span>
+          <button
+            type="button"
+            onClick={() => setTag(null)}
+            className="inline-flex items-center gap-1.5 border border-accent px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-accent transition-colors hover:bg-accent hover:text-background"
+          >
+            #{selectedTag}
+            <X size={10} />
+          </button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+        {filteredPosts.map((post, idx) => (
+          <BlogCard key={post.slug} post={post} index={idx} />
+        ))}
+      </div>
+
+      {filteredPosts.length === 0 && (
+        <div className="border-y border-border py-20 text-center">
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+            No entries match the current filter.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
