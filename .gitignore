@@ -35,7 +35,11 @@ venv/
 
 # pipeline run summaries (workflow artifacts; never committed)
 run-summary.json
+project-run-summary.json
 failure-body.md
+
+# project pipeline temp workspace
+.project-work/
 
 # local build logs
 *.log

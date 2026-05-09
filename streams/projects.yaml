@@ -1,0 +1,42 @@
+# streams/projects.yaml
+#
+# Weekly project generation stream. Picks the most interesting recent paper
+# that can be implemented without GPUs, creates a full GitHub repo with
+# working code and visualizations, then adds a project page to the portfolio.
+
+stream:
+  id: projects
+  name: "Weekly Project Implementation"
+  enabled: true
+  language: "en"
+
+schedule:
+  cron: "0 6 * * 6"               # Saturday 06:00 UTC = 09:00 Riyadh
+  timezone: "Asia/Riyadh"
+
+discovery:
+  source: huggingface_daily_papers
+  lookback_days: 14
+  top_n: 20
+  filters:
+    categories: []
+    min_upvotes: 3
+  dedup_state_file: pipeline-state/used-projects.json
+
+content:
+  output_path: "content/projects"
+  slug_pattern: "{project-slug}"
+  tags: []  # auto-detected by Claude
+
+generation:
+  model: "claude-sonnet-4-6"
+  fallback_model: "claude-haiku-4-5"
+
+cover_image:
+  enabled: true
+  size: "1792x1024"
+  quality: "hd"
+
+quality_gates:
+  build_validation: true
+  min_figures: 4

@@ -1,0 +1,132 @@
+"""
+repo_setup.py — Create a GitHub repo from the generated project code.
+
+Uses `gh` CLI to create the repo, copy in project files, and push.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import os
+import shutil
+import subprocess
+from pathlib import Path
+
+logger = logging.getLogger(__name__)
+
+GITHUB_USERNAME = "Ahmad-Nayfeh"
+
+
+def create_repo(
+    project_name: str,
+    description: str,
+    tags: list[str],
+    files: dict[str, str],
+    work_dir: Path,
+) -> dict:
+    """
+    Create a GitHub repo and push the generated code.
+
+    Returns:
+        {
+            "success": bool,
+            "repo_url": str | None,
+            "clone_url": str | None,
+            "error": str | None,
+        }
+    """
+    result: dict = {
+        "success": False,
+        "repo_url": None,
+        "clone_url": None,
+        "error": None,
+    }
+
+    repo_dir = work_dir / project_name
+
+    # Wipe and create repo directory
+    if repo_dir.exists():
+        shutil.rmtree(repo_dir)
+    repo_dir.mkdir(parents=True, exist_ok=True)
+
+    # Write all project files into repo_dir
+    for rel_path, content in files.items():
+        full_path = repo_dir / rel_path
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+        full_path.write_text(content, encoding="utf-8")
+
+    # Write README
+    readme_path = repo_dir / "README.md"
+    if not readme_path.exists():
+        readme_path.write_text(f"# {project_name}\n\n{description}\n", encoding="utf-8")
+
+    # Write .gitignore
+    gitignore_src = Path(__file__).resolve().parent.parent / "project-template" / ".gitignore"
+    if gitignore_src.exists():
+        shutil.copy2(gitignore_src, repo_dir / ".gitignore")
+
+    # Init git and create initial commit
+    try:
+        subprocess.run(["git", "init"], cwd=str(repo_dir), capture_output=True, text=True, check=True)
+        subprocess.run(["git", "add", "."], cwd=str(repo_dir), capture_output=True, text=True, check=True)
+        subprocess.run(
+            ["git", "commit", "-m", f"Initial implementation of {project_name}"],
+            cwd=str(repo_dir),
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        result["error"] = f"Git init/commit failed: {e.stderr[:300]}"
+        return result
+
+    # Create repo on GitHub via gh CLI
+    try:
+        proc = subprocess.run(
+            [
+                "gh", "repo", "create",
+                f"{GITHUB_USERNAME}/{project_name}",
+                "--public",
+                "--description", description[:120],
+                "--source", str(repo_dir),
+                "--push",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if proc.returncode != 0:
+            result["error"] = f"gh repo create failed: {proc.stderr[:500]}"
+            return result
+
+        # Parse repo URL from output
+        for line in proc.stdout.splitlines():
+            if "github.com" in line:
+                result["repo_url"] = line.strip()
+                break
+        if not result["repo_url"]:
+            result["repo_url"] = f"https://github.com/{GITHUB_USERNAME}/{project_name}"
+        result["clone_url"] = f"https://github.com/{GITHUB_USERNAME}/{project_name}.git"
+
+    except FileNotFoundError:
+        result["error"] = "gh CLI not found — install GitHub CLI"
+        return result
+    except subprocess.TimeoutExpired:
+        result["error"] = "gh repo create timed out"
+        return result
+
+    # Set repo topics from tags
+    if tags:
+        try:
+            topic_args = ["gh", "repo", "edit", f"{GITHUB_USERNAME}/{project_name}"]
+            for tag in tags[:5]:
+                topic_args.extend(["--add-topic", tag.lower().replace(" ", "-")])
+            subprocess.run(topic_args, capture_output=True, text=True, timeout=15)
+        except Exception:
+            logger.warning("Failed to set repo topics (non-fatal)")
+
+    result["success"] = True
+    logger.info("Repo created: %s", result["repo_url"])
+
+    return result
