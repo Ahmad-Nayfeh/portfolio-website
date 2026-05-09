@@ -20,8 +20,8 @@ name: publish
 #      set to "0 7 * * 0"  (= 10:00 Riyadh = 07:00 UTC, every Sunday).
 #
 on:
-  # schedule:
-  #   - cron: "*/30 * * * *"   # ← Uncomment this block to resume auto runs.
+  schedule:
+    - cron: "*/30 * * * *"   # Tick every 30 min; per-stream cron decides what runs.
   workflow_dispatch:
     inputs:
       stream_id:

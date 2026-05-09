@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Newsreader, JetBrains_Mono } from "next/font/google"
+import { Inter, Cormorant_Garamond, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import "katex/dist/katex.min.css"
 import Navbar from "@/components/layout/Navbar"
@@ -14,9 +14,9 @@ const inter = Inter({
   variable: "--font-sans",
 })
 
-// Editorial display serif — Newsreader. Variable axes for weight + optical size,
-// gives the magazine-style headline voice without feeling antique.
-const newsreader = Newsreader({
+// Display serif — Cormorant Garamond. High-contrast letterforms with a
+// literary, slightly dramatic feel that suits the laboratory palette.
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600", "700"],
@@ -48,7 +48,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
+      className={`${inter.variable} ${cormorant.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         <meta name="google-site-verification" content="TRmiP4XM7rQHNMBz7LJs_ZTRzVb46pLD0LJlJ-hz8QU" />

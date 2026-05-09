@@ -25,7 +25,7 @@ export default function BlogCard({ post, index }: BlogCardProps) {
     <article className="group flex flex-col">
       <Link
         href={`/blog/${post.slug}`}
-        className="relative block aspect-[4/3] w-full overflow-hidden bg-secondary"
+        className="relative block aspect-[16/9] w-full overflow-hidden bg-secondary"
       >
         <Image
           src={post.coverImage || "/placeholder.svg"}

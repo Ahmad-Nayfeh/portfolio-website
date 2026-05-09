@@ -15,6 +15,7 @@ import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import rehypeKatex from "rehype-katex"
 import rehypePrettyCode from "rehype-pretty-code"
+import rehypeSlug from "rehype-slug"
 import type { Options as PrettyCodeOptions } from "rehype-pretty-code"
 
 const prettyCodeOptions: PrettyCodeOptions = {
@@ -41,6 +42,7 @@ export default function MdxRenderer({ source }: MdxRendererProps) {
           mdxOptions: {
             remarkPlugins: [remarkGfm, remarkMath],
             rehypePlugins: [
+              rehypeSlug,
               rehypeKatex,
               [rehypePrettyCode, prettyCodeOptions],
             ],

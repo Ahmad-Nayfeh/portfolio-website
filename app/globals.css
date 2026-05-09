@@ -16,10 +16,14 @@
 }
 
 /* =========================================================================
- * Engineering Editorial — design tokens (May 2026 redesign).
+ * Analog Laboratory — design tokens (May 2026 redesign).
  *
- * Light mode: warm ivory paper, deep slate ink, electric cobalt accent.
- * Dark mode:  midnight navy ground, bone-white text, same cobalt accent.
+ * Light mode: warm parchment ground, forest-green text, amber accent.
+ * Dark mode:  dark-forest ground, cream text, amber glow.
+ *
+ * The palette is inspired by scientific instruments, oscilloscope traces,
+ * and well-worn laboratory notebooks — amber and green as complementary
+ * opposites that create both warmth and authority.
  *
  * Colors are HSL triplets so Tailwind can wrap them with `hsl(var(--x))`
  * and apply opacity modifiers like `bg-primary/80`.
@@ -27,105 +31,105 @@
 @layer base {
   :root {
     /* ── Locked palette (exact HSL equivalents of design-tokens.ts hexes) ──
-     * cream   #fbf6ec → 41  65%  95%   navy    #0c1e3e → 218  68%  15%
-     * cobalt  #2754d8 → 225  69%  50%   slate   #6b7a99 → 221  18%  51%
-     * mist    #c9d2e3 → 219  32%  84%   rust    #d4884a →  27  62%  56%
-     * oxblood #a1322f →   2  55%  41%
+     * parchment #f5f0e8 → 45  25%  93%   forest    #1a2e1a → 120  28%  14%
+     * amber     #d4942a → 38  69%  50%   sage      #6b8a6b → 100  12%  48%
+     * cream     #d8d5c8 → 45  17%  82%   copper    #c87a4f →  22  52%  55%
+     * rust      #a1322f →   2  55%  41%
      * ─────────────────────────────────────────────────────────────────── */
 
     /* Surfaces */
-    --background: 41 65% 95%;            /* cream  #fbf6ec */
-    --foreground: 218 68% 15%;           /* navy   #0c1e3e */
-    --card: 41 65% 97%;                  /* slightly lighter cream */
-    --card-foreground: 218 68% 15%;
-    --popover: 41 65% 97%;
-    --popover-foreground: 218 68% 15%;
+    --background: 45 25% 93%;            /* parchment #f5f0e8 */
+    --foreground: 120 28% 14%;           /* forest    #1a2e1a */
+    --card: 45 25% 96%;                  /* slightly lighter parchment */
+    --card-foreground: 120 28% 14%;
+    --popover: 45 25% 96%;
+    --popover-foreground: 120 28% 14%;
 
-    /* Primary = navy ink; used for headings and high-contrast UI. */
-    --primary: 218 68% 15%;
-    --primary-foreground: 41 65% 95%;
+    /* Primary = forest green for headings and high-contrast UI. */
+    --primary: 120 28% 14%;
+    --primary-foreground: 45 25% 93%;
 
-    /* Secondary = warm panel for code blocks, cards, etc. */
-    --secondary: 41 35% 90%;
-    --secondary-foreground: 218 68% 15%;
+    /* Secondary = warm parchment panel for code blocks, cards, etc. */
+    --secondary: 45 18% 88%;
+    --secondary-foreground: 120 28% 14%;
 
-    /* Muted = even gentler; mist-family for inline code and pills. */
-    --muted: 219 25% 88%;
-    --muted-foreground: 221 18% 51%;     /* slate  #6b7a99 */
+    /* Muted = cream family for inline code and pills. */
+    --muted: 45 15% 83%;
+    --muted-foreground: 100 12% 48%;     /* sage    #6b8a6b */
 
-    /* Accent = electric cobalt — the single signature color. */
-    --accent: 225 69% 50%;              /* cobalt #2754d8 */
-    --accent-foreground: 41 65% 95%;
+    /* Accent = warm amber — the single signature color. */
+    --accent: 38 69% 50%;               /* amber   #d4942a */
+    --accent-foreground: 45 25% 93%;
 
-    --destructive: 2 55% 41%;           /* oxblood #a1322f */
-    --destructive-foreground: 41 65% 95%;
+    --destructive: 2 55% 41%;           /* rust    #a1322f */
+    --destructive-foreground: 45 25% 93%;
 
-    --border: 219 25% 88%;              /* mist-family */
-    --input: 219 25% 88%;
-    --ring: 225 69% 50%;
+    --border: 45 17% 82%;               /* cream-family */
+    --input: 45 17% 82%;
+    --ring: 38 69% 50%;
     --radius: 0.375rem;                  /* tighter than default; editorial */
 
-    /* Chart palette aligned to the editorial palette. */
-    --chart-1: 225 69% 50%;             /* cobalt */
-    --chart-2: 195 70% 45%;
-    --chart-3: 27 62% 56%;              /* rust   #d4884a */
-    --chart-4: 268 60% 55%;
-    --chart-5: 152 50% 42%;
+    /* Chart palette aligned to the laboratory palette. */
+    --chart-1: 38 69% 50%;              /* amber */
+    --chart-2: 170 50% 40%;             /* teal */
+    --chart-3: 22 52% 55%;              /* copper */
+    --chart-4: 200 65% 50%;             /* steel blue */
+    --chart-5: 320 45% 50%;             /* muted magenta */
 
     /* Sidebar tokens (kept for shadcn compatibility). */
-    --sidebar-background: 41 65% 95%;
-    --sidebar-foreground: 221 18% 51%;
-    --sidebar-primary: 218 68% 15%;
-    --sidebar-primary-foreground: 41 65% 95%;
-    --sidebar-accent: 41 35% 90%;
-    --sidebar-accent-foreground: 218 68% 15%;
-    --sidebar-border: 219 25% 88%;
-    --sidebar-ring: 225 69% 50%;
+    --sidebar-background: 45 25% 93%;
+    --sidebar-foreground: 100 12% 48%;
+    --sidebar-primary: 120 28% 14%;
+    --sidebar-primary-foreground: 45 25% 93%;
+    --sidebar-accent: 45 18% 88%;
+    --sidebar-accent-foreground: 120 28% 14%;
+    --sidebar-border: 45 17% 82%;
+    --sidebar-ring: 38 69% 50%;
   }
 
   .dark {
-    /* Midnight navy ground — deep, slightly blue, not flat black. */
-    --background: 218 45% 8%;
-    --foreground: 41 25% 93%;            /* warm bone */
-    --card: 218 38% 11%;
-    --card-foreground: 41 25% 93%;
-    --popover: 218 38% 11%;
-    --popover-foreground: 41 25% 93%;
+    /* Dark forest ground — deep, slightly warm, not flat black. */
+    --background: 120 42% 8%;
+    --foreground: 40 22% 88%;            /* warm cream */
+    --card: 120 35% 11%;
+    --card-foreground: 40 22% 88%;
+    --popover: 120 35% 11%;
+    --popover-foreground: 40 22% 88%;
 
-    --primary: 41 25% 93%;
-    --primary-foreground: 218 45% 8%;
+    --primary: 40 22% 88%;
+    --primary-foreground: 120 42% 8%;
 
-    --secondary: 218 30% 16%;
-    --secondary-foreground: 41 25% 93%;
+    --secondary: 120 25% 14%;
+    --secondary-foreground: 40 22% 88%;
 
-    --muted: 218 30% 16%;
-    --muted-foreground: 221 12% 65%;
+    --muted: 120 25% 14%;
+    --muted-foreground: 100 10% 54%;
 
-    /* Slightly lifted cobalt for dark-mode contrast. */
-    --accent: 225 75% 62%;
-    --accent-foreground: 218 45% 8%;
+    /* Brighter amber for dark-mode glow. */
+    --accent: 36 80% 63%;
+    --accent-foreground: 120 42% 8%;
 
-    --destructive: 2 55% 50%;           /* oxblood lifted for dark legibility */
-    --destructive-foreground: 41 25% 93%;
+    --destructive: 2 55% 50%;           /* rust lifted for dark legibility */
+    --destructive-foreground: 40 22% 88%;
 
-    --border: 218 30% 18%;
-    --input: 218 30% 18%;
-    --ring: 225 75% 62%;
+    --border: 120 16% 18%;
+    --input: 120 16% 18%;
+    --ring: 36 80% 63%;
 
-    --chart-1: 225 75% 62%;
-    --chart-2: 195 75% 55%;
-    --chart-3: 27 75% 62%;
-    --chart-4: 268 65% 65%;
-    --chart-5: 152 55% 52%;
+    --chart-1: 36 80% 63%;
+    --chart-2: 170 60% 50%;
+    --chart-3: 22 62% 60%;
+    --chart-4: 200 70% 60%;
+    --chart-5: 320 55% 60%;
 
-    --sidebar-background: 218 45% 8%;
-    --sidebar-foreground: 221 12% 75%;
-    --sidebar-primary: 41 25% 93%;
-    --sidebar-primary-foreground: 218 45% 8%;
-    --sidebar-accent: 218 30% 16%;
-    --sidebar-accent-foreground: 41 25% 93%;
-    --sidebar-border: 218 30% 18%;
-    --sidebar-ring: 225 75% 62%;
+    --sidebar-background: 120 42% 8%;
+    --sidebar-foreground: 100 10% 60%;
+    --sidebar-primary: 40 22% 88%;
+    --sidebar-primary-foreground: 120 42% 8%;
+    --sidebar-accent: 120 25% 14%;
+    --sidebar-accent-foreground: 40 22% 88%;
+    --sidebar-border: 120 16% 18%;
+    --sidebar-ring: 36 80% 63%;
   }
 }
 
@@ -145,7 +149,7 @@
     letter-spacing: -0.015em;
   }
 
-  /* Subtle selection color — uses the cobalt accent at low alpha. */
+  /* Subtle selection color — uses the amber accent at low alpha. */
   ::selection {
     background-color: hsl(var(--accent) / 0.22);
     color: hsl(var(--foreground));

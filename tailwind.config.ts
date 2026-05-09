@@ -1,4 +1,4 @@
-// tailwind.config.ts — Engineering Editorial design system (May 2026).
+// tailwind.config.ts — Analog Laboratory design system (May 2026 redesign).
 import type { Config } from "tailwindcss"
 
 const config: Config = {
@@ -35,17 +35,17 @@ const config: Config = {
         kicker: "0.18em",
       },
       colors: {
-        // ── Locked editorial palette ─────────────────────────────────────
+        // ── Locked laboratory palette ────────────────────────────────────
         // Exact hexes from the visual identity shared by blog cover images,
         // inline figures (plot_style.py), and the website. Use these named
         // tokens in new components; the semantic tokens below map to them.
-        cream:   "#fbf6ec",   // dominant background — warm off-white
-        navy:    "#0c1e3e",   // primary text + lines — deep navy
-        cobalt:  "#2754d8",   // electric cobalt — the single accent color
-        slate:   "#6b7a99",   // secondary text + muted elements
-        mist:    "#c9d2e3",   // fills, grid lines, soft backgrounds
-        rust:    "#d4884a",   // warm accent — use sparingly (one per page)
-        oxblood: "#a1322f",   // earthy red — error states, thresholds
+        parchment: "#f5f0e8",  // dominant background — warm paper
+        forest:    "#1a2e1a",  // primary text + lines — deep green
+        amber:     "#d4942a",  // warm amber — the single accent color
+        sage:      "#6b8a6b",  // secondary text + muted elements
+        cream:     "#d8d5c8",  // fills, grid lines, soft backgrounds
+        copper:    "#c87a4f",  // warm accent — use sparingly (one per page)
+        rust:      "#a1322f",  // earthy red — error states, thresholds
         // ── Semantic tokens (shadcn-compatible, HSL CSS variables) ───────
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -104,7 +104,7 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       // Editorial-grade prose tweaks for the @tailwindcss/typography plugin.
-      // Body uses Inter; first-level headings switch to Newsreader.
+      // Body uses Inter; first-level headings switch to the display serif.
       typography: ({ theme }: { theme: (k: string) => string }) => ({
         DEFAULT: {
           css: {

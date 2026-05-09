@@ -78,23 +78,27 @@ export function extractHeadings(
   mdx: string,
 ): Array<{ id: string; text: string; level: 2 | 3 }> {
   const headings: Array<{ id: string; text: string; level: 2 | 3 }> = []
+  const seen: Map<string, number> = new Map()
   for (const line of mdx.split("\n")) {
     const m = line.match(/^(#{2,3})\s+(.+)$/)
     if (!m) continue
     const level = m[1].length as 2 | 3
-    // Strip inline MDX / Markdown formatting: backticks, bold, italic, links.
     const text = m[2]
       .replace(/`[^`]*`/g, (s) => s.slice(1, -1))
       .replace(/\*\*([^*]+)\*\*/g, "$1")
       .replace(/\*([^*]+)\*/g, "$1")
       .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
       .trim()
-    const id = text
+    const slug = text
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
       .replace(/^-|-$/g, "")
+    // Handle duplicate IDs the same way rehype-slug / github-slugger does.
+    const count = seen.get(slug) ?? 0
+    seen.set(slug, count + 1)
+    const id = count === 0 ? slug : `${slug}-${count}`
     headings.push({ id, text, level })
   }
   return headings

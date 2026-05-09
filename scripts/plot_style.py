@@ -49,14 +49,12 @@ from cycler import cycler
 # ---------------------------------------------------------------------------
 
 PALETTE = {
-    "background": "#fbf6ec",   # warm off-white
-    "ink":        "#0c1e3e",   # deep navy — primary line / text
-    "accent":     "#2754d8",   # electric cobalt — call-out series
-    "muted":      "#6b7a99",   # cool slate — secondary series, light text
-    "soft":       "#c9d2e3",   # near-background tint — fills, gridlines
-    "warm":       "#d4884a",   # rust accent — used SPARINGLY (e.g. one
-                                # data point worth highlighting). NOT a
-                                # default series color.
+    "background": "#f5f0e8",   # warm parchment
+    "ink":        "#1a2e1a",   # deep forest green — primary line / text
+    "accent":     "#d4942a",   # warm amber — call-out series
+    "muted":      "#6b8a6b",   # cool sage — secondary series, light text
+    "soft":       "#d8d5c8",   # near-background tint — fills, gridlines
+    "warm":       "#c87a4f",   # copper accent — used SPARINGLY
     "danger":     "#a1322f",   # earthy red — error/regret bars, threshold
                                 # crossings. Also sparing.
 }
@@ -85,20 +83,20 @@ _RCPARAMS = {
     "axes.facecolor":   PALETTE["background"],
     "savefig.facecolor": PALETTE["background"],
     "savefig.edgecolor": PALETTE["background"],
-    "savefig.dpi":      160,
+    "savefig.dpi":      200,
     "figure.dpi":       110,
-    "figure.figsize":   (7.2, 4.5),  # ~16:10, fits the blog content column
+    "figure.figsize":   (7.5, 4.75),  # ~16:10, fits the blog content column
     "figure.constrained_layout.use": True,
 
     # --- typography -------------------------------------------------------
     "font.family":      "serif",
     "font.serif":       ["DejaVu Serif", "Georgia", "Cambria", "Times New Roman"],
-    "font.size":        11,
-    "axes.titlesize":   13,
+    "font.size":        11.5,
+    "axes.titlesize":   13.5,
     "axes.titleweight": "regular",
     "axes.titlepad":    14,
     "axes.titlelocation": "left",     # editorial titles align with the y-axis
-    "axes.labelsize":   11,
+    "axes.labelsize":   11.5,
     "axes.labelpad":    8,
     "axes.labelcolor":  PALETTE["ink"],
     "xtick.labelsize":  9.5,
@@ -141,8 +139,9 @@ _RCPARAMS = {
 
     # --- legend -----------------------------------------------------------
     "legend.frameon":   False,
-    "legend.fontsize":  10,
+    "legend.fontsize":  10.5,
     "legend.handlelength": 1.4,
+    "legend.handletextpad": 0.8,
     "legend.borderaxespad": 0.6,
 
     # --- color cycle ------------------------------------------------------
@@ -222,6 +221,41 @@ def lead_color(idx=0):
     region the same color as a line).
     """
     return CYCLE[idx % len(CYCLE)]
+
+
+def subplots(nrows=1, ncols=1, *, width=7.5, height=None, **kwargs):
+    """Open a multi-panel figure at editorial default sizing.
+
+    Use this instead of ``plt.subplots()`` when your demo has multiple
+    subplots — it guarantees the editorial style is applied and sets a
+    sensible total figure size. When *height* is omitted it scales
+    proportionally from the single-panel default.
+
+    Returns ``(fig, axes)`` where *axes* is a single Axes or array of
+    Axes matching (nrows, ncols).
+    """
+    apply_editorial_style()
+    if height is None:
+        height = width * (4.75 / 7.5) * (nrows / max(ncols, 1))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(width, height), **kwargs)
+    return fig, axes
+
+
+def editorial_tick_params(ax, *, bottom=True, left=True):
+    """Apply editorial tick defaults to an existing axis.
+
+    Thin outward ticks on the specified sides, matching the style pack's
+    conventions. Useful when building a figure from multiple subplots
+    where some have shared axes that don't show ticks by default.
+    """
+    ax.tick_params(
+        axis="x", direction="out", length=4, width=0.8,
+        bottom=bottom, labelbottom=bottom,
+    )
+    ax.tick_params(
+        axis="y", direction="out", length=4, width=0.8,
+        left=left, labelleft=left,
+    )
 
 
 # Apply on import. Demo code that imports this module gets the style

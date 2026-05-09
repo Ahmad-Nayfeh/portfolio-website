@@ -117,7 +117,7 @@ def _wrap_demo_for_capture(code: str) -> str:
         "for _i, _num in enumerate(_plt.get_fignums(), start=1):\n"
         "    _fig = _plt.figure(_num)\n"
         "    _path = f'figure_{_i}.png'\n"
-        "    _fig.savefig(_path, dpi=160, bbox_inches='tight')\n"
+        "    _fig.savefig(_path, dpi=200, bbox_inches='tight')\n"
         "    print(f'SAVED_FIGURE:{_path}')\n"
     )
     return header + code + footer

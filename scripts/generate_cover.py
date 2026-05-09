@@ -51,9 +51,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 STYLE_SUFFIX = (
     "Flat editorial vector illustration in the style of Quanta Magazine and "
     "Distill.pub. Geometric and abstract. Minimal composition with generous "
-    "negative space. Strict three-color palette: warm off-white background "
-    "(approximately #fbf6ec), deep navy primary (approximately #0c1e3e), "
-    "and a single electric cobalt blue accent (approximately #2754d8). "
+    "negative space. Strict three-color palette: warm parchment background "
+    "(approximately #f5f0e8), deep forest green primary (approximately "
+    "#1a2e1a), and a single warm amber accent (approximately #d4942a). "
     "Crisp vector shapes with clean edges. No gradients, no shading, no "
     "rasterized textures, no photorealism. No people, no faces, no human "
     "figures. No text, no letters, no captions, no logos. Scientific "

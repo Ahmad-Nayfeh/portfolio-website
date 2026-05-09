@@ -1,5 +1,5 @@
 /**
- * lib/design-tokens.ts — Locked editorial palette.
+ * lib/design-tokens.ts — Locked laboratory palette.
  *
  * Single source of truth for the visual identity shared across:
  *   • Website (Tailwind classes, inline styles)
@@ -12,27 +12,27 @@
  */
 
 export const PALETTE = {
-  /** Dominant background — warm off-white paper. */
-  cream:   "#fbf6ec",
-  /** Primary text and ruled lines — deep navy. */
-  navy:    "#0c1e3e",
-  /** Electric cobalt — the single accent color. Sparingly. */
-  cobalt:  "#2754d8",
-  /** Secondary text, captions, muted UI — cool slate. */
-  slate:   "#6b7a99",
+  /** Dominant background — warm paper. */
+  parchment: "#f5f0e8",
+  /** Primary text and ruled lines — deep forest green. */
+  forest:    "#1a2e1a",
+  /** Warm amber — the single accent color. Sparingly. */
+  amber:     "#d4942a",
+  /** Secondary text, captions, muted UI — cool sage. */
+  sage:      "#6b8a6b",
   /** Fills, grid lines, soft card backgrounds — near-bg tint. */
-  mist:    "#c9d2e3",
-  /** Warm rust accent — one highlight per composition, maximum. */
-  rust:    "#d4884a",
+  cream:     "#d8d5c8",
+  /** Warm copper accent — one highlight per composition, maximum. */
+  copper:    "#c87a4f",
   /** Earthy red — error states, warning thresholds. */
-  oxblood: "#a1322f",
+  rust:      "#a1322f",
 } as const
 
 export type PaletteKey = keyof typeof PALETTE
 
 /**
  * CSS variable equivalents for use in inline styles.
- * Use Tailwind's `text-cobalt` / `bg-cream` classes wherever possible;
+ * Use Tailwind's `text-amber` / `bg-parchment` classes wherever possible;
  * reach for these only in dynamic inline styles.
  */
 export const CSS_VARS = {
