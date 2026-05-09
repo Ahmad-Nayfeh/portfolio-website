@@ -41,7 +41,9 @@ export default function BlogGrid({ posts, initialTag = null }: BlogGridProps) {
         params.delete("tag")
       }
       // Replace so the back button doesn't cycle through every tag click.
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+      const url = `${pathname}?${params.toString()}`
+      // @ts-expect-error -- dynamic query string is not a static Route
+      router.replace(url, { scroll: false })
     },
     [router, pathname, searchParams],
   )
