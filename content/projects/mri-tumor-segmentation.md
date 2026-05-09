@@ -3,7 +3,7 @@ title: "AI-Powered MRI Brain Tumor Segmentation"
 slug: "mri-tumor-segmentation"
 date: "2025-06-14"
 coverImage: "/images/projects/mri-tumor-segmentation.jpg"
-tags: ["MRI", "Deep Learning", "Image Processing", "U-Net"]
+tags: ["Deep Learning", "Medical Imaging", "Computer Vision"]
 excerpt: "An end-to-end deep learning solution for the automated segmentation of brain tumors from multi-modal MRI scans."
 category: "MRI Scans"
 githubLink: "https://github.com/ahmad-nayfeh/MRI-Tumor-Segmentation"

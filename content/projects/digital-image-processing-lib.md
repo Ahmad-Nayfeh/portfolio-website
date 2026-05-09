@@ -3,7 +3,7 @@ title: "DIP-Lib: Interactive Digital Image Processing Toolkit"
 slug: "digital-image-processing-lib"
 date: "2024-05-01"
 coverImage: "/images/projects/digital-image-processing-lib.jpg"
-tags: ["Image Processing", "Educational Tools", "Denoising", "Edge Detection", "Visualization"]
+tags: ["Image Processing", "Computer Vision"]
 excerpt: "A modular Streamlit-based web app for exploring core image processing techniques — complete with parameterized controls, visual comparisons, and dynamic pipelines."
 category: "Computer Vision"
 githubLink: "https://github.com/nahmad2000/Digital-Image-Processing-Library"

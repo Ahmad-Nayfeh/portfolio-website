@@ -1,5 +1,5 @@
 /**
- * lib/design-tokens.ts — Locked laboratory palette.
+ * lib/design-tokens.ts — Nocturne palette (May 2026 redesign).
  *
  * Single source of truth for the visual identity shared across:
  *   • Website (Tailwind classes, inline styles)
@@ -7,34 +7,32 @@
  *   • Inline figures (scripts/plot_style.py PALETTE)
  *   • DALL-E illustration briefs (streams/ai-papers.yaml)
  *
- * Rule: never deviate from these hexes on any surface. The brand identity
- * holds because one palette appears on covers, charts, and the site.
+ * Deep dark canvas with electric teal, amber, and magenta accents.
  */
 
 export const PALETTE = {
-  /** Dominant background — warm paper. */
-  parchment: "#f5f0e8",
-  /** Primary text and ruled lines — deep forest green. */
-  forest:    "#1a2e1a",
-  /** Warm amber — the single accent color. Sparingly. */
-  amber:     "#d4942a",
-  /** Secondary text, captions, muted UI — cool sage. */
-  sage:      "#6b8a6b",
-  /** Fills, grid lines, soft card backgrounds — near-bg tint. */
-  cream:     "#d8d5c8",
-  /** Warm copper accent — one highlight per composition, maximum. */
-  copper:    "#c87a4f",
-  /** Earthy red — error states, warning thresholds. */
-  rust:      "#a1322f",
+  /** Deep near-black background with a blue hint. */
+  bg:       "#080812",
+  /** Card / surface background. */
+  surface:  "#12121e",
+  /** Subtle border colour. */
+  border:   "#1e1e30",
+  /** Primary text — warm white. */
+  text:     "#e8e8ed",
+  /** Secondary text — muted cool grey. */
+  muted:    "#8888a0",
+  /** Electric teal — primary accent (technical, modern). */
+  teal:     "#00d4aa",
+  /** Warm amber — secondary accent (energy, highlights). */
+  amber:    "#ffba08",
+  /** Hot magenta — tertiary accent (creativity, surprise). */
+  magenta:  "#ff3cac",
+  /** Error / destructive red. */
+  red:      "#ff3366",
 } as const
 
 export type PaletteKey = keyof typeof PALETTE
 
-/**
- * CSS variable equivalents for use in inline styles.
- * Use Tailwind's `text-amber` / `bg-parchment` classes wherever possible;
- * reach for these only in dynamic inline styles.
- */
 export const CSS_VARS = {
   background:  "hsl(var(--background))",
   foreground:  "hsl(var(--foreground))",

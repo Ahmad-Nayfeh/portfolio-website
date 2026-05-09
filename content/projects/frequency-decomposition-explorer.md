@@ -3,7 +3,7 @@ title: "Frequency Decomposition Explorer"
 slug: "frequency-decomposition-explorer"
 date: "2024-04-10"
 coverImage: "/images/projects/frequency-decomposition-explorer.jpg"
-tags: ["Signal Processing", "Fourier Transform", "Frequency Analysis", "Image Processing", "Educational Tools"]
+tags: ["Signal Processing", "Image Processing"]
 excerpt: "An interactive Streamlit app to visualize, isolate, and reconstruct 1D or 2D signals based on their frequency bands using FFT and IFFT."
 category: "Signal & Image Processing"
 githubLink: "https://github.com/nahmad2000/Frequency-Decomposition-Explorer"

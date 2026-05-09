@@ -37,9 +37,6 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!post) notFound()
 
   const relatedPosts = await getRelatedPosts(post, 3)
-
-  // Extract headings for the sticky ToC. Falls back gracefully to an empty
-  // array (ToC renders nothing if fewer than 2 headings are found).
   const tocHeadings = post.content ? extractHeadings(post.content) : []
 
   return (
@@ -54,12 +51,28 @@ export default async function BlogPostPage({ params }: PageProps) {
         </span>
       </Link>
 
-      <article>
+      <article className="relative">
+        {/* Decorative background orbs */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div
+            className="absolute -right-32 -top-32 h-[600px] w-[600px] opacity-[0.04]"
+            style={{
+              background: "radial-gradient(ellipse at center, hsl(var(--accent)), transparent 70%)",
+            }}
+          />
+          <div
+            className="absolute -left-32 top-0 h-[400px] w-[400px] opacity-[0.025]"
+            style={{
+              background: "radial-gradient(ellipse at center, hsl(326 100% 62%), transparent 70%)",
+            }}
+          />
+        </div>
+
         {/* === Editorial header === */}
         <header className="mt-12 grid grid-cols-12 gap-x-6 border-b border-border pb-10">
           {/* Meta column — date, read time, tags */}
           <div className="col-span-12 lg:col-span-3">
-            <div className="flex flex-row gap-x-6 lg:flex-col lg:gap-y-5">
+            <div className="flex flex-row gap-x-6 rounded-xl border border-border/50 bg-card/60 p-5 backdrop-blur-md lg:flex-col lg:gap-y-5">
               {post.date && (
                 <div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
@@ -123,7 +136,6 @@ export default async function BlogPostPage({ params }: PageProps) {
                 {post.excerpt}
               </p>
             )}
-            {/* Tags on mobile */}
             {post.tags && post.tags.length > 0 && (
               <div className="mt-6 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground lg:hidden">
                 {post.tags.map((tag) => (
@@ -142,7 +154,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         {/* Cover image */}
         {post.coverImage && (
-          <div className="relative my-10 aspect-[16/9] overflow-hidden bg-secondary md:my-14">
+          <div className="relative my-10 aspect-[16/9] overflow-hidden rounded-xl border border-border/50 bg-secondary shadow-lg shadow-black/20 md:my-14">
             <Image
               src={post.coverImage}
               alt={post.title}
@@ -151,12 +163,12 @@ export default async function BlogPostPage({ params }: PageProps) {
               priority
               sizes="(max-width: 1400px) 100vw, 1400px"
             />
+            <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-border/20" />
           </div>
         )}
 
         {/* Body — article column + sticky ToC sidebar on wide screens */}
-        <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-x-12 xl:grid-cols-[1fr_220px]">
-          {/* Article prose */}
+        <div className="mx-auto mt-10 grid grid-cols-1 gap-x-14 xl:grid-cols-[1fr_280px]">
           <div>
             {post.content && (
               <div className="prose prose-lg dark:prose-invert max-w-none editorial-body">
@@ -164,7 +176,6 @@ export default async function BlogPostPage({ params }: PageProps) {
               </div>
             )}
 
-            {/* Footer rule */}
             <div className="mt-20 border-t border-border pt-8">
               <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
                 End of entry · Ahmad Nayfeh · {post.date ? formatDate(post.date) : ""}
@@ -172,7 +183,6 @@ export default async function BlogPostPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Sticky ToC — only rendered when the post has enough headings */}
           <aside className="hidden xl:block">
             <TableOfContents headings={tocHeadings} />
           </aside>

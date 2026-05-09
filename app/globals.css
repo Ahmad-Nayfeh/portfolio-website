@@ -16,120 +16,91 @@
 }
 
 /* =========================================================================
- * Analog Laboratory — design tokens (May 2026 redesign).
+ * Nocturne — design tokens (May 2026 redesign).
  *
- * Light mode: warm parchment ground, forest-green text, amber accent.
- * Dark mode:  dark-forest ground, cream text, amber glow.
- *
- * The palette is inspired by scientific instruments, oscilloscope traces,
- * and well-worn laboratory notebooks — amber and green as complementary
- * opposites that create both warmth and authority.
- *
- * Colors are HSL triplets so Tailwind can wrap them with `hsl(var(--x))`
- * and apply opacity modifiers like `bg-primary/80`.
+ * Single dark mode. Deep near-black canvas with electric teal, amber, and
+ * magenta accents. Each section of the homepage shifts its accent colour.
  * ========================================================================= */
 @layer base {
   :root {
-    /* ── Locked palette (exact HSL equivalents of design-tokens.ts hexes) ──
-     * parchment #f5f0e8 → 45  25%  93%   forest    #1a2e1a → 120  28%  14%
-     * amber     #d4942a → 38  69%  50%   sage      #6b8a6b → 100  12%  48%
-     * cream     #d8d5c8 → 45  17%  82%   copper    #c87a4f →  22  52%  55%
-     * rust      #a1322f →   2  55%  41%
-     * ─────────────────────────────────────────────────────────────────── */
+    /* ── Locked palette ────────────────────────────────────────────────── */
+    /* bg       #080812 → 240 28%  5%   surface  #12121e → 240 20%  9%
+     * border   #1e1e30 → 240 15% 15%   text     #e8e8ed → 240 10% 92%
+     * muted    #8888a0 → 240 10% 60%   teal     #00d4aa → 168 100% 42%
+     * amber    #ffba08 →  43 100% 52%  magenta  #ff3cac → 326 100% 62%
+     * red      #ff3366 → 350 100% 60%
+     * ──────────────────────────────────────────────────────────────────── */
 
     /* Surfaces */
-    --background: 45 25% 93%;            /* parchment #f5f0e8 */
-    --foreground: 120 28% 14%;           /* forest    #1a2e1a */
-    --card: 45 25% 96%;                  /* slightly lighter parchment */
-    --card-foreground: 120 28% 14%;
-    --popover: 45 25% 96%;
-    --popover-foreground: 120 28% 14%;
+    --background: 240 28% 5%;
+    --foreground: 240 10% 92%;
+    --card: 240 20% 9%;
+    --card-foreground: 240 10% 92%;
+    --popover: 240 20% 9%;
+    --popover-foreground: 240 10% 92%;
 
-    /* Primary = forest green for headings and high-contrast UI. */
-    --primary: 120 28% 14%;
-    --primary-foreground: 45 25% 93%;
+    --primary: 240 10% 92%;
+    --primary-foreground: 240 28% 5%;
 
-    /* Secondary = warm parchment panel for code blocks, cards, etc. */
-    --secondary: 45 18% 88%;
-    --secondary-foreground: 120 28% 14%;
+    --secondary: 240 15% 14%;
+    --secondary-foreground: 240 10% 92%;
 
-    /* Muted = cream family for inline code and pills. */
-    --muted: 45 15% 83%;
-    --muted-foreground: 100 12% 48%;     /* sage    #6b8a6b */
+    --muted: 240 15% 14%;
+    --muted-foreground: 240 10% 60%;
 
-    /* Accent = warm amber — the single signature color. */
-    --accent: 38 69% 50%;               /* amber   #d4942a */
-    --accent-foreground: 45 25% 93%;
+    /* Default accent = teal (technical, modern) */
+    --accent: 168 100% 42%;
+    --accent-foreground: 240 28% 5%;
 
-    --destructive: 2 55% 41%;           /* rust    #a1322f */
-    --destructive-foreground: 45 25% 93%;
+    --destructive: 350 100% 60%;
+    --destructive-foreground: 240 10% 92%;
 
-    --border: 45 17% 82%;               /* cream-family */
-    --input: 45 17% 82%;
-    --ring: 38 69% 50%;
-    --radius: 0.375rem;                  /* tighter than default; editorial */
+    --border: 240 15% 15%;
+    --input: 240 15% 15%;
+    --ring: 168 100% 42%;
+    --radius: 0.5rem;
 
-    /* Chart palette aligned to the laboratory palette. */
-    --chart-1: 38 69% 50%;              /* amber */
-    --chart-2: 170 50% 40%;             /* teal */
-    --chart-3: 22 52% 55%;              /* copper */
-    --chart-4: 200 65% 50%;             /* steel blue */
-    --chart-5: 320 45% 50%;             /* muted magenta */
+    /* Section zone accent overrides (parent classes set these) */
+    --section-accent: 168 100% 42%;
+    --section-glow: rgba(0, 212, 170, 0.15);
 
-    /* Sidebar tokens (kept for shadcn compatibility). */
-    --sidebar-background: 45 25% 93%;
-    --sidebar-foreground: 100 12% 48%;
-    --sidebar-primary: 120 28% 14%;
-    --sidebar-primary-foreground: 45 25% 93%;
-    --sidebar-accent: 45 18% 88%;
-    --sidebar-accent-foreground: 120 28% 14%;
-    --sidebar-border: 45 17% 82%;
-    --sidebar-ring: 38 69% 50%;
+    /* Chart palette */
+    --chart-1: 168 100% 42%;
+    --chart-2: 43 100% 52%;
+    --chart-3: 326 100% 62%;
+    --chart-4: 240 10% 60%;
+    --chart-5: 350 100% 60%;
+
+    /* Sidebar tokens */
+    --sidebar-background: 240 28% 5%;
+    --sidebar-foreground: 240 10% 60%;
+    --sidebar-primary: 240 10% 92%;
+    --sidebar-primary-foreground: 240 28% 5%;
+    --sidebar-accent: 240 15% 14%;
+    --sidebar-accent-foreground: 240 10% 92%;
+    --sidebar-border: 240 15% 15%;
+    --sidebar-ring: 168 100% 42%;
   }
 
-  .dark {
-    /* Dark forest ground — deep, slightly warm, not flat black. */
-    --background: 120 42% 8%;
-    --foreground: 40 22% 88%;            /* warm cream */
-    --card: 120 35% 11%;
-    --card-foreground: 40 22% 88%;
-    --popover: 120 35% 11%;
-    --popover-foreground: 40 22% 88%;
-
-    --primary: 40 22% 88%;
-    --primary-foreground: 120 42% 8%;
-
-    --secondary: 120 25% 14%;
-    --secondary-foreground: 40 22% 88%;
-
-    --muted: 120 25% 14%;
-    --muted-foreground: 100 10% 54%;
-
-    /* Brighter amber for dark-mode glow. */
-    --accent: 36 80% 63%;
-    --accent-foreground: 120 42% 8%;
-
-    --destructive: 2 55% 50%;           /* rust lifted for dark legibility */
-    --destructive-foreground: 40 22% 88%;
-
-    --border: 120 16% 18%;
-    --input: 120 16% 18%;
-    --ring: 36 80% 63%;
-
-    --chart-1: 36 80% 63%;
-    --chart-2: 170 60% 50%;
-    --chart-3: 22 62% 60%;
-    --chart-4: 200 70% 60%;
-    --chart-5: 320 55% 60%;
-
-    --sidebar-background: 120 42% 8%;
-    --sidebar-foreground: 100 10% 60%;
-    --sidebar-primary: 40 22% 88%;
-    --sidebar-primary-foreground: 120 42% 8%;
-    --sidebar-accent: 120 25% 14%;
-    --sidebar-accent-foreground: 40 22% 88%;
-    --sidebar-border: 120 16% 18%;
-    --sidebar-ring: 36 80% 63%;
+  /* Section zone classes — each overrides the accent colour for Tailwind's
+     text-accent / border-accent / bg-accent utilities and the glow vars. */
+  .zone-teal {
+    --accent: 168 100% 42%;
+    --ring: 168 100% 42%;
+    --section-accent: 168 100% 42%;
+    --section-glow: rgba(0, 212, 170, 0.15);
+  }
+  .zone-amber {
+    --accent: 43 100% 52%;
+    --ring: 43 100% 52%;
+    --section-accent: 43 100% 52%;
+    --section-glow: rgba(255, 186, 8, 0.15);
+  }
+  .zone-magenta {
+    --accent: 326 100% 62%;
+    --ring: 326 100% 62%;
+    --section-accent: 326 100% 62%;
+    --section-glow: rgba(255, 60, 172, 0.15);
   }
 }
 
@@ -139,94 +110,146 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "ss01", "cv11", "cv02";  /* Inter humanist tweaks */
+    font-feature-settings: "ss01", "cv11", "cv02";
   }
 
-  /* Editorial display headings — applied selectively via .font-display. */
+  /* Display headings — bold sans-serif for Nocturne */
   .font-display {
-    font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-    font-feature-settings: "ss01", "ss02";
-    letter-spacing: -0.015em;
+    font-family: var(--font-sans), "Inter", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
-  /* Subtle selection color — uses the amber accent at low alpha. */
   ::selection {
-    background-color: hsl(var(--accent) / 0.22);
+    background-color: hsl(var(--section-accent) / 0.25);
     color: hsl(var(--foreground));
   }
 }
 
-/* Reusable editorial components.
- * Kept as utility classes (not @apply'd into HTML elements globally) so
- * they only affect places we deliberately opt in. */
+/* ── Animated background gradient ────────────────────────────────────────── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(ellipse 35% 30% at 15% 20%, rgba(0, 212, 170, 0.07), transparent 60%),
+    radial-gradient(ellipse 30% 35% at 85% 15%, rgba(255, 60, 172, 0.05), transparent 60%),
+    radial-gradient(ellipse 30% 25% at 50% 80%, rgba(255, 186, 8, 0.04), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 75% 70%, rgba(0, 212, 170, 0.04), transparent 60%);
+  animation: gradientDrift 45s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes gradientDrift {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  25%  { transform: translate(1.5%, -0.5%) rotate(0.5deg) scale(1.01); }
+  50%  { transform: translate(-0.5%, 1.5%) rotate(-0.5deg) scale(0.99); }
+  75%  { transform: translate(1%, -1%) rotate(0.3deg) scale(1.005); }
+  100% { transform: translate(-1.5%, 0.5%) rotate(-0.8deg) scale(0.995); }
+}
+
+/* ── Glass card ──────────────────────────────────────────────────────────── */
+.glass-card {
+  background: hsl(var(--card) / 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+.glass-card-strong {
+  background: hsl(var(--card) / 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid hsl(var(--border) / 0.6);
+}
+
+/* ── Glow effects ────────────────────────────────────────────────────────── */
+.glow-hover {
+  transition: box-shadow 0.35s ease, border-color 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.glow-hover:hover {
+  box-shadow: 0 0 24px var(--section-glow), 0 0 48px var(--section-glow);
+  border-color: hsl(var(--section-accent) / 0.25);
+  transform: translateY(-2px);
+}
+
+.glow-border {
+  border-color: hsl(var(--section-accent) / 0.2);
+  transition: border-color 0.35s ease;
+}
+.glow-border:hover {
+  border-color: hsl(var(--section-accent) / 0.4);
+}
+
+.glow-text {
+  text-shadow: 0 0 20px var(--section-glow);
+}
+
+/* ── Gradient text ───────────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--section-accent)), hsl(326 100% 62%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Reusable editorial components */
 @layer components {
-  /* Eyebrow / kicker label above an editorial title. */
   .editorial-eyebrow {
     @apply inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground;
   }
 
-  /* Thin rule used to mark section starts. */
   .editorial-rule {
-    @apply h-px w-12 bg-foreground/40;
+    @apply h-px w-12 bg-current opacity-30;
   }
 
-  /* Drop cap for the first letter of an article body. */
   .editorial-dropcap::first-letter {
-    font-family: var(--font-serif), Georgia, serif;
+    font-family: var(--font-sans), "Inter", ui-sans-serif, system-ui, sans-serif;
     float: left;
     font-size: 4.5rem;
     line-height: 0.9;
     padding: 0.35rem 0.6rem 0 0;
-    font-weight: 600;
-    color: hsl(var(--accent));
+    font-weight: 700;
+    color: hsl(var(--section-accent));
   }
 }
 
-/* --- MODIFIED STYLES FOR MARKDOWN --- */
-/* Target ONLY INLINE code specifically */
+/* ── Prose styles ────────────────────────────────────────────────────────── */
 .prose code:not(pre code) {
   @apply rounded bg-muted px-[0.4em] py-[0.2em] font-mono text-sm font-semibold text-foreground;
 }
 
-/* Base styles for CODE BLOCKS container in light mode */
 .prose pre {
-  @apply rounded-lg border p-4 overflow-x-auto bg-secondary text-secondary-foreground;
+  @apply rounded-lg border p-4 overflow-x-auto;
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
 }
 
-/* Override CODE BLOCK container styles for dark mode */
-.dark .prose pre {
-    @apply bg-[#0d1117] text-[#c9d1d9] border-gray-700; /* GitHub dark-like colors */
-    /* Or use Tailwind variables: e.g., bg-gray-900 text-gray-300 border-gray-700 */
-}
-
-/* Styles for the <code> element INSIDE <pre> */
 .prose pre code {
-   @apply block /* Use block for better layout control inside pre */
-          min-w-full /* Ensure code block takes full width */
-          bg-transparent p-0 border-none text-sm text-inherit; /* Reset background/padding/border, inherit text color */
-   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; /* Common monospace fonts */
-   /* The actual syntax colors come from Shiki inline styles (rehype-pretty-code). */
+  @apply block min-w-full bg-transparent p-0 border-none text-sm text-inherit;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-/* Base image styling */
 .prose img {
   @apply rounded-lg;
 }
 
-/* ── Inline DALL-E illustrations (generated by generate_inline_images.py) ── */
 .prose figure.editorial-figure {
   margin: 2.5rem 0;
 }
 
 .prose figure.editorial-figure img {
-  @apply w-full rounded border border-border object-cover;
+  @apply w-full rounded border object-cover;
+  border-color: hsl(var(--border));
 }
 
 .prose figure.editorial-figure figcaption {
   @apply mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground;
 }
 
-/* Inline variant — floated on wide screens, stacked on narrow. */
 .prose figure.editorial-figure--inline {
   @apply my-6;
 }
@@ -241,13 +264,12 @@
   }
 }
 
-/* ── Demo output figures (generated by run_demo.py) ── */
 .prose figure.demo-figure {
   margin: 2.5rem 0;
   padding: 1.25rem;
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius);
-  background-color: hsl(var(--secondary));
+  background: hsl(var(--card));
 }
 
 .prose figure.demo-figure img {
@@ -258,22 +280,17 @@
   @apply mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground;
 }
 
-/* --- END OF MODIFIED MARKDOWN STYLES --- */
+.prose a {
+  color: hsl(var(--section-accent));
+  text-decoration: none;
+  border-bottom: 1px solid hsl(var(--section-accent) / 0.35);
+  transition: border-color 0.2s ease;
+}
+.prose a:hover {
+  border-bottom-color: hsl(var(--section-accent));
+}
 
-
-/* =========================================================================
- * Motion — editorial micro-interactions.
- *
- * Two principles:
- *   1. Motion should feel like type setting itself, not bouncing into place.
- *      Short durations (180–360ms), easing curves with a slight settle, and
- *      modest distances (no more than ~12px of translate).
- *   2. Always honor prefers-reduced-motion. If the reader has asked the OS to
- *      reduce motion, we strip animations entirely — the layout still works
- *      because every element is composed for the static state first.
- * ========================================================================= */
-
-/* Legacy fade-in — kept for any existing usages. */
+/* ── Motion ──────────────────────────────────────────────────────────────── */
 .fade-in {
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -289,9 +306,6 @@
   }
 }
 
-/* Editorial fade-up — small offset, soft easing, 360ms. Used as an entrance
- * animation on hero content, mastheads, and the first row of cards. Pair with
- * the `.delay-*` utilities to stagger sibling elements. */
 .fade-up {
   opacity: 0;
   transform: translateY(8px);
@@ -312,9 +326,41 @@
 .delay-300  { animation-delay: 300ms; }
 .delay-360  { animation-delay: 360ms; }
 
-/* Underline-grow — a 1px rule under inline links that animates from 0 to
- * 100% of the link's width on hover. Cleaner than border-bottom because the
- * width can be animated. Apply via `.link-underline` on an inline element. */
+/* ── Pulse / glow accent elements ────────────────────────────────────────── */
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsl(var(--section-accent));
+  box-shadow: 0 0 8px var(--section-glow);
+  animation: pulseDot 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ── Hero ambient particles ────────────────────────────────────────────────── */
+@keyframes heroParticleFloat {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(4px, -6px); }
+  50%  { transform: translate(-3px, -12px); }
+  75%  { transform: translate(5px, -6px); }
+  100% { transform: translate(-2px, 0); }
+}
+
+@keyframes heroParticleFade {
+  to { opacity: 0.7; }
+}
+
+@keyframes heroOrbPulse {
+  0%   { opacity: 0.04; transform: scale(0.95); }
+  50%  { opacity: 0.07; transform: scale(1.05); }
+  100% { opacity: 0.05; transform: scale(0.98); }
+}
+
+/* ── Underline grow (links) ──────────────────────────────────────────────── */
 .link-underline {
   position: relative;
   display: inline-block;
@@ -327,7 +373,7 @@
   right: 0;
   bottom: -2px;
   height: 1px;
-  background-color: hsl(var(--accent));
+  background-color: hsl(var(--section-accent));
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -338,8 +384,6 @@
   transform: scaleX(1);
 }
 
-/* Lift — a featherweight hover lift used on cards and tiles. 2px of motion,
- * paired with a subtle shadow shift handled in component CSS where needed. */
 .editorial-lift {
   transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -347,10 +391,7 @@
   transform: translateY(-2px);
 }
 
-/* Honor prefers-reduced-motion globally — short-circuit every transition and
- * animation to a single frame so nothing moves but the static layout still
- * holds. We override Tailwind's transition-* helpers via attribute selectors
- * so the override actually wins. */
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -367,19 +408,15 @@
   }
 }
 
-
-/* --- START: Arabic RTL Overrides for Prose --- */
-
+/* ── Arabic RTL Overrides ────────────────────────────────────────────────── */
 .prose {
-  text-align: left; /* Default LTR alignment */
+  text-align: left;
 }
 
-/* Force RTL alignment when inside a container with dir="rtl" */
 [dir="rtl"] .prose {
   text-align: right;
 }
 
-/* Align list items correctly in RTL */
 [dir="rtl"] .prose ul,
 [dir="rtl"] .prose ol {
   padding-right: 1.625em;
@@ -396,22 +433,16 @@
     margin-left: 0.5em;
 }
 
-/* --- END: Arabic RTL Overrides for Prose --- */
-
-
-/* === PROJECT PAGE STYLES START === */
-
-/* Base container for custom project pages */
+/* ── Project page styles ─────────────────────────────────────────────────── */
 .project-prose-container {
   font-family: 'Inter', sans-serif;
   line-height: 1.75;
 }
 
-/* Custom Headers */
 .project-prose-container h2 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: hsl(var(--primary));
+  color: hsl(var(--foreground));
   margin-top: 3rem;
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
@@ -425,7 +456,6 @@
     font-weight: 600;
 }
 
-/* Custom Paragraphs */
 .project-prose-container p {
     font-size: 1.1rem;
     color: hsl(var(--muted-foreground));
@@ -436,20 +466,18 @@
     color: hsl(var(--foreground));
 }
 
-/* Custom Lists */
 .project-prose-container ul {
   list-style-type: none;
   padding-left: 0;
 }
 .project-prose-container li {
-  background-color: hsl(var(--secondary));
+  background: hsl(var(--card));
   padding: 0.75rem 1.25rem;
   border-radius: 0.5rem;
   margin-bottom: 0.75rem;
-  border-left: 4px solid hsl(var(--primary));
+  border-left: 4px solid hsl(var(--section-accent));
 }
 
-/* Image Gallery Styles */
 .project-gallery {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -468,12 +496,11 @@
     transform: scale(1.03);
 }
 
-/* Custom Link Buttons */
 .project-cta-link {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: hsl(var(--primary));
+    background: hsl(var(--section-accent));
     color: hsl(var(--primary-foreground));
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
@@ -482,14 +509,9 @@
     transition: all 0.2s ease-in-out;
 }
 .project-cta-link:hover {
-    background-color: hsl(var(--primary) / 0.85);
+    opacity: 0.85;
     transform: translateY(-2px);
 }
-
-/* === PROJECT PAGE STYLES END === */
-
-
-/* === NEW: Two-Column Layout Styles START === */
 
 .project-two-col-layout {
   display: grid;
@@ -505,7 +527,7 @@
 }
 
 .project-feature-box {
-  background-color: hsl(var(--card));
+  background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   border-radius: 0.75rem;
   padding: 1.5rem;
@@ -531,5 +553,3 @@
   margin-bottom: 0.5rem;
   color: hsl(var(--muted-foreground));
 }
-
-/* === Two-Column Layout Styles END === */

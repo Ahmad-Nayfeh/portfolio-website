@@ -1,19 +1,10 @@
 "use client"
 
-/**
- * Editorial masthead navigation.
- *
- * The top of the site reads like a magazine masthead: a thin meta-row above
- * (date / edition), then the brand wordmark in display serif, with the nav
- * laid out as small caps. Active route is marked by a cobalt rule under the
- * label, not a color swap — keeps the bar quiet and the accent meaningful.
- */
 import { useState, useEffect } from "react"
 import type { Route } from "next"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
-import ThemeToggle from "@/components/ThemeToggle"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -24,27 +15,17 @@ const navItems = [
   { name: "About", path: "/about" },
 ]
 
-// Tiny utility — formats today as "MAY 02, 2026" for the meta-row.
-function formatToday(): string {
-  return new Date()
-    .toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
-    .toUpperCase()
-}
-
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [today, setToday] = useState("")
   const pathname = usePathname()
 
   useEffect(() => {
-    setToday(formatToday())
     const onScroll = () => setScrolled(window.scrollY > 8)
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
-  // Close mobile menu when route changes.
   useEffect(() => {
     setIsOpen(false)
   }, [pathname])
@@ -52,32 +33,17 @@ export default function Navbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full transition-[background-color,backdrop-filter,border-color] duration-200",
+        "sticky top-0 z-40 w-full transition-all duration-200",
         scrolled
-          ? "bg-background/80 backdrop-blur-md border-b border-border/80"
-          : "bg-background border-b border-transparent",
+          ? "glass-card-strong border-b border-border/50"
+          : "bg-transparent",
       )}
     >
-      {/* Meta row — date, edition number, slogan. Hidden when scrolled to keep
-          the masthead compact during reading. */}
-      <div
-        className={cn(
-          "border-b border-border/60 transition-all overflow-hidden",
-          scrolled ? "h-0 opacity-0" : "h-7 opacity-100",
-        )}
-      >
-        <div className="container mx-auto flex h-7 items-center justify-between px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-          <span suppressHydrationWarning>{today || "—"}</span>
-          <span className="hidden sm:inline">Engineering · AI · Systems</span>
-          <span>Vol. 01</span>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4">
+      <div className="mx-auto w-full max-w-[1400px] px-4 md:px-10 lg:px-16">
         <div className="flex h-16 items-center justify-between md:h-20">
           <Link
             href="/"
-            className="font-display text-xl tracking-tightest md:text-2xl"
+            className="font-display text-xl tracking-tight md:text-2xl glow-text"
             aria-label="Ahmad Nayfeh — home"
           >
             Ahmad Nayfeh
@@ -103,20 +69,20 @@ export default function Navbar() {
                   <span
                     aria-hidden
                     className={cn(
-                      "absolute -bottom-1.5 left-0 h-px bg-accent transition-[width] duration-300 ease-out",
+                      "absolute -bottom-1.5 left-0 h-px transition-[width] duration-300 ease-out",
                       isActive ? "w-full" : "w-0 group-hover:w-full",
                     )}
+                    style={{
+                      backgroundColor: isActive ? "hsl(var(--section-accent))" : "hsl(var(--section-accent))",
+                    }}
                   />
                 </Link>
               )
             })}
-            <span aria-hidden className="h-4 w-px bg-border" />
-            <ThemeToggle />
           </nav>
 
           {/* Mobile Navigation Toggle */}
           <div className="flex items-center gap-1 md:hidden">
-            <ThemeToggle />
             <Button
               variant="ghost"
               size="icon"
@@ -147,7 +113,9 @@ export default function Navbar() {
                     isActive ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
-                  <span className="mr-3 text-accent">{isActive ? "▸" : "·"}</span>
+                  <span className="mr-3" style={{ color: "hsl(var(--section-accent))" }}>
+                    {isActive ? "▸" : "·"}
+                  </span>
                   {item.name}
                 </Link>
               )

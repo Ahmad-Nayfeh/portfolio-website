@@ -1,11 +1,8 @@
 import SectionMasthead from "@/components/editorial/SectionMasthead"
+import StaggerGroup from "@/components/ui/StaggerGroup"
 
 interface SkillsProps {
   skills?: string[]
-  /**
-   * When `false`, render only the chip cloud without the section masthead.
-   * Used on the About page where its own H1 already frames the section.
-   */
   showMasthead?: boolean
 }
 
@@ -24,7 +21,7 @@ export default function Skills({
   showMasthead = true,
 }: SkillsProps) {
   return (
-    <section className="py-16 md:py-24">
+    <section className="zone-teal py-16 md:py-24">
       {showMasthead && (
         <SectionMasthead
           kicker="The Toolbox"
@@ -33,11 +30,16 @@ export default function Skills({
         />
       )}
 
-      <div className="flex flex-wrap gap-x-3 gap-y-3">
+      <StaggerGroup
+        staggerDelay={60}
+        direction="scale"
+        distance={0}
+        className="flex flex-wrap gap-x-3 gap-y-3"
+      >
         {skills.map((skill, idx) => (
           <span
             key={skill}
-            className="inline-flex items-center gap-2 border border-border bg-card px-3.5 py-1.5 text-sm text-foreground transition-colors hover:border-accent hover:text-accent"
+            className="glass-card inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-sm text-foreground glow-hover"
           >
             <span className="font-mono text-[10px] text-muted-foreground">
               {String(idx + 1).padStart(2, "0")}
@@ -45,7 +47,7 @@ export default function Skills({
             {skill}
           </span>
         ))}
-      </div>
+      </StaggerGroup>
     </section>
   )
 }

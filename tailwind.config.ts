@@ -1,4 +1,3 @@
-// tailwind.config.ts — Analog Laboratory design system (May 2026 redesign).
 import type { Config } from "tailwindcss"
 
 const config: Config = {
@@ -11,42 +10,19 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // Three font families bound to the CSS variables loaded by next/font in
-      // app/layout.tsx. Inter for UI, Newsreader for editorial display, and
-      // JetBrains Mono for code.
       fontFamily: {
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "Times New Roman", "serif"],
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
-        display: ["var(--font-serif)", "Georgia", "serif"],
+        display: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
-      // Editorial-scale type ramp. Display sizes get tighter tracking and
-      // a leading suited to large serif headlines.
       fontSize: {
-        "display-2xl": ["clamp(3.5rem, 8vw, 6rem)", { lineHeight: "1.02", letterSpacing: "-0.022em" }],
-        "display-xl":  ["clamp(2.75rem, 6vw, 4.5rem)", { lineHeight: "1.05", letterSpacing: "-0.02em" }],
-        "display-lg":  ["clamp(2rem, 4.5vw, 3.25rem)", { lineHeight: "1.08", letterSpacing: "-0.018em" }],
-        "display-md":  ["clamp(1.625rem, 3vw, 2.25rem)", { lineHeight: "1.15", letterSpacing: "-0.014em" }],
-      },
-      letterSpacing: {
-        tightest: "-0.025em",
-        editorial: "-0.015em",
-        wider: "0.04em",
-        kicker: "0.18em",
+        "display-2xl": ["clamp(3.5rem, 8vw, 6rem)", { lineHeight: "1.02", letterSpacing: "-0.025em" }],
+        "display-xl":  ["clamp(2.75rem, 6vw, 4.5rem)", { lineHeight: "1.05", letterSpacing: "-0.022em" }],
+        "display-lg":  ["clamp(2rem, 4.5vw, 3.25rem)", { lineHeight: "1.08", letterSpacing: "-0.02em" }],
+        "display-md":  ["clamp(1.625rem, 3vw, 2.25rem)", { lineHeight: "1.15", letterSpacing: "-0.018em" }],
       },
       colors: {
-        // ── Locked laboratory palette ────────────────────────────────────
-        // Exact hexes from the visual identity shared by blog cover images,
-        // inline figures (plot_style.py), and the website. Use these named
-        // tokens in new components; the semantic tokens below map to them.
-        parchment: "#f5f0e8",  // dominant background — warm paper
-        forest:    "#1a2e1a",  // primary text + lines — deep green
-        amber:     "#d4942a",  // warm amber — the single accent color
-        sage:      "#6b8a6b",  // secondary text + muted elements
-        cream:     "#d8d5c8",  // fills, grid lines, soft backgrounds
-        copper:    "#c87a4f",  // warm accent — use sparingly (one per page)
-        rust:      "#a1322f",  // earthy red — error states, thresholds
-        // ── Semantic tokens (shadcn-compatible, HSL CSS variables) ───────
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -103,8 +79,6 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      // Editorial-grade prose tweaks for the @tailwindcss/typography plugin.
-      // Body uses Inter; first-level headings switch to the display serif.
       typography: ({ theme }: { theme: (k: string) => string }) => ({
         DEFAULT: {
           css: {
@@ -122,9 +96,9 @@ const config: Config = {
             fontSize: "1.0625rem",
             lineHeight: "1.75",
             "h1, h2, h3, h4": {
-              fontFamily: "var(--font-serif), Georgia, serif",
-              letterSpacing: "-0.015em",
-              fontWeight: "600",
+              fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
+              letterSpacing: "-0.02em",
+              fontWeight: "700",
             },
             h1: { fontSize: "2.5rem", lineHeight: "1.1" },
             h2: {
@@ -136,32 +110,24 @@ const config: Config = {
               borderBottom: "1px solid hsl(var(--border))",
             },
             h3: { fontSize: "1.375rem", lineHeight: "1.3", marginTop: "1.8em" },
-            "a": { textDecoration: "none", borderBottom: "1px solid hsl(var(--accent) / 0.45)" },
+            "a": {
+              textDecoration: "none",
+              borderBottom: "1px solid hsl(var(--accent) / 0.35)",
+            },
             "a:hover": { borderBottomColor: "hsl(var(--accent))" },
             blockquote: {
               fontStyle: "italic",
-              fontFamily: "var(--font-serif), Georgia, serif",
               borderLeftWidth: "3px",
               fontWeight: "400",
               color: "hsl(var(--foreground))",
+              borderLeftColor: "hsl(var(--accent))",
             },
             "code::before": { content: "none" },
             "code::after": { content: "none" },
           },
         },
         invert: {
-          css: {
-            "--tw-prose-body": "hsl(var(--foreground))",
-            "--tw-prose-headings": "hsl(var(--foreground))",
-            "--tw-prose-links": "hsl(var(--accent))",
-            "--tw-prose-bold": "hsl(var(--foreground))",
-            "--tw-prose-quotes": "hsl(var(--foreground))",
-            "--tw-prose-quote-borders": "hsl(var(--accent))",
-            "--tw-prose-code": "hsl(var(--foreground))",
-            "--tw-prose-hr": "hsl(var(--border))",
-            "--tw-prose-bullets": "hsl(var(--muted-foreground))",
-            "--tw-prose-counters": "hsl(var(--muted-foreground))",
-          },
+          css: {},
         },
       }),
       keyframes: {
@@ -181,12 +147,22 @@ const config: Config = {
           from: { backgroundSize: "0% 1px" },
           to: { backgroundSize: "100% 1px" },
         },
+        "pulse-dot": {
+          "0%, 100%": { opacity: "0.6", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.3)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { boxShadow: "0 0 8px var(--section-glow), 0 0 16px var(--section-glow)" },
+          "50%": { boxShadow: "0 0 16px var(--section-glow), 0 0 32px var(--section-glow)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-up": "fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both",
         "underline-grow": "underline-grow 0.35s ease-out forwards",
+        "pulse-dot": "pulse-dot 2.5s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
       },
     },
   },

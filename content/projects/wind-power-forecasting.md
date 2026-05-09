@@ -3,7 +3,7 @@ title: "Wind Power Forecasting"
 slug: "wind-power-forecasting"
 date: "2024-03-15"
 coverImage: "/images/projects/wind-power-forecasting.jpg"
-tags: ["Time Series Forecasting", "Deep Learning", "Supervised Learning", "AI", "Model Complexity"]
+tags: ["Deep Learning", "Time Series", "Energy"]
 excerpt: "Hybrid deep learning and machine learning pipeline for wind power forecasting using direct LSTM and LSTM→Random Forest architectures."
 category: "AI for Energy"
 githubLink: "https://github.com/nahmad2000/WindPowerForecasting-LSTM-RF"

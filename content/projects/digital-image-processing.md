@@ -3,7 +3,7 @@ title: "Digital Image Processing Projects"
 slug: "digital-image-processing"
 date: "2024-05-01"
 coverImage: "/images/projects/digital-image-processing.jpg"
-tags: ["Image Processing", "Educational Tools", "Denoising", "Edge Detection", "Visualization"]
+tags: ["Image Processing", "Computer Vision"]
 excerpt: "A modular suite of classic image processing mini-projects — covering interpolation, compression, denoising, enhancement, and shading correction — with clean visual benchmarks and Python implementations."
 category: "Computer Vision"
 githubLink: "https://github.com/nahmad2000/Digital-Image-Processing"

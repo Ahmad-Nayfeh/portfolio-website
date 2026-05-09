@@ -61,7 +61,10 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
   if (headings.length < 2) return null
 
   return (
-    <nav aria-label="Table of contents" className="sticky top-24 hidden xl:block">
+    <nav
+      aria-label="Table of contents"
+      className="sticky top-24 hidden xl:block rounded-xl border border-border/50 bg-card/60 p-5 backdrop-blur-md"
+    >
       <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
         Contents
       </div>

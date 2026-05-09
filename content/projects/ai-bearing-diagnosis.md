@@ -3,7 +3,7 @@ title: "AI-Powered Bearing Fault Diagnosis"
 slug: "ai-bearing-diagnosis"
 date: "2025-06-09"
 coverImage: "/images/projects/ai-bearing-diagnosis.jpg"
-tags: ["Machine Learning", "Deep Learning", "Signal Processing", "Predictive Maintenance", "1D CNN", "Streamlit"]
+tags: ["Deep Learning", "Signal Processing", "Predictive Maintenance"]
 excerpt: "An end-to-end deep learning project that uses a 1D Convolutional Neural Network (CNN) to diagnose bearing faults from vibration signals, deployed as an interactive Streamlit web app."
 category: "Predictive Maintenance"
 githubLink: "https://github.com/ahmad-nayfeh/ai-bearing-diagnosis"

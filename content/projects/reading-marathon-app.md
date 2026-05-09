@@ -4,7 +4,7 @@ slug: "reading-marathon-app"
 lang: ar
 date: "2025-07-13"
 coverImage: "/images/projects/reading-marathon-app.jpg"
-tags: ["هندسة البيانات", "تحليل البيانات", "Streamlit", "Firebase", "Pandas", "Plotly", "بايثون متكامل", "Google Cloud", "API Integration"]
+tags: ["Data Engineering", "Arabic"]
 excerpt: "ابتكار وتطوير منظومة سحابية شاملة (End-to-End System) تستخدم هندسة البيانات والتحليلات المتقدمة لتحويل تجربة القراءة الجماعية إلى رحلة تفاعلية ومحفزة. المنصة تعالج التحديات الإدارية والتحفيزية من خلال خط بيانات آلي، ونظام ألعاب ذكي، ولوحات تحكم متطورة."
 category: "تطبيقات وتحليلات البيانات"
 githubLink: "https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud"

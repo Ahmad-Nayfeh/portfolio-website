@@ -1,43 +1,6 @@
 """scripts/generate_inline_images.py
 
-Inline illustration generation (H4 — May 2026).
-
-Each generated post gets ONE big editorial cover image at the top (see
-generate_cover.py). H4 adds 2-4 SMALLER inline illustrations woven into
-the prose, so the post reads as a visual essay rather than a wall of
-text broken only by code blocks.
-
-How it works:
-
-1. The `inline_image_briefs` metadata stage (defined in
-   streams/ai-papers.yaml) asks Claude to output JSON describing 2-4
-   illustrations with stable IDs (e.g. "OPENING", "DIALECTIC_1") and
-   one-sentence visual briefs each.
-
-2. The prose stages (umbrella_opening, dialectical_walk, ...) drop
-   `{{IMG:ID}}` placeholder tokens at natural narrative beats. Each
-   placeholder corresponds to one entry in the briefs JSON.
-
-3. THIS module reads the briefs, renders each through DALL-E with the
-   inline style suffix (similar palette to the cover but looser
-   composition — "Distill.pub explainer figure" rather than "magazine
-   cover"), saves the PNGs under `public/blog-images/<slug>/`, then
-   rewrites the MDX file replacing each `{{IMG:ID}}` placeholder with
-   a real markdown image reference.
-
-Failure handling:
-  - A failed render leaves its placeholder in the MDX as a HTML comment
-    (`<!-- IMG:ID failed to render -->`) so the post still ships and
-    the omission is visible in review.
-  - Cost-meter integration mirrors generate_cover.py — billed on
-    response, ceiling-checked, raises CostCeilingExceeded to abort
-    cleanly.
-
-Sizing & cost (DALL-E 3, May 2026):
-  1024x1024 standard = $0.04
-  1024x1024 HD       = $0.08
-  We use 1024x1024 standard for inline. Three inline images per post +
-  one HD cover = $0.04*3 + $0.12 = $0.24/post; at weekly cadence ~$12/yr.
+Inline illustration generation — Nocturne style (May 2026).
 """
 from __future__ import annotations
 
@@ -55,46 +18,24 @@ log = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-# Locked inline style suffix. INTENTIONALLY DIFFERENT from the cover
-# suffix (generate_cover.py:STYLE_SUFFIX) — same palette, but the
-# composition language shifts from "magazine cover" to "in-text
-# explainer figure". Cover images need to carry visual weight at
-# 1792x1024 with the headline; inline images need to be readable at
-# ~600px column width and feel like Distill.pub margin sketches.
 INLINE_STYLE_SUFFIX = (
-    "Flat editorial vector illustration in the style of Distill.pub "
-    "explainer figures. Diagrammatic and abstract. Centered composition "
-    "filling roughly 70 percent of the canvas with breathing room "
-    "around. Strict three-color palette: warm parchment background "
-    "(approximately #f5f0e8), deep forest green primary (approximately "
-    "#1a2e1a), and a single warm amber accent (approximately #d4942a). "
-    "Crisp vector shapes, hairline strokes, no gradients, "
-    "no shading, no rasterized textures, no photorealism. No people, "
-    "no faces, no human figures. No text, no letters, no captions, "
-    "no logos. Schematic and symbolic, like a margin sketch in a "
-    "research notebook."
+    "Flat editorial vector illustration in the style of Distill.pub explainer "
+    "figures. Diagrammatic and abstract. Centered composition filling roughly "
+    "70 percent of the canvas with breathing room around. Dark background "
+    "(approximately #080812). Strict three-color palette: electric teal "
+    "(#00d4aa), warm amber (#ffba08), and hot magenta (#ff3cac) accents. "
+    "Crisp vector shapes, hairline strokes, subtle glow effects, no gradients, "
+    "no shading, no rasterized textures, no photorealism. No people, no faces, "
+    "no human figures. No text, no letters, no captions, no logos. Schematic "
+    "and symbolic, like a luminous margin sketch in a research notebook."
 )
 
-# Placeholder regex. Matches `{{IMG:OPENING}}` or `{{IMG:DIALECTIC_1}}`.
-# The ID is captured for lookup against the briefs JSON. Uppercase
-# letters, digits, underscores only — keeps the syntax noise-resistant
-# in markdown (no spaces, no special chars).
 PLACEHOLDER_RE = re.compile(r"\{\{IMG:([A-Z0-9_]+)\}\}")
 
-# How many briefs we'll honor per post. The stage prompt asks for 2-4;
-# this is the hard cap on the rendering side so a runaway model can't
-# burn the cost ceiling on twenty illustrations.
 MAX_INLINE_IMAGES = 4
 
-# Default size + quality for inline. 1024x1024 standard balances cost
-# vs visual quality at the inline image dimensions we'll display.
 INLINE_SIZE = "1024x1024"
 INLINE_QUALITY = "standard"
-
-
-# ---------------------------------------------------------------------------
-# OpenAI client (lazy import — same convention as generate_cover.py)
-# ---------------------------------------------------------------------------
 
 
 def _openai_client() -> Any:
@@ -107,8 +48,7 @@ def _openai_client() -> Any:
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError(
-            "OPENAI_API_KEY environment variable is not set. Add it to your "
-            "GitHub repo's Actions secrets."
+            "OPENAI_API_KEY environment variable is not set."
         )
     return OpenAI(api_key=api_key)
 
@@ -118,7 +58,6 @@ def _build_dalle_prompt(brief: str) -> str:
 
 
 def _download(url: str, target: Path) -> None:
-    """Stream an image from `url` to `target`. Atomic-ish."""
     target.parent.mkdir(parents=True, exist_ok=True)
     tmp = target.with_suffix(target.suffix + ".part")
     with urllib.request.urlopen(url, timeout=60) as resp, tmp.open("wb") as f:
@@ -130,21 +69,10 @@ def _download(url: str, target: Path) -> None:
     tmp.replace(target)
 
 
-# ---------------------------------------------------------------------------
-# Brief parsing
-# ---------------------------------------------------------------------------
-
-
 _JSON_OBJECT_RE = re.compile(r"\{[\s\S]*\}")
 
 
 def _extract_json_object(text: str) -> dict[str, Any] | None:
-    """Pull the first {...} JSON object out of `text`, fenced or not.
-
-    Same tolerance pattern as scripts/select_papers.py — models
-    sometimes wrap JSON in ```json fences or in a prose preamble despite
-    being told not to.
-    """
     if not text:
         return None
     text = text.strip()
@@ -165,22 +93,6 @@ def _extract_json_object(text: str) -> dict[str, Any] | None:
 
 
 def parse_briefs(stage_text: str) -> list[dict[str, str]]:
-    """Parse the inline_image_briefs stage output into a clean list.
-
-    Expected schema:
-        {
-          "images": [
-            {"id": "OPENING",     "brief": "An abstract scene of...", "alt": "..."},
-            {"id": "DIALECTIC_1", "brief": "...",                      "alt": "..."},
-            ...
-          ]
-        }
-
-    Tolerant of: missing `alt`, ids in lowercase, briefs with trailing
-    periods, extra unknown keys.
-
-    Returns at most `MAX_INLINE_IMAGES` entries with normalized keys.
-    """
     obj = _extract_json_object(stage_text)
     if not obj or not isinstance(obj.get("images"), list):
         return []
@@ -204,18 +116,12 @@ def parse_briefs(stage_text: str) -> list[dict[str, str]]:
     return out
 
 
-# ---------------------------------------------------------------------------
-# Rendering
-# ---------------------------------------------------------------------------
-
-
 def _render_one(
     *,
     client: Any,
     brief: dict[str, str],
     out_dir: Path,
 ) -> str | None:
-    """Render one inline illustration. Returns its public path, or None on failure."""
     image_id = brief["id"]
     target = out_dir / f"inline_{image_id.lower()}.png"
     prompt = _build_dalle_prompt(brief["brief"])
@@ -235,7 +141,6 @@ def _render_one(
         log.warning("Inline image %s: DALL-E call failed (%s).", image_id, e)
         return None
 
-    # Cost meter — billed on response, same pattern as the cover stage.
     meter = cost_meter.get_meter()
     if meter is not None:
         try:
@@ -247,7 +152,7 @@ def _render_one(
             )
         except cost_meter.CostCeilingExceeded:
             raise
-        except Exception as e:  # pragma: no cover — defensive
+        except Exception as e:
             log.warning("cost_meter: failed to record DALL-E inline usage (%s)", e)
 
     if not response.data:
@@ -274,15 +179,6 @@ def render_inline_images(
     slug: str,
     skip: bool = False,
 ) -> dict[str, dict[str, str]]:
-    """Render every inline brief and return {id -> {public_path, alt}}.
-
-    Failures are surfaced as missing entries in the returned dict so
-    `substitute_placeholders` can decide what to leave behind in the MDX
-    (a comment, an empty alt-text, etc).
-
-    `skip=True` short-circuits — used for `--skip-cover` style runs and
-    for tests that don't want to hit the OpenAI API.
-    """
     if skip:
         log.info("Inline image generation skipped (skip=True).")
         return {}
@@ -317,26 +213,10 @@ def render_inline_images(
     return results
 
 
-# ---------------------------------------------------------------------------
-# Placeholder substitution
-# ---------------------------------------------------------------------------
-
-
 def substitute_placeholders(
     mdx: str,
     rendered: dict[str, dict[str, str]],
 ) -> tuple[str, int, int]:
-    """Replace `{{IMG:ID}}` tokens in `mdx` with markdown image syntax.
-
-    For each placeholder:
-      - If `rendered[id]` exists, swap for `![alt](public_path)`.
-        We wrap it in a paragraph break so the image renders on its
-        own line in the prose flow (markdown would otherwise inline it).
-      - If not, swap for an HTML comment so the gap is visible to a
-        human reviewer but doesn't show up to readers.
-
-    Returns: (new_mdx, replaced_count, missing_count).
-    """
     replaced = 0
     missing = 0
 
@@ -348,22 +228,13 @@ def substitute_placeholders(
             replaced += 1
             alt = entry.get("alt", "Inline illustration")
             path = entry.get("path", "")
-            # Surrounding blank lines force markdown to render the image
-            # as its own block element rather than splicing it inline
-            # with the preceding/following text.
             return f"\n\n![{alt}]({path})\n\n"
         missing += 1
         return f"<!-- IMG:{placeholder_id} not rendered -->"
 
     new_mdx = PLACEHOLDER_RE.sub(_sub, mdx)
-    # Collapse any triple+ newlines we may have introduced down to 2.
     new_mdx = re.sub(r"\n{3,}", "\n\n", new_mdx)
     return new_mdx, replaced, missing
-
-
-# ---------------------------------------------------------------------------
-# Public entry point
-# ---------------------------------------------------------------------------
 
 
 def render_and_substitute(
@@ -374,17 +245,9 @@ def render_and_substitute(
     slug: str,
     skip: bool = False,
 ) -> dict[str, Any]:
-    """Top-level: render briefs, rewrite the MDX in place. Returns a summary.
-
-    Wired into main.py after `write_post` succeeds. Failure here is
-    non-fatal — the post ships with placeholders rewritten as comments,
-    and the run summary records what didn't render.
-    """
     inline_cfg = getattr(stream_cfg, "inline_images", None)
     enabled = getattr(inline_cfg, "enabled", True) if inline_cfg else True
     if not enabled or skip:
-        # Even when disabled we sub the placeholders to comments so a
-        # post that contains `{{IMG:OPENING}}` never ships visibly broken.
         mdx = mdx_path.read_text(encoding="utf-8")
         new_mdx, _, missing = substitute_placeholders(mdx, {})
         if new_mdx != mdx:

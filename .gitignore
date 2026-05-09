@@ -36,3 +36,10 @@ venv/
 # pipeline run summaries (workflow artifacts; never committed)
 run-summary.json
 failure-body.md
+
+# local build logs
+*.log
+
+# handoff / agent notes
+HANDOFF_NOTES.md
+.claude/

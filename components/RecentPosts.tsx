@@ -1,5 +1,6 @@
 import BlogCard from "@/components/BlogCard"
 import SectionMasthead from "@/components/editorial/SectionMasthead"
+import StaggerGroup from "@/components/ui/StaggerGroup"
 import type { Post } from "@/types"
 
 interface RecentPostsProps {
@@ -8,7 +9,7 @@ interface RecentPostsProps {
 
 export default function RecentPosts({ posts }: RecentPostsProps) {
   return (
-    <section className="py-16 md:py-24">
+    <section className="zone-magenta py-16 md:py-24">
       <SectionMasthead
         kicker="From the Notebook"
         title="Recent writing"
@@ -16,11 +17,16 @@ export default function RecentPosts({ posts }: RecentPostsProps) {
         link={{ href: "/blog", label: "Open the notebook" }}
       />
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post, idx) => (
-          <BlogCard key={post.slug} post={post} index={idx} />
+      <StaggerGroup
+        staggerDelay={100}
+        direction="up"
+        distance={16}
+        className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3"
+      >
+        {posts.map((post) => (
+          <BlogCard key={post.slug} post={post} />
         ))}
-      </div>
+      </StaggerGroup>
     </section>
   )
 }

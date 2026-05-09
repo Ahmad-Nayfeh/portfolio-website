@@ -52,11 +52,27 @@ export default async function ProjectPage({ params }: PageProps) {
         </span>
       </Link>
 
-      <article>
+      <article className="relative">
+        {/* Decorative background orbs */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div
+            className="absolute -right-32 -top-32 h-[600px] w-[600px] opacity-[0.05]"
+            style={{
+              background: "radial-gradient(ellipse at center, hsl(var(--accent)), transparent 70%)",
+            }}
+          />
+          <div
+            className="absolute -left-32 top-0 h-[400px] w-[400px] opacity-[0.03]"
+            style={{
+              background: "radial-gradient(ellipse at center, hsl(326 100% 62%), transparent 70%)",
+            }}
+          />
+        </div>
+
         {/* === Editorial header — meta column on the left, title on the right. === */}
         <header className="mt-12 grid grid-cols-12 gap-x-6 border-b border-border pb-10">
           <div className="col-span-12 lg:col-span-3">
-            <div className="flex flex-row gap-x-6 lg:flex-col lg:gap-y-5">
+            <div className="flex flex-row gap-x-6 rounded-xl border border-border/50 bg-card/60 p-5 backdrop-blur-md lg:flex-col lg:gap-y-5">
               {project.date && (
                 <div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
@@ -141,7 +157,7 @@ export default async function ProjectPage({ params }: PageProps) {
         </header>
 
         {project.coverImage && (
-          <div className="relative my-10 aspect-[16/9] overflow-hidden bg-secondary md:my-14">
+          <div className="relative my-10 aspect-[16/9] overflow-hidden rounded-xl border border-border/50 bg-secondary shadow-lg shadow-black/20 md:my-14">
             <Image
               src={project.coverImage}
               alt={project.title}
@@ -150,39 +166,39 @@ export default async function ProjectPage({ params }: PageProps) {
               priority
               sizes="(max-width: 1400px) 100vw, 1400px"
             />
+            <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-border/20" />
           </div>
         )}
 
-        {/* Body — single editorial column. Project content uses
-            project-prose-container styles for richer, custom layouts. */}
-        <div className="mx-auto max-w-3xl">
+        {/* Body — single editorial column, full-width within container */}
+        <div className="mx-auto mt-10">
           {project.content && (
             <div className="project-prose-container">
               <MarkdownRenderer content={project.content} />
             </div>
           )}
-        </div>
 
-        {/* Closing rule */}
-        <div className="mx-auto mt-20 max-w-3xl border-t border-border pt-8">
-          <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-            <span>End of case study</span>
-            {project.githubLink && (
-              <a
-                href={project.githubLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 text-foreground"
-              >
-                <span className="border-b border-border transition-colors group-hover:border-accent">
-                  Read the source
-                </span>
-                <ArrowUpRight
-                  size={12}
-                  className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                />
-              </a>
-            )}
+          {/* Closing rule */}
+          <div className="mx-auto mt-20 border-t border-border pt-8">
+            <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              <span>End of case study</span>
+              {project.githubLink && (
+                <a
+                  href={project.githubLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2 text-foreground"
+                >
+                  <span className="border-b border-border transition-colors group-hover:border-accent">
+                    Read the source
+                  </span>
+                  <ArrowUpRight
+                    size={12}
+                    className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  />
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </article>

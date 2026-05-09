@@ -3,7 +3,7 @@ title: "MNIST CNN Layer Analysis"
 slug: "mnist-cnn-layer-analysis"
 date: "2024-02-28"
 coverImage: "/images/projects/mnist-cnn-layer-analysis.jpg"
-tags: ["Deep Learning", "Model Complexity", "Supervised Learning", "Image Processing", "Visualization"]
+tags: ["Deep Learning", "Computer Vision"]
 excerpt: "An educational deep learning experiment comparing test accuracy and model complexity across CNN architectures for handwritten digit classification."
 category: "Deep Learning"
 githubLink: "https://github.com/nahmad2000/MNIST-CNN-Layer-Analysis"

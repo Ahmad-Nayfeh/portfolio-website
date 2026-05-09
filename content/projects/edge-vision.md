@@ -3,7 +3,7 @@ title: "Edge Vision"
 slug: "edge-vision"
 date: "2024-04-01"
 coverImage: "/images/projects/edge-vision.jpg"
-tags: ["Edge Detection", "Image Processing", "Computer Vision", "Educational Tools", "Visualization"]
+tags: ["Computer Vision", "Image Processing"]
 excerpt: "Compare multiple edge detection algorithms (Sobel, Scharr, Laplacian, Canny) with real-time visualization and interactive parameter control."
 category: "Computer Vision"
 githubLink: "https://github.com/nahmad2000/Edge-Vision"

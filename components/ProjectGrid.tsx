@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import ProjectCard from "@/components/ProjectCard"
+import StaggerGroup from "@/components/ui/StaggerGroup"
 import type { Project } from "@/types"
 import { cn } from "@/lib/utils"
 
@@ -19,21 +20,27 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
 
   return (
     <div>
+      {/* Filter chips */}
       {allTags.length > 0 && (
-        <div className="mb-12 border-b border-border pb-8">
-          <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-            Filter by stack
+        <div className="mb-12">
+          <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            Stack
           </div>
-          <div className="flex flex-wrap gap-x-3 gap-y-1.5 font-mono text-[11px] uppercase tracking-[0.18em]">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              className={cn(
-                "transition-colors",
-                selectedTag === null
-                  ? "text-accent"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
               onClick={() => setSelectedTag(null)}
+              className={cn(
+                "rounded-full border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-all duration-200",
+                selectedTag === null
+                  ? "border-transparent"
+                  : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
+              )}
+              style={
+                selectedTag === null
+                  ? { backgroundColor: "hsl(var(--accent))", color: "hsl(var(--primary-foreground))" }
+                  : {}
+              }
             >
               All
             </button>
@@ -41,29 +48,40 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
               <button
                 type="button"
                 key={tag}
-                className={cn(
-                  "transition-colors",
-                  selectedTag === tag
-                    ? "text-accent"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
                 onClick={() => setSelectedTag(tag)}
+                className={cn(
+                  "rounded-full border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-all duration-200",
+                  selectedTag === tag
+                    ? "border-transparent"
+                    : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
+                )}
+                style={
+                  selectedTag === tag
+                    ? { backgroundColor: "hsl(var(--accent))", color: "hsl(var(--primary-foreground))" }
+                    : {}
+                }
               >
-                #{tag}
+                {tag}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((project, idx) => (
-          <ProjectCard key={project.slug} project={project} index={idx} />
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <div className="border-y border-border py-20 text-center">
+      {/* Card grid with staggered entrance */}
+      {filtered.length > 0 ? (
+        <StaggerGroup
+          staggerDelay={100}
+          direction="up"
+          distance={16}
+          className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3"
+        >
+          {filtered.map((project) => (
+            <ProjectCard key={project.slug} project={project} />
+          ))}
+        </StaggerGroup>
+      ) : (
+        <div className="border-y py-20 text-center" style={{ borderColor: "hsl(var(--border))" }}>
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
             No projects match the current filter.
           </p>
