@@ -77,6 +77,22 @@ Required files:
    - Type hints on all functions
    - Docstrings explaining the algorithm
 
+1. "README.md"
+   - PROFESSIONAL, polished README — the kind you'd see on a top GitHub repo.
+   - Must include ALL of these sections:
+     a) **Title + badge row** — project name, license badge, Python version badge
+     b) **Overview** — 2-3 paragraphs explaining what this project does, what paper it implements (with link to arxiv), and why it matters
+     c) **Visual Results** — embed the figures using markdown: `![Figure 1](output/figure_1.png)`. Show ALL figures inline with brief captions explaining what each shows. THIS IS CRITICAL — the figures are the star of the README.
+     d) **Installation** — clear step-by-step: `git clone`, `cd`, `pip install -r requirements.txt`
+     e) **Quick Start** — `python demo.py` and what to expect
+     f) **Usage** — how to import and use the library in your own code, with a short code example
+     g) **Project Structure** — tree view of files
+     h) **How It Works** — brief technical explanation of the algorithm
+     i) **Results Summary** — table of key metrics or findings from the demo
+     j) **License** — MIT
+   - Use markdown headings, code blocks, tables, and embedded images throughout
+   - Every figure filename in "output/" must match exactly what demo.py produces
+
 2. "demo.py"
    - THE MOST IMPORTANT FILE. This is a standalone script that:
      a) Imports from src.implementation
@@ -92,10 +108,11 @@ Required files:
      e) Every figure uses the Nocturne palette (dark background, teal/amber/magenta accents)
      f) Figures are publication-quality: proper labels, legends, titles, grid
      g) Uses seaborn style for statistical plots where appropriate
-     h) Saves each figure as both .png (300 DPI) and .pdf
-     i) Prints progress to stdout
+     h) Saves each figure as .png (300 DPI) to "output/" directory
+     i) Prints progress to stdout  
    - Must NOT call plt.show()
    - Must handle errors gracefully
+   - FIGURE FILENAMES must be descriptive, like "main_result.png", "comparison.png", "parameter_sensitivity.png", "convergence.png", "boundary_behavior.png", "ablation.png"
 
 3. "requirements.txt"
    - numpy

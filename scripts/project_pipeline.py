@@ -181,6 +181,14 @@ def main():
         }])
         sys.exit(1)
 
+    # Add generated figures to the project files so they get committed to the repo
+    output_dir = work_dir / project.project_name / "output"
+    if output_dir.exists():
+        for fig_path in sorted(output_dir.iterdir()):
+            if fig_path.suffix.lower() in {".png", ".jpg", ".jpeg", ".pdf", ".svg"}:
+                rel = f"output/{fig_path.name}"
+                project.files[rel] = fig_path.read_bytes()
+
     # ── Stage 5: Create GitHub repo ───────────────────────────────────────
     logger.info("Creating GitHub repo: %s", project.project_name)
     repo_result = create_repo(
