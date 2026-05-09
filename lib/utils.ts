@@ -65,3 +65,37 @@ export function formatDateTime(dateString: string): string {
   const timePart = formatTime(dateString)
   return timePart ? `${datePart} · ${timePart}` : datePart
 }
+
+/**
+ * Extract H2 and H3 headings from a raw MDX / Markdown string so they can
+ * be passed to the TableOfContents component as server-rendered props.
+ *
+ * The generated IDs match the scheme used by rehype-slug (lowercase,
+ * spaces to hyphens, non-word chars stripped) so clicking a ToC link
+ * scrolls to the correct anchor.
+ */
+export function extractHeadings(
+  mdx: string,
+): Array<{ id: string; text: string; level: 2 | 3 }> {
+  const headings: Array<{ id: string; text: string; level: 2 | 3 }> = []
+  for (const line of mdx.split("\n")) {
+    const m = line.match(/^(#{2,3})\s+(.+)$/)
+    if (!m) continue
+    const level = m[1].length as 2 | 3
+    // Strip inline MDX / Markdown formatting: backticks, bold, italic, links.
+    const text = m[2]
+      .replace(/`[^`]*`/g, (s) => s.slice(1, -1))
+      .replace(/\*\*([^*]+)\*\*/g, "$1")
+      .replace(/\*([^*]+)\*/g, "$1")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .trim()
+    const id = text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+    headings.push({ id, text, level })
+  }
+  return headings
+}
