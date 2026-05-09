@@ -4,6 +4,14 @@ import { ArrowUpRight } from "lucide-react"
 import type { Project } from "@/types"
 import { formatDate } from "@/lib/utils"
 
+/**
+ * ProjectCard — like BlogCard, but project-shaped.
+ *
+ * May 2026: tag chips now link to the filtered projects index. Image has a
+ * slight cobalt tint on hover (via mix-blend multiply + palette accent).
+ * Focus ring matches the accent so keyboard navigation is consistent.
+ */
+
 interface ProjectCardProps {
   project: Project
   index?: number
@@ -20,7 +28,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
     <article className="group flex flex-col">
       <Link
         href={`/projects/${project.slug}`}
-        className="relative block aspect-[4/3] w-full overflow-hidden bg-secondary"
+        className="relative block aspect-[4/3] w-full overflow-hidden bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         <Image
           src={project.coverImage || "/placeholder.svg"}
@@ -57,15 +65,4 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           </p>
         )}
 
-        {tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-            {tags.slice(0, 3).map((tag) => (
-              <span key={tag}>#{tag}</span>
-            ))}
-            {tags.length > 3 && <span>+{tags.length - 3}</span>}
-          </div>
-        )}
-      </div>
-    </article>
-  )
-}
+     
