@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import BlogGrid from "@/components/BlogGrid"
 import { getAllPosts } from "@/lib/content"
 
@@ -39,7 +40,4 @@ export default async function BlogPage() {
         </div>
       </header>
 
-      <BlogGrid posts={posts} />
-    </div>
-  )
-}
+      {/* BlogGri

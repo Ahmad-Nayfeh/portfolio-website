@@ -1,6 +1,16 @@
 "use client"
 
-import { useState } from "react"
+/**
+ * BlogGrid — filterable post list with URL-reflected state.
+ *
+ * Tag selection is written into `?tag=<name>` so filtered views are
+ * linkable and survive page refresh. The search query stays client-only
+ * (no URL state) because it changes on every keystroke and polluting
+ * history with search terms is annoying UX.
+ */
+
+import { useState, useCallback } from "react"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { Search } from "lucide-react"
 import BlogCard from "@/components/BlogCard"
 import type { Post } from "@/types"
@@ -8,11 +18,33 @@ import { cn } from "@/lib/utils"
 
 interface BlogGridProps {
   posts: Post[]
+  /** Pre-selected tag read from the URL by the page server component. */
+  initialTag?: string | null
 }
 
-export default function BlogGrid({ posts }: BlogGridProps) {
+export default function BlogGrid({ posts, initialTag = null }: BlogGridProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedTag, setSelectedTag] = useState<string | null>(null)
+
+  // The active tag is the URL param (controlled) not local state.
+  const selectedTag = searchParams.get("tag") ?? null
+
+  const setTag = useCallback(
+    (tag: string | null) => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (tag) {
+        params.set("tag", tag)
+      } else {
+        params.delete("tag")
+      }
+      // Replace so the back button doesn't cycle through every tag click.
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    },
+    [router, pathname, searchParams],
+  )
 
   // Extract all unique tags from posts.
   const allTags = Array.from(new Set(posts.flatMap((post) => post.tags))).sort()
@@ -21,6 +53,7 @@ export default function BlogGrid({ posts }: BlogGridProps) {
   const filteredPosts = posts.filter((post) => {
     const q = searchQuery.toLowerCase()
     const matchesSearch =
+      q === "" ||
       post.title.toLowerCase().includes(q) ||
       (post.excerpt ?? "").toLowerCase().includes(q)
     const matchesTag = selectedTag ? post.tags.includes(selectedTag) : true
@@ -29,7 +62,7 @@ export default function BlogGrid({ posts }: BlogGridProps) {
 
   return (
     <div>
-      {/* Filter row — borderless on top, single bottom rule, editorial. */}
+      {/* Filter row */}
       <div className="mb-12 flex flex-col gap-5 border-b border-border pb-8 lg:flex-row lg:items-end lg:justify-between">
         <div className="lg:max-w-md lg:flex-1">
           <label
@@ -65,43 +98,8 @@ export default function BlogGrid({ posts }: BlogGridProps) {
                     ? "text-accent"
                     : "text-muted-foreground hover:text-foreground",
                 )}
-                onClick={() => setSelectedTag(null)}
+                onClick={() => setTag(null)}
               >
                 All
               </button>
-              {allTags.map((tag) => (
-                <button
-                  type="button"
-                  key={tag}
-                  className={cn(
-                    "transition-colors",
-                    selectedTag === tag
-                      ? "text-accent"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                  onClick={() => setSelectedTag(tag)}
-                >
-                  #{tag}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-        {filteredPosts.map((post, idx) => (
-          <BlogCard key={post.slug} post={post} index={idx} />
-        ))}
-      </div>
-
-      {filteredPosts.length === 0 && (
-        <div className="border-y border-border py-20 text-center">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-            No entries match the current filter.
-          </p>
-        </div>
-      )}
-    </div>
-  )
-}
+              {all
