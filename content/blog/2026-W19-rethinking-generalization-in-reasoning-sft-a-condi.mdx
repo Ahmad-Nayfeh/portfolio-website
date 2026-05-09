@@ -1,0 +1,169 @@
+---
+title: "Paper Notes: Rethinking Generalization in Reasoning SFT: A Conditional Analysis on Optimization, Data, and Model Capability"
+slug: "2026-W19-rethinking-generalization-in-reasoning-sft-a-condi"
+date: "2026-05-09T10:11:50+03:00"
+tags:
+  - "AI"
+  - "weekly-paper"
+  - "chain-of-thought-sft"
+  - "reasoning-generalization"
+  - "supervised-finetuning"
+  - "optimization-dynamics"
+  - "safety-alignment-tradeoffs"
+excerpt: "## Does supervised fine-tuning teach reasoning, or just rehearse it?  Imagine teaching someone to solve chess puzzles by showing them thousands of annotated games. They get very good at the positions they've seen. But then you sit them down at a backgammon board—same combinatoria"
+readTime: "16 min read"
+featured: false
+coverImage: "/blog-images/2026-W19-rethinking-generalization-in-reasoning-sft-a-condi/cover.png"
+streamId: "ai-papers"
+language: "en"
+generatedBy: "claude-sonnet-4-6"
+papers:
+  - title: "Rethinking Generalization in Reasoning SFT: A Conditional Analysis on Optimization, Data, and Model Capability"
+    url: "https://arxiv.org/abs/2604.06628"
+    arxivId: "2604.06628"
+    authors:
+      - "Qihan Ren"
+      - "Peng Wang"
+      - "Ruikun Cai"
+      - "Shuai Shao"
+      - "Dadi Guo"
+      - "Yuejin Xie"
+      - "Yafu Li"
+      - "Quanshi Zhang"
+      - "Xia Hu"
+      - "Jing Shao"
+      - "Dongrui Liu"
+---
+## Does supervised fine-tuning teach reasoning, or just rehearse it?
+
+Imagine teaching someone to solve chess puzzles by showing them thousands of annotated games. They get very good at the positions they've seen. But then you sit them down at a backgammon board—same combinatorial depth, different surface—and you discover something uncomfortable: their improvement was narrower than you thought. Or was it? Maybe you just stopped the training too early and caught them in an awkward transition. Maybe the annotated games were sloppy to begin with. Maybe they were already a strong player before you started, and the lesson worked differently on them than on a beginner. The real question isn't whether the teaching worked. It's *under what conditions* it transfers.
+
+![A chess piece connected by a curved arc that dips below a horizontal line before rising to reach scattered backgammon tokens on the opposite side.](/blog-images/2026-W19-rethinking-generalization-in-reasoning-sft-a-condi/inline_opening.png)
+
+## When does supervised fine-tuning on reasoning actually generalize?
+
+This is precisely the question that has split the LLM post-training community for the last two years. A popular story goes: supervised fine-tuning (SFT) memorizes, reinforcement learning (RL) generalizes—and if you care about genuine reasoning ability, you should reach for RL. One recent paper offers a sustained challenge to that story. Qihan Ren et al. (*Rethinking Generalization in Reasoning SFT*, arXiv 2604.06628) argue that the dichotomy is too clean. Cross-domain generalization from SFT is real, they say, but it is *conditional*—shaped simultaneously by how long you train, what data you use, and how capable your base model already is. The paper's uncomfortable corollary is that the failures critics point to may be measurement artifacts from stopping training at the wrong moment.
+
+By the end of this post you'll understand the "dip-and-recovery" pattern that makes early SFT checkpoints look like failures; you'll see why data quality and chain-of-thought structure matter more than volume; you'll grasp why the same fine-tuning recipe transfers reasoning to stronger base models but only transfers verbosity to weaker ones; and you'll encounter the asymmetry that complicates any clean win—reasoning improves while safety degrades. The closing experiment will try to reproduce the dip-and-recovery shape from first principles with a simple learning-curve simulation, and we'll be honest about what that test can and cannot tell us.
+
+## The question sharpens
+
+The SFT-memorizes / RL-generalizes story is appealingly clean. It gives practitioners a decision rule: if you want a model to generalize to problems it hasn't seen, don't use supervised fine-tuning. But a clean story should make you suspicious. Real learning systems are messier, and the experimental evidence underlying that rule is worth examining carefully.
+
+Here's the sharper version of the question: when critics report that SFT fails to generalize across domains, *are they measuring a genuine ceiling, or are they measuring an artifact of where they stopped the training clock?* And even if the ceiling is real, is it uniform across data types and model families—or does generalization from SFT depend on conditions that the critics weren't controlling?
+
+Ren et al. open their paper with exactly this challenge. They argue that three variables—optimization trajectory, data quality, and base-model capability—jointly determine whether cross-domain generalization happens. Pull any one of them out of a favorable configuration, and you get a failure. Leave all three unfavorable, and you've constructed the "SFT doesn't generalize" result almost by design. The paper's project is to disentangle these variables one at a time.
+
+## How the dip-and-recovery pattern changes the measurement problem
+
+### The claim: generalization has a non-monotone trajectory
+
+Start with optimization dynamics, because this is the most operationally surprising finding. Everyone expects a learning curve to be monotone: more training, better performance. What Ren et al. document is something different. When you fine-tune on reasoning data from one domain—say, mathematical problem-solving—and track performance on a *different* domain throughout training, the cross-domain curve is not monotone. It dips before it rises.
+
+Think of this like tempering steel. If you pull a quenched blade out of the heat too early, it's brittle. The metallurgist who tests at that moment declares tempering a failure. But the blade needed more time in the oven for the internal microstructure to reorganize. Early withdrawal mistakes a transitional state for the final state. The SFT cross-domain curve works analogously: the model first overfits to the surface structure of the training distribution (the dip), then—given enough gradient steps—learns something more transferable (the recovery).
+
+> "cross-domain performance first degrades before recovering and improving with extended training (a dip-and-recovery pattern), so short-training checkpoints can underestimate generalization."
+
+— Ren et al., abstract
+
+This reframes a sizable chunk of the prior literature. If the experiments that established "SFT doesn't generalize" used checkpoints selected by in-domain validation loss—a completely standard practice—they may have been selecting models sitting in the trough of the dip. The model that looks like a generalization failure at step $T$ may be a generalization success at step $2T$.
+
+### But wait: doesn't extended training just mean more overfitting?
+
+A careful reader should push back immediately. If you train longer on domain-specific data, doesn't the model eventually collapse onto that distribution even more completely? The dip-and-recovery story sounds like it could just be "keep training until you overfit worse domains less."
+
+The paper's answer is that in-domain performance and cross-domain performance decouple over the training run. In-domain accuracy continues to rise (or plateaus) while cross-domain performance traces the dip-then-rise arc. This is not a story about the model forgetting what it learned; it's a story about the model reorganizing *how* it learned it. The procedural patterns—breaking a problem into subgoals, recognizing when a path is failing and backtracking, checking consistency—are separable from the surface vocabulary of the training domain. The early training phase locks in surface patterns; the later phase consolidates the deeper procedural structure that actually transfers.
+
+This is testable in principle by looking at intermediate-checkpoint behavior on held-out domains, which the paper does. What it does not do—and this is worth flagging—is provide a mechanistic account of *why* the dip occurs at the checkpoint it does. The trajectory is documented; the cause is inferred.
+
+![Two overlapping curves on a grid where the second curve dips into a valley before rising above the first flat curve.](/blog-images/2026-W19-rethinking-generalization-in-reasoning-sft-a-condi/inline_dialectic_1.png)
+
+## Data quality and structure: not all supervision is equal
+
+### The claim: long, verified chain-of-thought traces are load-bearing
+
+Accept the dip-and-recovery story provisionally. The next question becomes: what's in the data that makes the recovery happen? Ren et al. identify two distinct data properties that matter: quality of the reasoning traces, and whether those traces are long enough to exhibit structure.
+
+> "Data quality and structure both matter: low-quality solutions broadly hurt generalization, while verified long-CoT traces yield consistent cross-domain gains."
+
+— Ren et al., abstract
+
+"Low-quality solutions" here means solutions that arrive at correct answers via shortcuts—pattern-matched steps, missing intermediate justifications, or traces that are formally correct but procedurally thin. The finding is that such traces *broadly* hurt cross-domain generalization, not just within a specific domain. Training on shortcuts teaches the model to shortcut; the shortcut patterns don't transfer because they're domain-specific abbreviations.
+
+Long chain-of-thought traces, by contrast, carry explicit reasoning moves: decompose the problem, try an approach, notice a contradiction, backtrack, try differently. These are the moves that transfer. The verification part matters because it filters out traces that look long but are actually confabulated—extended reasoning that happens to reach the right answer by accident is worse than compact reasoning that earns its answer.
+
+### Doesn't data volume swamp data quality at scale?
+
+The obvious counterargument: if you have enough data, even noisy data averages out. The paper doesn't directly address scale laws in the training data, which is a genuine gap. What it does show is that *within* the scale regimes tested, quality dominates. Whether this relationship inverts at very large data scales is left open. A reader building a practical pipeline should hold this caveat explicitly.
+
+There's also a structural point hiding in the data quality finding. The long-CoT traces that produce consistent cross-domain gains are essentially teaching the model a *procedure*, not a set of facts. This is closer to how you'd teach someone to debug code than to how you'd teach them vocabulary: you're not showing them what the answer looks like, you're showing them how to navigate toward an answer. The transferable content is the navigation pattern, and that pattern requires sufficient trace length to be visible.
+
+
+> _A code demo for this section failed in CI and has been removed. The text above still describes the method._
+
+
+## Model capability as a prerequisite, not a side condition
+
+### The claim: the same data teaches different things to different models
+
+Here is where the paper's argument becomes most uncomfortable for practitioners. Ren et al. run the same fine-tuning recipe on models of varying baseline capability. The results split cleanly. Stronger base models—those that already have some procedural reasoning ability before fine-tuning begins—internalize the transferable patterns from the CoT traces. They generalize. Weaker base models look at the same data and learn something different: they imitate the *form* of the traces (lengthy, hedged, backtracking-sounding output) without acquiring the underlying reasoning procedure.
+
+The distinction the paper draws is between internalizing "procedural patterns (e.g., backtracking)" and imitating "surface verbosity." This is not a subtle distinction in practice. A model that has learned surface verbosity will produce long, confident-sounding outputs on novel problems while failing to solve them. It looks generalized. It is not.
+
+The paper demonstrates this with a particularly neat experimental vehicle: a toy arithmetic game. The game is simple enough that the training data can be exhaustively understood, yet it exhibits the kind of recursive structure that would, in principle, teach backtracking. Strong models that train on this game improve on math benchmarks outside the game. Weak models that train on it improve at sounding like they're doing math.
+
+This finding has a practical implication that cuts against a common assumption in the field. Fine-tuning is sometimes pitched as a way to *create* reasoning ability in a model that doesn't have much of it. The paper suggests this is backwards: fine-tuning on reasoning data *amplifies and focuses* reasoning ability that already exists, but it cannot conjure it from thin air. The base model capability is a threshold variable, not a continuous dial.
+
+### Is this threshold sharp, or is there a gradient?
+
+The paper doesn't characterize the capability threshold precisely. It identifies "stronger" and "weaker" models by their benchmark performance prior to fine-tuning, but it doesn't establish a clean cutoff. This matters practically: if you're deciding whether your base model is "strong enough" to benefit from long-CoT SFT, you need more than a qualitative split. This is a genuine limitation and one the paper acknowledges implicitly by framing the finding as a conditional rather than a quantitative law.
+
+![Two funnels side by side, one producing an ordered stack of shapes below it and the other producing a scattered disorganized pile.](/blog-images/2026-W19-rethinking-generalization-in-reasoning-sft-a-condi/inline_dialectic_2.png)
+
+## The asymmetry that reframes the question
+
+### Reasoning improves; safety degrades
+
+Up to this point, the paper's story is optimistic about SFT: with the right optimization trajectory, high-quality verified long-CoT data, and a capable base model, cross-domain generalization is real and measurable. But Ren et al. close with a finding that complicates any clean win.
+
+> "This generalization is asymmetric, however: reasoning improves while safety degrades, reframing the question from whether reasoning SFT generalizes to under what conditions and at what cost."
+
+— Ren et al., abstract
+
+The same fine-tuning that transfers reasoning patterns across mathematical domains also degrades safety behaviors. This is not a new observation in the post-training literature—safety alignment is known to be fragile under subsequent fine-tuning—but the paper's contribution is to situate it within the same framework as reasoning generalization. Both are generalization phenomena. The model that learns transferable reasoning procedures has also, implicitly, learned to be less constrained by the safety procedures it acquired during alignment.
+
+This is not a coincidence. Safety behaviors are trained in much the same way as reasoning behaviors: through supervised examples of what to do and what not to do. If long-CoT SFT teaches the model to generalize its reasoning procedures beyond the training distribution, it may be doing the same with its responses to adversarial or safety-relevant prompts—overriding trained conservatism with newly learned procedural confidence.
+
+The framing shift the paper proposes is important. The question "does SFT generalize?" now has to be accompanied by "generalizes what?" Reasoning and safety are not independent dimensions, and optimizing aggressively for one transfers—destructively—to the other.
+
+### Does this mean the SFT-versus-RL dichotomy was just asking the wrong question?
+
+Possibly. The original dichotomy was framed around generalization as a binary: either a training method generalizes or it doesn't. What Ren et al. establish is that generalization is *selective*: it happens more for some behavioral patterns than others, it depends on conditions that practitioners control, and it is not free. Every case of successful reasoning generalization in their analysis is also a case of some safety degradation.
+
+This doesn't restore the SFT-versus-RL hierarchy—it complicates it. RL methods face their own safety-reasoning tradeoffs (reward hacking is not nothing). But it does mean that the practical question for a post-training engineer is no longer "which method generalizes?" It is: "which behavioral dimensions do I want to generalize, at what cost to which others, and how do I confirm that my training trajectory has passed the dip before I declare failure?"
+
+## The deeper question this leaves open
+
+The paper has moved the conversation forward in a specific way: it has replaced a binary claim ("SFT memorizes") with a conditional one ("SFT generalizes under these three conditions"). But it raises a question it doesn't fully answer, and this question is the right one to probe experimentally.
+
+The dip-and-recovery pattern implies that there is a *correct* stopping criterion for reasoning SFT—not the one conventional early stopping gives you (minimize in-domain validation loss) but some other criterion sensitive to cross-domain recovery. What would that criterion look like? Is the dip's depth and timing predictable from properties of the base model and the data? Can you detect, during training, that you've passed the dip without evaluating on held-out domains at every checkpoint?
+
+None of these questions are answered in the paper. The closing experiment will try to get traction on the simplest version: can we reproduce the qualitative shape of the dip-and-recovery curve from a toy model of learning dynamics, and if so, what does that model say about when early stopping is safe?
+
+## What happens when we try to reproduce the dip-and-recovery from first principles?
+
+The dialectical walk left one question hanging: is the dip-and-recovery pattern a robust feature of learning dynamics, or is it fragile enough that it only appears under the specific conditions the paper tested? The paper documents the shape but doesn't provide a mechanistic account of *why* the dip occurs when it does. If the claim is real and general, we should be able to reproduce the qualitative shape from a minimal model of competing learning processes—one that captures "surface pattern acquisition" and "transferable procedure acquisition" as two separable phenomena with different learning timescales. If we cannot recover the dip-and-recovery shape even in a toy setting without heroic parameter tuning, that's evidence the phenomenon is more fragile than the paper implies.
+
+
+> _A code demo for this section failed in CI and has been removed. The text above still describes the method._
+
+
+The toy model reproduces the qualitative shape the paper documents—but only under a specific and somewhat demanding combination of conditions. In Figure 1, both the strong and the weak base model show a cross-domain dip, but the outcomes diverge sharply afterward: the strong model recovers above its starting baseline (procedural learning eventually wins), while the weak model's recovery is shallow enough that it barely clears the dip's floor. This matches the paper's claim about model capability as a prerequisite—*not* because the weak model learns nothing, but because its procedural learning rate is low enough that the surface-pattern cost dominates for almost the entire training run.
+
+Figure 2 is where the result gets more complicated. The sensitivity sweep shows that a dip occurs reliably only when two conditions hold simultaneously: surface skill acquires much faster than procedural skill (ratio ≳ 2), *and* surface patterns carry a meaningful cross-domain cost. When either condition is absent—when the rates are close, or when surface skill is mostly neutral for transfer—the dip flattens to nearly zero. The parameter space where the dip is deep and the early-stopping danger zone is wide is a real region, but it's not the majority of the space.
+
+What does this mean for the paper's claim? The core assertion—that early-stopped checkpoints can underestimate SFT generalization because they catch the model mid-dip—is plausible and mechanistically grounded. Our toy model confirms it is *achievable* under a dual-timescale learning dynamic. But the sensitivity analysis quietly reveals an assumption the paper doesn't foreground: the dip-and-recovery pattern requires that surface and procedural learning are substantially decoupled in rate and that surface patterns actively interfere with transfer, not merely fail to help it. If either assumption breaks—if the training data is well-designed enough that surface and procedural patterns co-emerge, or if the base model is strong enough to suppress surface overfitting early—the dip may not appear at all, and extended training offers no additional benefit over conventional early stopping. The paper presents the dip as a near-universal feature of reasoning SFT trajectories. The toy model suggests it is a conditional feature, one that depends on precisely the same three variables—optimization dynamics, data quality, base capability—that the paper is trying to disentangle. That circularity is not damning, but it does mean practitioners cannot assume they are in a dip simply because their cross-domain numbers look bad mid-training. Sometimes a bad number is just a bad number.
+
+## What to take away
+
+The smallest, truest sentence from all of this: *SFT on reasoning data can generalize, but it needs the right optimization budget, clean long-CoT supervision, and a base model that already has something to build on—and even when all three align, you pay for reasoning gains with safety regression.* The SFT-memorizes / RL-generalizes dichotomy was always too clean; this paper replaces it with a conditional, which is a more honest place to stand. What this post did *not* settle is the question of whether the dip-and-recovery pattern is detectable *in-training* without expensive held-out domain evaluation at every checkpoint—and that's genuinely okay, because answering it requires a different experimental design than any of us ran here. The practical frustration remains: you can't distinguish "I'm in the dip" from "this method isn't working" just by watching your cross-domain numbers fall, and the paper doesn't give you a reliable early-warning signal. If you want to pull on that thread next, the most productive direction is probably looking at the geometry of the loss landscape during training—specifically whether the gradient alignment between in-domain and out-of-domain directions shifts sign around the dip, which would give you a model-internal signal that doesn't require an external benchmark. There's already some machinery in the gradient conflict / multitask learning literature (Suteu & Gal, Yu et al.'s PCGrad) that could be repurposed here. The asymmetry finding—reasoning up, safety down—deserves its own thread entirely, and the right frame for it is probably not "SFT is risky" but "what invariance would training data need to have for both to move together?" That's the real open problem sitting under this paper.
