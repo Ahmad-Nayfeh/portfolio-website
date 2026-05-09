@@ -1,0 +1,270 @@
+---
+title: "Paper Notes: ClawBench: Can AI Agents Complete Everyday Online Tasks?"
+slug: "2026-W19-clawbench-can-ai-agents-complete-everyday-online-t"
+date: "2026-05-09T14:48:26+03:00"
+tags:
+  - "AI"
+  - "weekly-paper"
+  - "web-agent-evaluation"
+  - "multimodal-game-agents"
+  - "vision-language-action"
+  - "task-completion-benchmarks"
+  - "embodied-reasoning"
+excerpt: "You've probably watched someone attempt to book a dentist appointment online — not someone struggling with technology, but a reasonably competent adult — and noticed how many micro-decisions the task actually demands: finding the right form, reading the fine print, choosing a tim"
+readTime: "18 min read"
+featured: false
+coverImage: "/blog-images/2026-W19-clawbench-can-ai-agents-complete-everyday-online-t/cover.png"
+streamId: "ai-papers"
+language: "en"
+generatedBy: "claude-sonnet-4-6"
+papers:
+  - title: "ClawBench: Can AI Agents Complete Everyday Online Tasks?"
+    url: "https://arxiv.org/abs/2604.08523"
+    arxivId: "2604.08523"
+    authors:
+      - "Yuxuan Zhang"
+      - "Yubo Wang"
+      - "Yipeng Zhu"
+      - "Penghui Du"
+      - "Junwen Miao"
+      - "Xuan Lu"
+      - "Wendong Xu"
+      - "Yunzhuo Hao"
+      - "Songcheng Cai"
+      - "Xiaochen Wang"
+      - "Huaisong Zhang"
+      - "Xian Wu"
+      - "Yi Lu"
+      - "Minyi Lei"
+      - "Kai Zou"
+      - "Huifeng Yin"
+      - "Ping Nie"
+      - "Liang Chen"
+      - "Dongfu Jiang"
+      - "Wenhu Chen"
+      - "Kelsey R. Allen"
+  - title: "GameWorld: Towards Standardized and Verifiable Evaluation of Multimodal Game Agents"
+    url: "https://arxiv.org/abs/2604.07429"
+    arxivId: "2604.07429"
+    authors:
+      - "Mingyu Ouyang"
+      - "Siyuan Hu"
+      - "Kevin Qinghong Lin"
+      - "Hwee Tou Ng"
+      - "Mike Zheng Shou"
+  - title: "MolmoAct2: Action Reasoning Models for Real-world Deployment"
+    url: "https://arxiv.org/abs/2605.02881"
+    arxivId: "2605.02881"
+    authors:
+      - "Haoquan Fang"
+      - "Jiafei Duan"
+      - "Donovan Clay"
+      - "Sam Wang"
+      - "Shuo Liu"
+      - "Weikai Huang"
+      - "Xiang Fan"
+      - "Wei-Chuan Tsai"
+      - "Shirui Chen"
+      - "Yi Ru Wang"
+      - "Shanli Xing"
+      - "Jaemin Cho"
+      - "Jae Sung Park"
+      - "Ainaz Eftekhar"
+      - "Peter Sushko"
+      - "Karen Farley"
+      - "Angad Wadhwa"
+      - "Cole Harrison"
+      - "Winson Han"
+      - "Ying-Chun Lee"
+      - "Eli VanderBilt"
+      - "Rose Hendrix"
+      - "Suveen Ellawela"
+      - "Lucas Ngoo"
+      - "Joyce Chai"
+      - "Zhongzheng Ren"
+      - "Ali Farhadi"
+      - "Dieter Fox"
+      - "Ranjay Krishna"
+---
+You've probably watched someone attempt to book a dentist appointment online — not someone struggling with technology, but a reasonably competent adult — and noticed how many micro-decisions the task actually demands: finding the right form, reading the fine print, choosing a time slot that matches unstated constraints, uploading the correct document, and hitting exactly the right submit button without accidentally confirming twice. The whole thing takes maybe four minutes for a human. It has resisted automation for thirty years.
+
+![Illustration of a human hand and a robotic gripper reaching toward a glowing button, neither making contact.](/blog-images/2026-W19-clawbench-can-ai-agents-complete-everyday-online-t/inline_opening.png)
+
+## Can an agent actually finish the task — not just start it?
+
+That single question is what three recent papers are circling from very different angles. **ClawBench** treats it as a web-automation problem: can a frontier model complete 153 real, live, mundane tasks on 144 actual production websites — booking, purchasing, applying — without accidentally submitting anything? **GameWorld** approaches the same question through video games, arguing that games offer a cleaner laboratory for exactly the capabilities that matter (fine-grained perception, multi-step planning, recovering from irreversible mistakes), and benchmarks 18 model-interface combinations across 34 browser-based games. **MolmoAct2** asks the same question about physical robots: can a single, fully open model reason about space and then act reliably enough to be deployed on hardware that costs less than a used car?
+
+Each paper offers a different answer to where the hard part lives. ClawBench says the bottleneck is the real-world interface — static sandboxes hide the complexity that production websites impose. GameWorld says it's measurement: without standardized action interfaces and verifiable outcome metrics, we don't even know how bad agents are. MolmoAct2 says it's the latency-accuracy trade-off baked into reasoning-augmented policies — you can have grounding, or you can have speed, but current architectures force you to choose.
+
+By the end of this post you'll have a concrete feel for what "task completion" really demands, why success rates in the low-thirties aren't a failure of ambition but a measurement of actual difficulty, and how each paper tries to close the gap between "the agent took many actions" and "the task is done." You'll also see what happens when we reconstruct a simplified version of the core difficulty in code — not to validate these results, but to probe whether the failure modes they describe are real.
+
+## The Question, Sharpened
+
+The opening framed the problem loosely: can an agent finish the task? Let's make that sharper. The real question is: *what is the agent actually failing at, and how would we know?*
+
+That distinction matters because a failure to complete a task could mean the agent took the wrong action, or it could mean the agent took actions we cannot verify were right or wrong. These are different problems requiring different fixes. If you're debugging a system and you can't tell whether the bug is in the controller or the sensor, you're not debugging — you're guessing.
+
+The three papers here each attack a different slice of this measurement problem. ClawBench asks: what happens when you run agents on real production websites, not sanitized replicas? GameWorld asks: can we even agree on what "completing a game task" means, across different action interfaces? MolmoAct2 asks: once we know what we're measuring, can we build a robot policy that's fast enough and accurate enough to be practically useful?
+
+These aren't the same question, but they're load-bearing parts of the same structure.
+
+---
+
+## How ClawBench Tries to Answer
+
+### The sandbox problem
+
+Every major web-agent benchmark before ClawBench — WebArena, VisualWebArena, Mind2Web — evaluates agents on either recorded page snapshots or purpose-built replicas of real websites. The replication is careful, but it strips out exactly what makes real websites hard: dynamic content that changes between visits, login flows that require actual credentials, forms that validate your inputs against live databases, and checkout flows that send real confirmation emails if you don't stop them.
+
+ClawBench's solution is elegant in its simplicity. It runs agents on the actual, live production websites — real Amazon, real LinkedIn, real booking platforms — but inserts a lightweight HTTP interception layer that catches and drops the final submission request before it reaches the server. The agent sees a real website, navigates a real workflow, and is stopped only at the last moment from having a real effect.
+
+> "Unlike existing benchmarks that evaluate agents in offline sandboxes with static pages, ClawBench operates on production websites, preserving the full complexity, dynamic nature, and challenges of real-world web interaction. A lightweight interception layer captures and blocks only the final submission request, ensuring safe evaluation without real-world side effects."
+
+— ClawBench abstract
+
+This is a meaningful engineering choice. Think of it like a flight simulator that uses real avionics and real air traffic data piped in from live radar, but with the throttle disconnected from anything that would actually move a physical plane. You get the fidelity of real conditions without the consequences.
+
+### What the tasks actually look like
+
+The 153 tasks span 15 categories: purchasing, booking, job applications, form submissions, account management, and more. The paper emphasizes three capabilities that existing benchmarks underweight:
+
+1. **Document-grounded navigation** — the agent is given a PDF or image containing relevant details (a job description, an insurance card, a receipt) and must extract information from it to complete the form correctly.
+2. **Multi-step cross-platform workflows** — some tasks require visiting multiple sites in sequence, where the output of one step (a confirmation number, a tracking code) feeds the next.
+3. **Write-heavy operations** — filling long, detailed forms correctly, where a single field error invalidates the submission.
+
+The third point is underappreciated. Most existing benchmarks measure whether the agent *clicked* the right element. ClawBench measures whether the agent *wrote* the right content into the fields it found. These are different skills.
+
+### How bad is it?
+
+> "Our evaluations of 7 frontier models show that both proprietary and open-source models can complete only a small portion of these tasks. For example, Claude Sonnet 4.6 achieves only 33.3%."
+
+— ClawBench abstract
+
+33% is the *best* result from a frontier model. That number deserves a moment. Claude Sonnet 4.6 is not a small model. On coding benchmarks it scores in the high eighties. On reading comprehension it is close to ceiling. On live web tasks that a human completes in four minutes, it succeeds roughly one time in three.
+
+The failure modes ClawBench surfaces are worth naming: the agent navigates to the right page but misreads a dynamic price; it fills a form correctly but uses the wrong date format the site expects; it clicks "Continue" when it should click "Apply"; it extracts the wrong field from the user-provided PDF. These are not reasoning failures in the abstract — they are perceptual and procedural failures in a specific environment.
+
+### Where this answer breaks down
+
+But here is the obvious counterquestion: *how do we know the evaluation is consistent?* Production websites change. A task that was valid in January might be broken in March because the platform redesigned its checkout flow. The interception layer approach solves the side-effect problem but creates a reproducibility problem. If two researchers run the same task on the same model three months apart and get different results, is the model improving or is the website different?
+
+ClawBench does not fully resolve this. The paper notes that tasks are verified to be functional at evaluation time, but does not describe a protocol for tracking website drift or re-validating tasks after platform updates. For a benchmark running on 144 live platforms, this is a real fragility.
+
+![Illustration of a grid of web form elements with one cracked-open highlighted cell near the center.](/blog-images/2026-W19-clawbench-can-ai-agents-complete-everyday-online-t/inline_dialectic_1.png)
+
+## How GameWorld Picks Up the Thread
+
+This is exactly where GameWorld picks up. Its diagnosis is that the field's measurement problem is not just about environment fidelity — it's about what we're measuring and whether we can measure it consistently at all.
+
+### The action interface problem
+
+Consider the absurdity of the current situation in multimodal agent evaluation. Two agents can "play" the same game and produce radically different action traces — one sends raw keyboard scan codes, another sends semantic strings like `"move_left"`, a third uses a structured JSON API — and we have no principled way to compare their performance because the action space they operate in is different. It's like comparing two chess players where one is using algebraic notation and the other is physically moving pieces, and calling the faster typist the better player.
+
+GameWorld's answer is to standardize at two levels:
+
+1. **Computer-use agents** emit raw keyboard and mouse events — the most general interface, closest to what a human uses.
+2. **Generalist multimodal agents** act through a *Semantic Action Parsing* (SAP) layer that translates natural-language action descriptions into deterministic game inputs.
+
+The SAP layer is the key innovation. When an agent says `"press the jump button"`, SAP resolves this to the game-specific key binding, executes it deterministically, and logs a structured trace. This means two different models operating in the semantic action space are guaranteed to be playing the same game with the same controls — which sounds obvious, but was not true before.
+
+> "Two game agent interfaces are studied: (i) computer-use agents that directly emit keyboard and mouse controls, and (ii) generalist multimodal agents that act in a semantic action space via deterministic Semantic Action Parsing."
+
+— GameWorld abstract
+
+### Verifiable outcomes, not heuristic proxies
+
+The second problem GameWorld attacks is outcome measurement. Most game-agent benchmarks use heuristic proxies — did the agent reach region X on a map, did its score exceed threshold Y. These proxies fail silently: an agent can reach region X for the wrong reason, or a poorly calibrated threshold can make a weak agent look strong.
+
+GameWorld pairs each of its 170 tasks with *state-verifiable metrics* — conditions checked against the actual game state, not against the agent's trajectory or any model-predicted score. If the task is "collect three keys before opening the door," the verifier reads the game state directly to confirm key count and door status. There is no ambiguity.
+
+> "GameWorld contains 34 diverse games and 170 tasks, each paired with state-verifiable metrics for outcome-based evaluation. The results across 18 model-interface pairs suggest that even the best performing agent is far from achieving human capabilities on video games."
+
+— GameWorld abstract
+
+The benchmark also runs repeated full-benchmark reruns to test reproducibility — something ClawBench cannot easily do on live websites. This is a real methodological advantage, and it directly addresses the reproducibility fragility I flagged above.
+
+### What games actually test
+
+There's a natural skepticism here: video games are artificial. Why should performance on a platformer or a puzzle game tell us anything about booking a dentist appointment?
+
+GameWorld's implicit argument — supported by the capability breakdown across its 34 games — is that games *isolate* the sub-skills that web tasks *mix together*. A timing-sensitive platformer isolates fine-grained perception and motor precision. A multi-room puzzle isolates long-horizon planning. A strategy game with fog-of-war isolates inference under partial observability. By testing each in isolation, you can diagnose *which* capability is bottlenecking the agent, rather than observing a compound failure and not knowing what caused it.
+
+This is the same logic that motivates unit tests over integration tests in software engineering. Integration failures tell you something is wrong; unit failures tell you what.
+
+### Where GameWorld's answer breaks down
+
+The limitation here is symmetrical with ClawBench's strength. GameWorld achieves reproducibility and diagnostic clarity at the cost of ecological validity. A browser-based platformer is not a production checkout flow. The perceptual challenges are different — stylized game graphics versus real-world web UI rendering — and the procedural challenges are different too. A game agent that masters long-horizon planning in a dungeon crawler still needs to handle the specific, messy affordances of a real form: greyed-out fields, conditional dropdowns, client-side validation that fires on blur rather than submit.
+
+Neither ClawBench nor GameWorld fully captures what you'd need to evaluate a true general-purpose web agent. ClawBench has the right environment but measurement fragility. GameWorld has the right measurement properties but a constructed environment. A synthesis of both would be more powerful than either alone — but that synthesis doesn't exist yet.
+
+![Illustration of three cylinders representing perception, planning, and execution connected by arrows feeding into one narrow output pipe.](/blog-images/2026-W19-clawbench-can-ai-agents-complete-everyday-online-t/inline_dialectic_2.png)
+
+## MolmoAct2: When the Environment is Physical
+
+MolmoAct2 extends the same dialectic into a third domain — physical robots — and in doing so exposes a tension that web benchmarks can sidestep but robot deployment cannot: *latency is a hard constraint, not a soft preference*.
+
+### The reasoning-latency trade-off
+
+Recent work on reasoning-augmented VLA models (Vision-Language-Action models) showed that adding chain-of-thought steps before action selection improves task success rates in simulation. The intuition is appealing: if the robot explains to itself what it's about to do before doing it, it makes fewer dumb mistakes.
+
+But in real-time robot control, a policy that thinks for two seconds before each action is not a policy you can deploy. A robot arm moving at normal speed covers significant distance in two seconds. The planning horizon collapses.
+
+MolmoAct2's architectural response is `MolmoThink`, an adaptive-depth reasoning variant that only re-predicts depth tokens for scene regions that *change between timesteps* — essentially doing incremental geometric reasoning rather than full-scene reasoning on every frame. If the robot's hand moved but the objects on the table didn't, there's no need to re-ground the entire scene; only the changed region gets updated reasoning.
+
+> "We propose MolmoThink, an adaptive-depth reasoning variant that re-predicts depth tokens only for scene regions that change between timesteps, retaining geometric grounding at a fraction of prior latency."
+
+— MolmoAct2 abstract
+
+The analogy here is to video compression. A video codec doesn't encode each frame from scratch — it encodes *differences* from the previous frame (inter-frame coding), reserving full encoding only for keyframes or scene cuts. MolmoThink applies the same principle to geometric reasoning: full reasoning on keyframes, differential reasoning on intermediate frames.
+
+### The openness axis
+
+MolmoAct2 makes a second argument that is worth taking seriously on its own terms: the dominant robot VLA models are either closed (proprietary weights, no reproducibility) or open-weight but requiring expensive hardware. The paper claims to be "fully open" — weights, training code, *and* training data released.
+
+> "We release model weights, training code, and complete training data."
+
+— MolmoAct2 abstract
+
+The largest released dataset — `MolmoAct2-BimanualYAM` — comprises 720 hours of teleoperated bimanual trajectories. The paper claims this is the largest open bimanual dataset to date. I cannot independently verify this claim from the abstract alone, but the scale is notable: 720 hours at even one trajectory per minute is over 43,000 trajectories.
+
+The architecture grafts a flow-matching continuous-action expert onto a discrete-token VLM via per-layer KV-cache conditioning. This is denser than it sounds: the VLM produces language-like reasoning tokens that are cached and then conditioned into a separate action prediction network that outputs smooth, continuous joint trajectories rather than discrete action tokens. The discrete/continuous split lets you get language-grounded reasoning without the quantization artifacts that come from discretizing robot actions into tokens.
+
+### Where MolmoAct2's answer breaks down
+
+The honest limitation is empirical. The paper reports that MolmoAct2 outperforms Pi-05 and that MolmoER surpasses GPT-5 and Gemini Robotics ER-1.5 on embodied reasoning benchmarks. These are strong claims. But "most extensive empirical study of any open VLA to date" covers 7 benchmarks, and the paper — at least from the abstract — does not report absolute success rates on real-world tasks in a way that allows the same kind of stark comparison ClawBench provides. 33% is a number you can argue with. "Outperforms Pi-05 on 7 benchmarks" requires knowing what Pi-05 scores, which tasks were included, and whether those tasks are representative of deployment conditions.
+
+The latency numbers for `MolmoThink` are similarly presented comparatively ("fraction of prior latency") without an absolute figure in the abstract. For a claim that is specifically about real-time deployment viability, an absolute number matters — "2x faster" means something very different if the baseline is 4 seconds versus 400 milliseconds.
+
+---
+
+## The Deeper Question Neither Paper Resolves
+
+Three papers, three domains, one persistent gap: *we do not have a way to measure whether an agent's internal failure mode is perceptual, procedural, or planning-level — and without that decomposition, we don't know where to direct engineering effort.*
+
+ClawBench tells you the agent failed on a booking task. GameWorld tells you the agent failed to collect the keys before opening the door. MolmoAct2 tells you the success rate improved over a baseline. None of them gives you a clean answer to: *was the agent's representation of the scene wrong, or was the representation correct and the action selection wrong, or was the action selection correct and the execution imprecise?*
+
+This is the diagnostic gap that the closing experiment will probe — not to validate any of these papers' central claims, but to see whether we can construct even a toy version of the decomposition they leave unresolved.
+
+## What does "task difficulty" actually decompose into?
+
+The dialectical walk ended on a specific open question: when an agent fails a task, is the failure in perception, planning, or execution — and can we even separate these empirically? All three papers report aggregate success rates but none offers a clean decomposition. ClawBench's 33% tells you *that* Claude Sonnet 4.6 fails two tasks in three; it doesn't tell you *which sub-capability* is responsible. If the papers' implicit shared claim is correct — that task failure is a compound phenomenon driven by distinct, diagnosable sub-skills — then a toy experiment decomposing difficulty along those axes should reveal separable failure signatures. If the claim is wrong or overstated, the failure modes should blur together: hard tasks should simply be hard everywhere, with no structure worth exploiting.
+
+
+> _A code demo for this section failed in CI and has been removed. The text above still describes the method._
+
+
+### What the experiment shows — and what it doesn't
+
+The experiment showed that when task failure is generated by a multiplicative compound of three separable difficulty axes — perception, planning, and execution — a model that knows all three axes predicts failure significantly better than one that knows only the hardest single axis. The AUC gap is typically 0.05–0.12, which is not trivial in a 5-fold cross-validated setting with 153 tasks.
+
+This supports the papers' implicit shared claim: task failure is structured, not monolithic. The bar chart in Figure 1 shows that planning-dominant tasks fail at a noticeably higher rate than execution-dominant tasks for a strong agent — consistent with ClawBench's reported observation that multi-step sequencing across diverse platforms is harder than form-filling alone.
+
+But here is the honest caveat: this experiment is circular by construction. We *generated* the data with three separable axes and then asked a classifier to recover them. Of course it does. The real empirical question — whether we can instrument actual agent trajectories to produce reliable per-axis difficulty scores on live ClawBench tasks — is not answered here, because we don't have those trajectories. What the simulation demonstrates is the logical structure of the claim: *if* failure modes are separable, *then* decomposing them should improve predictive power. Whether the "if" holds on real data is something none of the three papers directly tests.
+
+The deeper problem is that ClawBench, GameWorld, and MolmoAct2 all stop at aggregate success rates. ClawBench reports category-level breakdowns (purchasing vs. booking vs. job applications) but these are taxonomic, not mechanistic. GameWorld's game-level results isolate capabilities somewhat more cleanly — a timing puzzle tests perception-execution coupling, a multi-room maze tests planning — but the mapping from game type to capability axis is informal. MolmoAct2 reports benchmark-level numbers without reporting which error types MolmoThink actually reduces.
+
+The experiment does not contradict any of the three papers. What it does is make the gap visible: there is a plausible and testable theory of why agents fail (compound, separable sub-skill deficits), and all three papers gesture at it, but none of them builds the measurement apparatus to verify it. The 33% success rate ClawBench reports is a real and striking number. What we still don't have is a principled answer to where the other 67% went.
+
+## What to take away
+
+The smallest, truest sentence to carry out of this conversation is: current frontier models fail two out of three mundane online tasks not because the tasks are conceptually hard, but because real environments are compound — they simultaneously demand accurate perception, multi-step planning, and precise execution, and failing at any one collapses the whole. ClawBench's 33%, GameWorld's consistent "far from human" results, and MolmoAct2's careful latency engineering all point at the same uncomfortable arithmetic: sub-skill deficits multiply rather than average. What this post did *not* settle — and honestly couldn't — is whether the failure modes that look separable in theory are actually separable in practice on real agent trajectories. The simulation showed that a compound model predicts failure better than a single-axis model, but we generated the data with that structure baked in; the real test would require instrumenting live ClawBench runs with per-step annotations fine-grained enough to distinguish "the agent saw the wrong thing" from "the agent planned incorrectly" from "the agent typed the wrong value into the right field." That instrumentation doesn't exist yet, and building it is probably harder than building the benchmark itself. If this conversation left you wanting to dig further, the most productive thread is probably the GameWorld benchmark's `Semantic Action Parsing` design — it's the only mechanism across the three papers that gives you a structured, reproducible action trace you could actually label for error type, and adapting that logging discipline to web-agent evaluation would go a long way toward turning "the agent failed" into "the agent failed here, for this reason, in a way we can fix."
