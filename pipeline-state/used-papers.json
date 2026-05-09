@@ -9,6 +9,30 @@
       "stream_id": "ai-papers",
       "slug": "2026-W19-rethinking-generalization-in-reasoning-sft-a-condi",
       "added_at": "2026-05-09T07:11:50Z"
+    },
+    {
+      "arxiv_id": "2604.08523",
+      "title": "ClawBench: Can AI Agents Complete Everyday Online Tasks?",
+      "url": "https://arxiv.org/abs/2604.08523",
+      "stream_id": "ai-papers",
+      "slug": "2026-W19-clawbench-can-ai-agents-complete-everyday-online-t",
+      "added_at": "2026-05-09T11:48:26Z"
+    },
+    {
+      "arxiv_id": "2604.07429",
+      "title": "GameWorld: Towards Standardized and Verifiable Evaluation of Multimodal Game Agents",
+      "url": "https://arxiv.org/abs/2604.07429",
+      "stream_id": "ai-papers",
+      "slug": "2026-W19-clawbench-can-ai-agents-complete-everyday-online-t",
+      "added_at": "2026-05-09T11:48:26Z"
+    },
+    {
+      "arxiv_id": "2605.02881",
+      "title": "MolmoAct2: Action Reasoning Models for Real-world Deployment",
+      "url": "https://arxiv.org/abs/2605.02881",
+      "stream_id": "ai-papers",
+      "slug": "2026-W19-clawbench-can-ai-agents-complete-everyday-online-t",
+      "added_at": "2026-05-09T11:48:26Z"
     }
   ]
 }
