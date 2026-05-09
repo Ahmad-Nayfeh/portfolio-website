@@ -10,16 +10,14 @@
  *   <FadeIn delay={120}>
  *     <p>Content that fades up on scroll.</p>
  *   </FadeIn>
- *
- * The `once` prop (default true) unobserves after the first reveal so
- * the element stays visible when the user scrolls back up.
  */
 
 import { useEffect, useRef, useState } from "react"
+import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
 export interface FadeInProps {
-  children: React.ReactNode
+  children: ReactNode
   className?: string
   /** Animation delay in milliseconds. Useful for staggered siblings. */
   delay?: number
@@ -35,9 +33,7 @@ export interface FadeInProps {
    * Set to false for a re-animate-on-scroll effect.
    */
   once?: boolean
-  /**
-   * Transition duration in ms. Default 500.
-   */
+  /** Transition duration in ms. Default 500. */
   duration?: number
 }
 
