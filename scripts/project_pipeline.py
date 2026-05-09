@@ -79,12 +79,12 @@ def main():
             import json as _json
             used_ids = {e.get("arxiv_id") for e in _json.loads(used_path.read_text())}
         for p in raw:
-            arxiv_id = p.get("paper", {}).get("id", "")
+            arxiv_id = p.get("arxiv_id", "")
             if arxiv_id and arxiv_id not in used_ids:
                 candidates.append({
-                    "title": p.get("paper", {}).get("title", ""),
-                    "abstract": p.get("paper", {}).get("summary", ""),
-                    "url": f"https://arxiv.org/abs/{arxiv_id}",
+                    "title": p.get("title", ""),
+                    "abstract": p.get("summary", ""),
+                    "url": p.get("url", ""),
                     "arxiv_id": arxiv_id,
                     "upvotes": p.get("upvotes", 0),
                 })
