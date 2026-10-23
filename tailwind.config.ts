@@ -15,6 +15,7 @@ const config: Config = {
         serif: ["var(--font-serif)", "Georgia", "Times New Roman", "serif"],
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
         display: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        arabic: ["var(--font-arabic)", "var(--font-sans)", "ui-sans-serif", "sans-serif"],
       },
       fontSize: {
         "display-2xl": ["clamp(3.5rem, 8vw, 6rem)", { lineHeight: "1.02", letterSpacing: "-0.025em" }],
@@ -54,6 +55,13 @@ const config: Config = {
           foreground: "hsl(var(--destructive-foreground))",
         },
         border: "hsl(var(--border))",
+        "border-strong": "hsl(var(--border-strong))",
+        lamp: "hsl(var(--lamp))",
+        phase: {
+          "1": "hsl(var(--phase-1))",
+          "2": "hsl(var(--phase-2))",
+          "3": "hsl(var(--phase-3))",
+        },
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         chart: {
@@ -96,9 +104,9 @@ const config: Config = {
             fontSize: "1.0625rem",
             lineHeight: "1.75",
             "h1, h2, h3, h4": {
-              fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
+              fontFamily: "var(--font-sans), ui-sans-serif, system-ui, sans-serif",
               letterSpacing: "-0.02em",
-              fontWeight: "700",
+              fontWeight: "600",
             },
             h1: { fontSize: "2.5rem", lineHeight: "1.1" },
             h2: {
@@ -116,7 +124,7 @@ const config: Config = {
             },
             "a:hover": { borderBottomColor: "hsl(var(--accent))" },
             blockquote: {
-              fontStyle: "italic",
+              fontStyle: "normal",
               borderLeftWidth: "3px",
               fontWeight: "400",
               color: "hsl(var(--foreground))",

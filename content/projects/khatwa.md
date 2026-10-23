@@ -3,10 +3,20 @@ title: "Khatwa: A Walking App That Plays Like a Game"
 slug: "khatwa"
 date: "2026-10-11"
 coverImage: "/images/projects/khatwa.jpg"
-tags: ["Product", "Android", "Kotlin", "Arabic"]
+tags: ["Android", "Kotlin", "Jetpack Compose", "Arabic"]
 excerpt: "A native Android app that counts steps, can lock the phone until you walk, and turns walking into daily quests, levels, and streaks, with walk suggestions timed around weather and prayer times."
 category: "Products"
+status: "Released"
 featured: true
+gallery:
+  - "/images/projects/khatwa/home.jpg"
+  - "/images/projects/khatwa/system.jpg"
+  - "/images/projects/khatwa/my-map.jpg"
+highlights:
+  - "Native Kotlin and Jetpack Compose, bilingual and right-to-left first"
+  - "Optional phone lock until the daily step goal is met"
+  - "Daily walk challenge using OpenStreetMap, weather, and prayer times"
+  - "Signed releases from CI with unit and emulator tests"
 ---
 
 # Khatwa (خطوة)
@@ -22,11 +32,6 @@ featured: true
 - **Walk maps** of every session and the streets you have explored, plus a six-month bodyweight training program (Arabic and English).
 - **Optional account** with private cloud backup and groups with leaderboards.
 
-<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-  <img src="/images/projects/khatwa/home.jpg" alt="Home" width="220" />
-  <img src="/images/projects/khatwa/system.jpg" alt="The System" width="220" />
-  <img src="/images/projects/khatwa/my-map.jpg" alt="Walk map" width="220" />
-</div>
 
 ## How it is built
 

@@ -4,20 +4,17 @@ import { useState, useCallback } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { Search, X } from "lucide-react"
 import BlogCard from "@/components/BlogCard"
-import StaggerGroup from "@/components/ui/StaggerGroup"
 import type { Post } from "@/types"
 import { cn } from "@/lib/utils"
 
 interface BlogGridProps {
   posts: Post[]
-  initialTag?: string | null
 }
 
-export default function BlogGrid({ posts, initialTag = null }: BlogGridProps) {
+export default function BlogGrid({ posts }: BlogGridProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-
   const [searchQuery, setSearchQuery] = useState("")
 
   const selectedTag = searchParams.get("tag") ?? null
@@ -25,13 +22,11 @@ export default function BlogGrid({ posts, initialTag = null }: BlogGridProps) {
   const setTag = useCallback(
     (tag: string | null) => {
       const params = new URLSearchParams(searchParams.toString())
-      if (tag) {
-        params.set("tag", tag)
-      } else {
-        params.delete("tag")
-      }
-      const url = `${pathname}?${params.toString()}`
-      // @ts-expect-error
+      if (tag) params.set("tag", tag)
+      else params.delete("tag")
+      const qs = params.toString()
+      const url = qs ? `${pathname}?${qs}` : pathname
+      // @ts-expect-error -- typed routes don't model query strings
       router.replace(url, { scroll: false })
     },
     [router, pathname, searchParams],
@@ -39,26 +34,19 @@ export default function BlogGrid({ posts, initialTag = null }: BlogGridProps) {
 
   const allTags = Array.from(new Set(posts.flatMap((post) => post.tags))).sort()
 
-  const filteredPosts = posts.filter((post) => {
-    const q = searchQuery.toLowerCase()
+  const filtered = posts.filter((post) => {
+    const q = searchQuery.trim().toLowerCase()
     const matchesSearch =
-      q === "" ||
-      post.title.toLowerCase().includes(q) ||
-      (post.excerpt ?? "").toLowerCase().includes(q)
+      q === "" || post.title.toLowerCase().includes(q) || (post.excerpt ?? "").toLowerCase().includes(q)
     const matchesTag = selectedTag ? post.tags.includes(selectedTag) : true
     return matchesSearch && matchesTag
   })
 
   return (
     <div>
-      {/* Filter section */}
-      <div className="mb-12 space-y-6">
-        {/* Search */}
-        <div className="max-w-md">
-          <label
-            htmlFor="search-posts"
-            className="mb-2 block font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground"
-          >
+      <div className="mb-8 grid grid-cols-1 gap-6 border-[1.5px] border-foreground bg-card p-4 md:grid-cols-[minmax(240px,320px)_1fr] md:p-5">
+        <div>
+          <label htmlFor="search-posts" className="label mb-2 block text-[10px]">
             Search
           </label>
           <div className="relative">
@@ -66,106 +54,76 @@ export default function BlogGrid({ posts, initialTag = null }: BlogGridProps) {
             <input
               id="search-posts"
               type="search"
-              placeholder="Title or excerpt…"
-              className="w-full rounded-lg border bg-card py-2.5 pl-10 pr-4 font-sans text-sm outline-none transition-colors placeholder:text-muted-foreground/50"
-              style={{
-                borderColor: "hsl(var(--border))",
-                color: "hsl(var(--foreground))",
-              }}
+              placeholder="Title or summary"
+              className="w-full border border-border bg-background py-2.5 pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-foreground"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
-
-        {/* Filter pills */}
         {allTags.length > 0 && (
           <div>
-            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              Topics
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setTag(null)}
-                className={cn(
-                  "rounded-full border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-all duration-200",
-                  selectedTag === null
-                    ? "border-transparent"
-                    : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
-                )}
-                style={
-                  selectedTag === null
-                    ? { backgroundColor: "hsl(var(--accent))", color: "hsl(var(--primary-foreground))" }
-                    : {}
-                }
-              >
+            <div className="label mb-2 text-[10px]">Topics</div>
+            <div className="flex flex-wrap gap-1.5">
+              <TagButton active={selectedTag === null} onClick={() => setTag(null)}>
                 All
-              </button>
+              </TagButton>
               {allTags.map((tag) => (
-                <button
-                  type="button"
-                  key={tag}
-                  onClick={() => setTag(tag)}
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-all duration-200",
-                    selectedTag === tag
-                      ? "border-transparent"
-                      : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
-                  )}
-                  style={
-                    selectedTag === tag
-                      ? { backgroundColor: "hsl(var(--accent))", color: "hsl(var(--primary-foreground))" }
-                      : {}
-                  }
-                >
+                <TagButton key={tag} active={selectedTag === tag} onClick={() => setTag(tag)}>
                   {tag}
-                </button>
+                </TagButton>
               ))}
             </div>
           </div>
         )}
+      </div>
 
-        {/* Active filter indicator */}
-        {selectedTag && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">Filtered:</span>
-            <button
-              type="button"
-              onClick={() => setTag(null)}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.15em] transition-colors"
-              style={{
-                backgroundColor: "hsl(var(--accent) / 0.15)",
-                color: "hsl(var(--accent))",
-                border: "1px solid hsl(var(--accent) / 0.3)",
-              }}
-            >
-              {selectedTag}
-              <X size={10} />
-            </button>
-          </div>
+      <div className="mb-2 flex items-center justify-between">
+        <span className="label">
+          {filtered.length} {filtered.length === 1 ? "entry" : "entries"}
+          {selectedTag ? ` · ${selectedTag}` : ""}
+        </span>
+        {(selectedTag || searchQuery) && (
+          <button
+            type="button"
+            onClick={() => {
+              setTag(null)
+              setSearchQuery("")
+            }}
+            className="inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.14em] text-accent"
+          >
+            <X size={12} /> Clear
+          </button>
         )}
       </div>
 
-      {/* Card grid with staggered entrance */}
-      {filteredPosts.length > 0 ? (
-        <StaggerGroup
-          staggerDelay={100}
-          direction="up"
-          distance={16}
-          className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3"
-        >
-          {filteredPosts.map((post) => (
-            <BlogCard key={post.slug} post={post} />
-          ))}
-        </StaggerGroup>
-      ) : (
-        <div className="border-y py-20 text-center" style={{ borderColor: "hsl(var(--border))" }}>
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-            No entries match the current filter.
-          </p>
-        </div>
-      )}
+      <div className="border-t-[1.5px] border-foreground">
+        {filtered.length > 0 ? (
+          filtered.map((post) => (
+            <BlogCard key={post.slug} post={post} index={posts.findIndex((p) => p.slug === post.slug)} />
+          ))
+        ) : (
+          <p className="py-16 text-center text-muted-foreground">No entries match that filter.</p>
+        )}
+      </div>
     </div>
+  )
+}
+
+function TagButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        "border px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.12em] transition-colors",
+        active
+          ? "border-foreground bg-foreground text-background"
+          : "border-border text-muted-foreground hover:border-foreground hover:text-foreground",
+      )}
+    >
+      {children}
+    </button>
   )
 }

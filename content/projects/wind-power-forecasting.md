@@ -1,29 +1,12 @@
 ---
 title: "Wind Power Forecasting"
 slug: "wind-power-forecasting"
-date: "2024-03-15"
+date: "2025-04-24"
 coverImage: "/images/projects/wind-power-forecasting.jpg"
 tags: ["Deep Learning", "Time Series", "Energy"]
 excerpt: "Hybrid deep learning and machine learning pipeline for wind power forecasting using direct LSTM and LSTM→Random Forest architectures."
-category: "AI for Energy"
-githubLink: "https://github.com/nahmad2000/WindPowerForecasting-LSTM-RF"
-challenge: "Building a real-time collaborative task management system that works seamlessly across devices was the main challenge. The app needed to handle concurrent updates from multiple users and provide a smooth, responsive experience."
-solution: "I used Firebase for real-time database and authentication, which allowed for instant updates across all connected clients. React was used for the UI, with TypeScript providing type safety and improved developer experience."
-technologies:
-  - "React"
-  - "Firebase (Firestore, Authentication)"
-  - "TypeScript"
-  - "CSS Modules"
-  - "React DnD (for drag-and-drop functionality)"
-  - "React Query"
-features:
-  - "Task creation and management"
-  - "Project organization"
-  - "Due dates and reminders"
-  - "Drag-and-drop interface"
-  - "Real-time collaboration"
-  - "User authentication and authorization"
-  - "Mobile-responsive design"
+category: "Lab"
+githubLink: "https://github.com/Ahmad-Nayfeh/WindPowerForecasting-LSTM-RF"
 featured: false
 ---
 

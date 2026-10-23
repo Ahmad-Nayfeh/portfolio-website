@@ -1,84 +1,83 @@
-import Image from "next/image"
+import type { Route } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
 import type { Project } from "@/types"
-import { formatDate } from "@/lib/utils"
+import { projectYear, splitTitle } from "@/components/projects/projectName"
+import { cn } from "@/lib/utils"
 
 interface ProjectCardProps {
   project: Project
-  index?: number
+  sheetNo?: string
+  /** "wide" lays the image beside the text (used when a card sits alone). */
+  layout?: "stacked" | "wide"
 }
 
-export default function ProjectCard({ project, index }: ProjectCardProps) {
-  const tags = project.tags ?? []
+/** Drawing-sheet card used on the projects index, the home page, and related lists. */
+export default function ProjectCard({ project, sheetNo, layout = "stacked" }: ProjectCardProps) {
+  const { name, tagline } = splitTitle(project.title)
+  const isArabic = project.lang === "ar"
+
   return (
-    <article className="group flex flex-col">
-      <Link
-        href={`/projects/${project.slug}`}
-        className="relative block aspect-[4/3] w-full overflow-hidden rounded-lg transition-shadow duration-300"
-        style={{
-          backgroundColor: "hsl(var(--card))",
-        }}
+    <Link
+      href={`/projects/${project.slug}` as Route}
+      className={cn(
+        "sheet sheet-hover group h-full",
+        layout === "wide" ? "grid grid-cols-1 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]" : "flex flex-col",
+      )}
+      dir={isArabic ? "rtl" : undefined}
+      lang={isArabic ? "ar" : undefined}
+    >
+      <div className={cn("flex h-9 items-center justify-between border-b border-border px-4", layout === "wide" && "md:col-span-2")} dir="ltr">
+        {sheetNo ? (
+          <span className="font-mono text-[10.5px] font-semibold text-accent">{sheetNo}</span>
+        ) : (
+          <span className="label text-[9.5px]">{project.category}</span>
+        )}
+        <span className="flex items-center gap-2">
+          {project.status && (
+            <>
+              <span className="lamp scale-75" aria-hidden />
+              <span className="label text-[9.5px]">{project.status}</span>
+              <span aria-hidden className="text-border">|</span>
+            </>
+          )}
+          <span className="label text-[9.5px]">{projectYear(project)}</span>
+        </span>
+      </div>
+
+      <div
+        className={cn(
+          "relative aspect-[16/10] overflow-hidden border-b border-border bg-secondary",
+          layout === "wide" && "md:aspect-auto md:min-h-[240px] md:border-b-0 md:border-e",
+        )}
       >
         <Image
-          src={project.coverImage || "/placeholder.svg"}
-          alt={project.title}
+          src={project.coverImage}
+          alt=""
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+          className="object-cover grayscale-[35%] transition duration-500 group-hover:scale-[1.02] group-hover:grayscale-0"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-        <span className="absolute left-3 top-3 rounded px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] backdrop-blur-sm"
-          style={{
-            backgroundColor: "hsl(var(--background) / 0.6)",
-            color: "hsl(var(--foreground))",
-            border: "1px solid hsl(var(--border) / 0.5)",
-          }}
-        >
-          {typeof index === "number"
-            ? `Case · ${String(index + 1).padStart(2, "0")}`
-            : "Case Study"}
-        </span>
-      </Link>
-
-      <div className="flex flex-1 flex-col pt-5">
-        <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          {project.date && <time dateTime={project.date}>{formatDate(project.date)}</time>}
-        </div>
-
-        <Link href={`/projects/${project.slug}`} className="flex items-start justify-between gap-3">
-          <h3 className="text-2xl font-bold leading-tight tracking-tight text-balance text-foreground transition-colors">
-            {project.title}
-          </h3>
-          <ArrowUpRight
-            size={18}
-            className="mt-1 shrink-0 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            style={{ color: "hsl(var(--section-accent))" }}
-          />
-        </Link>
-
-        {project.excerpt && (
-          <p className="mt-3 line-clamp-3 text-base leading-relaxed text-muted-foreground">
-            {project.excerpt}
-          </p>
-        )}
-
-        {tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.18em]">
-            {tags.slice(0, 3).map((tag) => (
-              <Link
-                key={tag}
-                href={`/projects?tag=${tag}`}
-                className="transition-colors"
-                style={{ color: "hsl(var(--section-accent))" }}
-              >
-                #{tag}
-              </Link>
-            ))}
-            {tags.length > 3 && <span className="text-muted-foreground">+{tags.length - 3}</span>}
-          </div>
-        )}
       </div>
-    </article>
+
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="text-[1.2rem] font-semibold leading-snug tracking-tight">
+          <span className="redline">{name}</span>
+        </h3>
+        {tagline && <p className="mt-1 text-[14.5px] font-medium text-foreground/75">{tagline}</p>}
+        <p className="mt-3 line-clamp-3 text-[14.5px] leading-relaxed text-muted-foreground">{project.excerpt}</p>
+        <div className="mt-auto flex items-end justify-between gap-3 pt-5" dir="ltr">
+          <div className="flex flex-wrap gap-1.5">
+            {project.tags.slice(0, 3).map((t) => (
+              <span key={t} className="chip">
+                {t}
+              </span>
+            ))}
+          </div>
+          <ArrowUpRight size={17} className="shrink-0 text-muted-foreground transition-colors group-hover:text-accent" />
+        </div>
+      </div>
+    </Link>
   )
 }

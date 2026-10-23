@@ -7,6 +7,8 @@ import type {
   Post,
   HomeContent,
   AboutContent,
+  WorkContent,
+  SkillGroup,
   FullProject,
   FullPost,
   ExperienceItem,
@@ -26,6 +28,8 @@ interface AboutInfoYaml {
   name?: string // Use optional fields if they might be missing in YAML
   tagline?: string
   skills?: string[]
+  skillGroups?: SkillGroup[]
+  languages?: string[]
   experience?: ExperienceItem[]
   education?: EducationItem[]
   // Add any other fields expected in info.yaml
@@ -78,6 +82,12 @@ function readYamlFile(filePath: string): unknown { // Return unknown
   }
 }
 
+// Estimated reading time from the post body (~230 words per minute).
+function readingTime(body: string): string {
+  const words = body.replace(/```[\s\S]*?```/g, " ").split(/\s+/).filter(Boolean).length
+  return `${Math.max(1, Math.round(words / 230))} min read`
+}
+
 // Get home page content
 export async function getHomeContent(): Promise<HomeContent> {
   const homeFile = readMarkdownFile("home/intro.md")
@@ -86,6 +96,7 @@ export async function getHomeContent(): Promise<HomeContent> {
     title: "Hi, I'm Your Name",
     subtitle: "I'm a web developer specializing in building exceptional digital experiences.",
     description: "Based in Your Location, I'm passionate about creating intuitive and performant web applications.",
+    now: [],
   }
 
   if (!homeFile?.data) { // Check if homeFile or its data property exists
@@ -96,6 +107,21 @@ export async function getHomeContent(): Promise<HomeContent> {
     title: homeFile.data.title || defaultContent.title,
     subtitle: homeFile.data.subtitle || defaultContent.subtitle,
     description: homeFile.data.description || defaultContent.description,
+    now: Array.isArray(homeFile.data.now) ? homeFile.data.now : [],
+  }
+}
+
+// Get the home page "At work" section
+export async function getWorkContent(): Promise<WorkContent | null> {
+  const raw = readYamlFile("home/work.yaml")
+  if (typeof raw !== "object" || raw === null) return null
+  const w = raw as Partial<WorkContent>
+  return {
+    title: w.title ?? "",
+    intro: w.intro ?? "",
+    products: w.products ?? [],
+    steps: w.steps ?? [],
+    automation: w.automation ?? "",
   }
 }
 
@@ -114,6 +140,8 @@ export async function getAboutContent(): Promise<AboutContent> {
     tagline: "Web Developer & Designer",
     bio: bioContent, // Use bio determined above
     skills: ["JavaScript", "TypeScript", "React", "Next.js"],
+    skillGroups: [],
+    languages: [],
     experience: [],
     education: [],
   }
@@ -130,6 +158,8 @@ export async function getAboutContent(): Promise<AboutContent> {
       tagline: infoFile.tagline ?? defaultInfo.tagline,
       bio: bioContent, // Bio is handled separately
       skills: infoFile.skills ?? defaultInfo.skills,
+      skillGroups: infoFile.skillGroups ?? [],
+      languages: infoFile.languages ?? [],
       experience: infoFile.experience ?? defaultInfo.experience,
       education: infoFile.education ?? defaultInfo.education,
     }
@@ -168,6 +198,9 @@ export async function getAllProjects(): Promise<Project[]> {
           features: fm.features,
           featured: fm.featured,
           lang: fm.lang,
+          status: fm.status,
+          gallery: fm.gallery,
+          highlights: fm.highlights,
         });
       }
     }
@@ -204,6 +237,9 @@ export async function getAllProjectsWithContent(): Promise<FullProject[]> {
                 content: projectFile.content,
                 lang: fm.lang,
                 featured: fm.featured,
+                status: fm.status,
+                gallery: fm.gallery,
+                highlights: fm.highlights,
             });
         }
     }
@@ -261,7 +297,7 @@ export async function getAllPosts(): Promise<Post[]> {
                 excerpt: fm.excerpt,
                 coverImage: fm.coverImage || "/placeholder.svg?height=600&width=800",
                 tags: fm.tags,
-                readTime: fm.readTime,
+                readTime: readingTime(postFile.content ?? ""),
                 featured: fm.featured,
             });
         }
@@ -289,7 +325,7 @@ export async function getAllPostsWithContent(): Promise<FullPost[]> {
                 excerpt: fm.excerpt,
                 coverImage: fm.coverImage || "/placeholder.svg?height=600&width=800",
                 tags: fm.tags,
-                readTime: fm.readTime,
+                readTime: readingTime(postFile.content ?? ""),
                 content: postFile.content,
                 featured: fm.featured,
             });
@@ -306,9 +342,7 @@ export async function getAllPostsWithContent(): Promise<FullPost[]> {
 
 export async function getRecentPosts(count: number): Promise<Post[]> {
   const posts = await getAllPosts()
-  return posts
-    .filter((post) => post.featured === true)
-    .slice(0, count)
+  return posts.slice(0, count)
 }
 
 // ===========================================

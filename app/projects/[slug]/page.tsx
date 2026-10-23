@@ -1,17 +1,18 @@
-import type { Metadata } from "next"
+import type { Metadata, Route } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ArrowUpRight, Github, ExternalLink } from "lucide-react"
-import { getProjectBySlug, getRelatedProjects, getAllProjects } from "@/lib/content"
+import { ArrowLeft, ArrowRight, ArrowUpRight, Github } from "lucide-react"
+import { getProjectBySlug, getAllProjects } from "@/lib/content"
 import { formatDate } from "@/lib/utils"
 import MarkdownRenderer from "@/components/MarkdownRenderer"
-import type { FullProject } from "@/types"
-import RelatedProjects from "@/components/RelatedProjects"
+import ProjectCard from "@/components/ProjectCard"
+import TitleBlock, { type TitleBlockCell } from "@/components/drawing/TitleBlock"
+import { hasLink, splitTitle } from "@/components/projects/projectName"
+import { projectTiers, tierOf } from "@/config/site"
 
 interface PageProps {
   params: Promise<{ slug: string }>
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateStaticParams() {
@@ -22,199 +23,183 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const project = await getProjectBySlug(slug)
-  if (!project) return { title: "Project Not Found" }
+  if (!project) return { title: "Project not found" }
   return {
-    title: `${project.title} | Ahmad Nayfeh`,
+    title: splitTitle(project.title).name,
     description: project.excerpt,
+    openGraph: { images: project.coverImage ? [project.coverImage] : [] },
   }
+}
+
+/** Project write-ups start with their own "# Title"; the page header already shows it. */
+function stripLeadingH1(md: string) {
+  return md.replace(/^\s*#\s+[^\n]+\n/, "")
 }
 
 export default async function ProjectPage({ params }: PageProps) {
   const { slug } = await params
-  const project: FullProject | null = await getProjectBySlug(slug)
+  const project = await getProjectBySlug(slug)
   if (!project) notFound()
 
-  const relatedProjects = await getRelatedProjects(project, 3)
-  const direction = project.lang === "ar" ? "rtl" : "ltr"
+  const all = await getAllProjects()
+  const tierId = tierOf(project.category)
+  const tier = projectTiers.find((t) => t.id === tierId)!
+  const idx = all.findIndex((p) => p.slug === project.slug)
+  const prev = idx > 0 ? all[idx - 1] : null
+  const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null
+  const related = all.filter((p) => p.slug !== project.slug && tierOf(p.category) === tierId).slice(0, 3)
+
+  const isArabic = project.lang === "ar"
+  const { name, tagline } = splitTitle(project.title)
+  const hasCover = project.coverImage && !project.coverImage.startsWith("/placeholder")
+
+  const spec: TitleBlockCell[] = [
+    { label: "Type", value: tier.name, emphasis: true },
+    { label: "Date", value: formatDate(project.date) },
+  ]
+  if (project.status) {
+    spec.push({
+      label: "Status",
+      span: 2,
+      value: (
+        <span className="inline-flex items-center gap-2">
+          <span className="lamp scale-75" aria-hidden />
+          {project.status}
+        </span>
+      ),
+    })
+  }
+  spec.push({
+    label: "Stack",
+    span: 2,
+    value: (
+      <span className="flex flex-wrap gap-1.5">
+        {project.tags.map((t) => (
+          <span key={t} className="chip">
+            {t}
+          </span>
+        ))}
+      </span>
+    ),
+  })
+  if (hasLink(project.liveDemoUrl) || hasLink(project.githubLink)) {
+    spec.push({
+      label: "Links",
+      span: 2,
+      value: (
+        <span className="flex flex-wrap gap-x-5 gap-y-1">
+          {hasLink(project.liveDemoUrl) && (
+            <a href={project.liveDemoUrl} target="_blank" rel="noopener noreferrer" className="redline inline-flex items-center gap-1.5 font-medium">
+              Live <ArrowUpRight size={13} />
+            </a>
+          )}
+          {hasLink(project.githubLink) && (
+            <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="redline inline-flex items-center gap-1.5 font-medium">
+              <Github size={13} /> Source
+            </a>
+          )}
+        </span>
+      ),
+    })
+  }
 
   return (
-    <div
-      className="mx-auto w-full max-w-[1400px] px-6 pb-20 pt-8 md:px-10 lg:px-16"
-      dir={direction}
-    >
+    <div className="mx-auto w-full max-w-[1240px] px-5 pb-16 pt-8 md:px-8 md:pt-12">
       <Link
-        href="/projects"
-        className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+        href={"/projects" as Route}
+        className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ArrowLeft size={12} className="transition-transform duration-300 group-hover:-translate-x-0.5" />
-        <span className="border-b border-border transition-colors group-hover:border-accent">
-          Back to projects
-        </span>
+        <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-0.5" />
+        All projects
       </Link>
 
-      <article className="relative">
-        {/* Decorative background orbs */}
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div
-            className="absolute -right-32 -top-32 h-[600px] w-[600px] opacity-[0.05]"
-            style={{
-              background: "radial-gradient(ellipse at center, hsl(var(--accent)), transparent 70%)",
-            }}
-          />
-          <div
-            className="absolute -left-32 top-0 h-[400px] w-[400px] opacity-[0.03]"
-            style={{
-              background: "radial-gradient(ellipse at center, hsl(326 100% 62%), transparent 70%)",
-            }}
-          />
-        </div>
-
-        {/* === Editorial header — meta column on the left, title on the right. === */}
-        <header className="mt-12 grid grid-cols-12 gap-x-6 border-b border-border pb-10">
-          <div className="col-span-12 lg:col-span-3">
-            <div className="flex flex-row gap-x-6 rounded-xl border border-border/50 bg-card/60 p-5 backdrop-blur-md lg:flex-col lg:gap-y-5">
-              {project.date && (
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                    Date
-                  </div>
-                  <time
-                    dateTime={project.date}
-                    className="mt-1 block font-display text-base text-foreground"
-                  >
-                    {formatDate(project.date)}
-                  </time>
-                </div>
-              )}
-              {project.tags && project.tags.length > 0 && (
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                    Stack
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                    {project.tags.map((tag) => (
-                      <span key={tag} className="border-b border-border">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {((project.githubLink && project.githubLink !== "#") || (project.liveDemoUrl && project.liveDemoUrl !== "#")) && (
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                    Links
-                  </div>
-                  <div className="mt-2 flex flex-col gap-2">
-                    {project.githubLink && project.githubLink !== "#" && (
-                      <a
-                        href={project.githubLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-foreground"
-                      >
-                        <Github size={13} className="text-muted-foreground transition-colors group-hover:text-accent" />
-                        <span className="border-b border-border transition-colors group-hover:border-accent">
-                          Source code
-                        </span>
-                      </a>
-                    )}
-                    {project.liveDemoUrl && project.liveDemoUrl !== "#" && (
-                      <a
-                        href={project.liveDemoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-foreground"
-                      >
-                        <ExternalLink
-                          size={13}
-                          className="text-muted-foreground transition-colors group-hover:text-accent"
-                        />
-                        <span className="border-b border-border transition-colors group-hover:border-accent">
-                          Live demo
-                        </span>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="col-span-12 mt-8 lg:col-span-9 lg:mt-0">
-            <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent">
-              Case Study
+      <article>
+        <header className="mt-8 grid grid-cols-1 gap-x-12 gap-y-8 border-b-[1.5px] border-foreground pb-10 lg:grid-cols-12">
+          <div className="lg:col-span-7" dir={isArabic ? "rtl" : undefined} lang={isArabic ? "ar" : undefined}>
+            <span className="label" dir="ltr">
+              {tier.name}
             </span>
-            <h1 className="font-display text-display-xl mt-4 text-balance">
-              {project.title}
-            </h1>
-            {project.excerpt && (
-              <p className="font-display mt-6 max-w-2xl text-xl italic leading-snug text-muted-foreground md:text-2xl">
-                {project.excerpt}
-              </p>
-            )}
+            <h1 className="mt-4 font-display text-[clamp(2.25rem,5.5vw,4rem)] leading-[1.02] text-balance">{name}</h1>
+            {tagline && <p className="mt-4 text-xl font-medium text-foreground/80 md:text-2xl">{tagline}</p>}
+            {project.excerpt && <p className="mt-5 max-w-2xl text-[1.05rem] leading-relaxed text-muted-foreground">{project.excerpt}</p>}
+          </div>
+          <div className="lg:col-span-5 lg:pt-8">
+            <TitleBlock cols={2} cells={spec} />
           </div>
         </header>
 
-        {project.coverImage && (
-          <div className="relative my-10 aspect-[16/9] overflow-hidden rounded-xl border border-border/50 bg-secondary shadow-lg shadow-black/20 md:my-14">
-            <Image
-              src={project.coverImage}
-              alt={project.title}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1400px) 100vw, 1400px"
-            />
-            <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-border/20" />
+        {project.gallery.length > 0 ? (
+          <div className="sheet mt-10 overflow-hidden">
+            <div className="flex items-center justify-between border-b border-border px-4 py-2">
+              <span className="label text-[9.5px]">{name} · Screens</span>
+              <span className="label text-[9.5px]">{project.gallery.length} views</span>
+            </div>
+            <div className="flex flex-wrap items-end justify-center gap-4 px-4 py-8 md:gap-8 md:px-10 md:py-12">
+              {project.gallery.map((src, i) => (
+                <div key={src} className="phone w-[42%] max-w-[240px] sm:w-[28%]">
+                  <Image src={src} alt={`${name} screen ${i + 1}`} width={540} height={1140} sizes="(max-width: 640px) 42vw, 240px" priority={i === 0} />
+                </div>
+              ))}
+            </div>
           </div>
+        ) : (
+          hasCover && (
+            <div className="sheet relative mt-10 aspect-[16/9] overflow-hidden">
+              <Image src={project.coverImage} alt="" fill className="object-cover" priority sizes="(max-width: 1240px) 100vw, 1240px" />
+            </div>
+          )
         )}
 
-        {/* Body — single editorial column, full-width within container */}
-        <div className="mx-auto mt-10">
+        <div
+          className="mx-auto mt-12 max-w-[820px] md:mt-16"
+          dir={isArabic ? "rtl" : undefined}
+          lang={isArabic ? "ar" : undefined}
+        >
           {project.content && (
             <div className="project-prose-container">
-              <MarkdownRenderer content={project.content} />
+              <MarkdownRenderer content={stripLeadingH1(project.content)} />
             </div>
           )}
-
-          {/* Closing rule */}
-          <div className="mx-auto mt-20 border-t border-border pt-8">
-            <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-              <span>End of case study</span>
-              {project.githubLink && project.githubLink !== "#" && (
-                <a
-                  href={project.githubLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-2 text-foreground"
-                >
-                  <span className="border-b border-border transition-colors group-hover:border-accent">
-                    Read the source
-                  </span>
-                  <ArrowUpRight
-                    size={12}
-                    className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                  />
-                </a>
-              )}
-            </div>
-          </div>
         </div>
       </article>
 
-      {relatedProjects.length > 0 && (
-        <section className="mt-24 border-t border-border pt-16">
-          <div className="mb-10 flex items-center gap-3">
-            <span aria-hidden className="h-px w-8 bg-accent" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-              More case studies
-            </span>
+      {/* Previous / next sheet */}
+      {(prev || next) && (
+        <nav aria-label="More projects" className={`mt-20 grid grid-cols-1 border-[1.5px] border-foreground ${prev && next ? "md:grid-cols-2" : ""}`}>
+          {prev && (
+            <Link href={`/projects/${prev.slug}` as Route} className="group border-b border-border p-5 transition-colors last:border-b-0 hover:bg-card md:border-b-0 md:border-r md:last:border-r-0">
+              <span className="label inline-flex items-center gap-2">
+                <ArrowLeft size={12} /> Newer
+              </span>
+              <span className="mt-2 block text-lg font-semibold tracking-tight">
+                <span className="redline">{splitTitle(prev.title).name}</span>
+              </span>
+            </Link>
+          )}
+          {next && (
+            <Link href={`/projects/${next.slug}` as Route} className="group p-5 text-right transition-colors hover:bg-card">
+              <span className="label inline-flex items-center gap-2">
+                Older <ArrowRight size={12} />
+              </span>
+              <span className="mt-2 block text-lg font-semibold tracking-tight">
+                <span className="redline">{splitTitle(next.title).name}</span>
+              </span>
+            </Link>
+          )}
+        </nav>
+      )}
+
+      {related.length > 0 && (
+        <section className="mt-20">
+          <div className="mb-8 flex items-center gap-3">
+            <span className="label">More in {tier.name}</span>
+            <span aria-hidden className="h-px flex-1 bg-border" />
           </div>
-          <h2 className="font-display text-display-md mb-10 text-balance">
-            Related projects
-          </h2>
-          <RelatedProjects projects={relatedProjects} />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {related.map((p) => (
+              <ProjectCard key={p.slug} project={p} />
+            ))}
+          </div>
         </section>
       )}
     </div>

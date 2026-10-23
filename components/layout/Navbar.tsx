@@ -4,16 +4,14 @@ import { useState, useEffect } from "react"
 import type { Route } from "next"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Menu, X, FileDown } from "lucide-react"
+import ThemeToggle from "@/components/ThemeToggle"
+import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
 
-const navItems = [
-  { name: "Index", path: "/" },
-  { name: "Projects", path: "/projects" },
-  { name: "Notebook", path: "/blog" },
-  { name: "About", path: "/about" },
-]
+function isActivePath(pathname: string, path: string) {
+  return path === "/" ? pathname === "/" : pathname === path || pathname.startsWith(path + "/")
+}
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -22,6 +20,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
@@ -33,95 +32,115 @@ export default function Navbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full transition-all duration-200",
-        scrolled
-          ? "glass-card-strong border-b border-border/50"
-          : "bg-transparent",
+        "sticky top-0 z-40 w-full border-b transition-colors duration-200",
+        scrolled || isOpen
+          ? "border-border bg-background/90 backdrop-blur-md"
+          : "border-transparent bg-transparent",
       )}
     >
-      <div className="mx-auto w-full max-w-[1400px] px-4 md:px-10 lg:px-16">
-        <div className="flex h-16 items-center justify-between md:h-20">
-          <Link
-            href="/"
-            className="font-display text-xl tracking-tight md:text-2xl glow-text"
-            aria-label="Ahmad Nayfeh — home"
+      <div className="mx-auto flex h-16 w-full max-w-[1240px] items-center justify-between px-5 md:px-8">
+        <Link href="/" className="group flex items-center gap-3" aria-label="Ahmad Nayfeh, home">
+          <span
+            aria-hidden
+            className="flex h-9 w-9 items-center justify-center border-[1.5px] border-foreground font-mono text-[13px] font-semibold tracking-tight transition-colors group-hover:border-accent group-hover:text-accent"
           >
-            Ahmad Nayfeh
-          </Link>
+            AN
+          </span>
+          <span className="flex flex-col leading-none">
+            <span className="text-[15px] font-semibold tracking-tight">Ahmad Nayfeh</span>
+            <span className="label mt-1 text-[9.5px]">Design Engineer</span>
+          </span>
+        </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-8 md:flex">
-            {navItems.map((item) => {
-              const isActive =
-                item.path === "/"
-                  ? pathname === "/"
-                  : pathname === item.path || pathname.startsWith(item.path + "/")
-              return (
-                <Link
-                  key={item.path}
-                  href={item.path as Route}
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+          {siteConfig.nav.map((item) => {
+            const active = isActivePath(pathname, item.path)
+            return (
+              <Link
+                key={item.path}
+                href={item.path as Route}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "group relative flex items-baseline gap-1.5 px-3 py-2 text-[13.5px] font-medium transition-colors",
+                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <span className={cn("font-mono text-[10px]", active ? "text-accent" : "text-muted-foreground/70")}>
+                  {item.sheet}
+                </span>
+                {item.name}
+                <span
+                  aria-hidden
                   className={cn(
-                    "group relative font-mono text-[11px] uppercase tracking-[0.18em] transition-colors",
-                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                    "absolute inset-x-3 -bottom-[13px] h-[2px] bg-accent transition-transform duration-300",
+                    active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
                   )}
-                >
-                  {item.name}
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "absolute -bottom-1.5 left-0 h-px transition-[width] duration-300 ease-out",
-                      isActive ? "w-full" : "w-0 group-hover:w-full",
-                    )}
-                    style={{
-                      backgroundColor: isActive ? "hsl(var(--section-accent))" : "hsl(var(--section-accent))",
-                    }}
-                  />
-                </Link>
-              )
-            })}
-          </nav>
+                  style={{ transformOrigin: "left" }}
+                />
+              </Link>
+            )
+          })}
+          <span aria-hidden className="mx-3 h-5 w-px bg-border" />
+          <a
+            href={siteConfig.resume}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mr-2 inline-flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-accent"
+          >
+            <FileDown size={13} />
+            CV
+          </a>
+          <ThemeToggle />
+        </nav>
 
-          {/* Mobile Navigation Toggle */}
-          <div className="flex items-center gap-1 md:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Toggle Menu"
-              onClick={() => setIsOpen((v) => !v)}
-            >
-              {isOpen ? <X size={20} /> : <Menu size={20} />}
-            </Button>
-          </div>
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            type="button"
+            className="inline-flex h-9 w-9 items-center justify-center border border-border"
+            onClick={() => setIsOpen((o) => !o)}
+            aria-expanded={isOpen}
+            aria-controls="mobile-nav"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+          >
+            {isOpen ? <X size={17} /> : <Menu size={17} />}
+          </button>
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
       {isOpen && (
-        <div className="border-t border-border/60 md:hidden">
-          <nav className="container mx-auto flex flex-col px-4 py-4">
-            {navItems.map((item) => {
-              const isActive =
-                item.path === "/"
-                  ? pathname === "/"
-                  : pathname === item.path || pathname.startsWith(item.path + "/")
+        <nav id="mobile-nav" className="border-t border-border md:hidden" aria-label="Main">
+          <ul className="mx-auto w-full max-w-[1240px] px-5 py-3">
+            {siteConfig.nav.map((item) => {
+              const active = isActivePath(pathname, item.path)
               return (
-                <Link
-                  key={item.path}
-                  href={item.path as Route}
-                  className={cn(
-                    "border-b border-border/40 py-3 font-mono text-xs uppercase tracking-[0.18em] last:border-b-0",
-                    isActive ? "text-foreground" : "text-muted-foreground",
-                  )}
-                >
-                  <span className="mr-3" style={{ color: "hsl(var(--section-accent))" }}>
-                    {isActive ? "▸" : "·"}
-                  </span>
-                  {item.name}
-                </Link>
+                <li key={item.path} className="border-b border-border last:border-b-0">
+                  <Link
+                    href={item.path as Route}
+                    aria-current={active ? "page" : undefined}
+                    className="flex items-baseline gap-3 py-3.5 text-base font-medium"
+                  >
+                    <span className={cn("font-mono text-[11px]", active ? "text-accent" : "text-muted-foreground")}>
+                      {item.sheet}
+                    </span>
+                    <span className={active ? "text-foreground" : "text-muted-foreground"}>{item.name}</span>
+                  </Link>
+                </li>
               )
             })}
-          </nav>
-        </div>
+            <li>
+              <a
+                href={siteConfig.resume}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 py-3.5 text-base font-medium text-muted-foreground"
+              >
+                <FileDown size={15} className="text-accent" />
+                Download CV
+              </a>
+            </li>
+          </ul>
+        </nav>
       )}
     </header>
   )

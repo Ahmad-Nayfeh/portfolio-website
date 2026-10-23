@@ -6,10 +6,10 @@ date: "2025-07-13"
 coverImage: "/images/projects/reading-marathon-app.jpg"
 tags: ["Data Engineering", "Arabic"]
 excerpt: "ابتكار وتطوير منظومة سحابية شاملة (End-to-End System) تستخدم هندسة البيانات والتحليلات المتقدمة لتحويل تجربة القراءة الجماعية إلى رحلة تفاعلية ومحفزة. المنصة تعالج التحديات الإدارية والتحفيزية من خلال خط بيانات آلي، ونظام ألعاب ذكي، ولوحات تحكم متطورة."
-category: "تطبيقات وتحليلات البيانات"
+category: "Products"
 githubLink: "https://github.com/Ahmad-Nayfeh/Reading-Tracker-Dashboard-Cloud"
 liveDemoUrl: "https://reading-marathon.streamlit.app/"
-featured: true
+featured: false
 ---
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');

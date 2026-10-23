@@ -1,0 +1,19 @@
+# Home page "At work" section. Plain language only: no internal codes,
+# customer names, prices, or figures from the employer.
+title: "Medium-voltage switchgear, from schematic to shop floor."
+intro: "At Alfanar's Secondary Switchgear Factory I own the electrical design of each order I'm assigned, from the first schematic until the unit leaves production."
+products:
+  - "Ring main units (RMU)"
+  - "Metered RMU"
+  - "Load-break switches"
+  - "Autoreclosers"
+steps:
+  - title: "Design"
+    detail: "Electrical schematics for each customer order, built to the customer's and the utility's specifications."
+  - title: "Approval"
+    detail: "Drawings go to the customer for review; I resolve their comments until sign-off."
+  - title: "Release"
+    detail: "The full production package: drawings, wiring and ferrule lists, labels, and the bill of materials in SAP."
+  - title: "Support"
+    detail: "Design point of contact for QC, testing, and production until the unit ships."
+automation: "Alongside the design work I build AI-assisted tools that automate routine design checks and documentation for the team, so errors are caught before they reach production."

@@ -5,10 +5,11 @@ date: "2025-06-14"
 coverImage: "/images/projects/mri-tumor-segmentation.jpg"
 tags: ["Deep Learning", "Medical Imaging", "Computer Vision"]
 excerpt: "An end-to-end deep learning solution for the automated segmentation of brain tumors from multi-modal MRI scans."
-category: "MRI Scans"
-githubLink: "https://github.com/ahmad-nayfeh/MRI-Tumor-Segmentation"
+category: "Research"
+githubLink: "https://github.com/Ahmad-Nayfeh/MRI-Tumor-Segmentation"
 liveDemoUrl: "https://mri-tumor-segmentation-nahmad.streamlit.app/"
 featured: true
+status: "Completed"
 ---
 
 # 🧠 AI-Powered MRI Brain Tumor Segmentation

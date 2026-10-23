@@ -1,213 +1,114 @@
-import type { Metadata } from "next"
+import type { Metadata, Route } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, Clock } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { getPostBySlug, getRelatedPosts, getAllPosts } from "@/lib/content"
 import RelatedPosts from "@/components/RelatedPosts"
 import TableOfContents from "@/components/TableOfContents"
 import { formatDate, formatTime, hasTimeComponent, extractHeadings } from "@/lib/utils"
 import MdxRenderer from "@/components/MdxRenderer"
-import type { FullPost } from "@/types"
 
-interface BlogPageParams {
-  slug: string
+interface PageProps {
+  params: Promise<{ slug: string }>
 }
 
-export async function generateStaticParams(): Promise<Array<BlogPageParams>> {
+export async function generateStaticParams() {
   const posts = await getAllPosts()
-  return posts
-    .filter((post) => typeof post.slug === "string")
-    .map((post) => ({ slug: post.slug }))
+  return posts.filter((post) => typeof post.slug === "string").map((post) => ({ slug: post.slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const post = await getPostBySlug(slug)
-  if (!post) return { title: "Post Not Found" }
+  if (!post) return { title: "Entry not found" }
   return {
-    title: `${post.title} | Ahmad Nayfeh`,
+    title: post.title,
     description: post.excerpt,
+    openGraph: { images: post.coverImage ? [post.coverImage] : [] },
   }
+}
+
+/** Hand-written posts start with their own "# Title"; the page header already shows it. */
+function stripLeadingH1(md: string) {
+  return md.replace(/^\s*#\s+[^\n]+\n/, "")
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params
-  const post: FullPost | null = await getPostBySlug(slug)
+  const post = await getPostBySlug(slug)
   if (!post) notFound()
 
   const relatedPosts = await getRelatedPosts(post, 3)
   const tocHeadings = post.content ? extractHeadings(post.content) : []
+  const hasCover = post.coverImage && !post.coverImage.startsWith("/placeholder")
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-6 pb-20 pt-8 md:px-10 lg:px-16">
+    <div className="mx-auto w-full max-w-[1240px] px-5 pb-16 pt-8 md:px-8 md:pt-12">
       <Link
-        href="/blog"
-        className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+        href={"/blog" as Route}
+        className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ArrowLeft size={12} className="transition-transform duration-300 group-hover:-translate-x-0.5" />
-        <span className="border-b border-border transition-colors group-hover:border-accent">
-          Back to the notebook
-        </span>
+        <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-0.5" />
+        Notebook
       </Link>
 
-      <article className="relative">
-        {/* Decorative background orbs */}
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div
-            className="absolute -right-32 -top-32 h-[600px] w-[600px] opacity-[0.04]"
-            style={{
-              background: "radial-gradient(ellipse at center, hsl(var(--accent)), transparent 70%)",
-            }}
-          />
-          <div
-            className="absolute -left-32 top-0 h-[400px] w-[400px] opacity-[0.025]"
-            style={{
-              background: "radial-gradient(ellipse at center, hsl(326 100% 62%), transparent 70%)",
-            }}
-          />
-        </div>
-
-        {/* === Editorial header === */}
-        <header className="mt-12 grid grid-cols-12 gap-x-6 border-b border-border pb-10">
-          {/* Meta column — date, read time, tags */}
-          <div className="col-span-12 lg:col-span-3">
-            <div className="flex flex-row gap-x-6 rounded-xl border border-border/50 bg-card/60 p-5 backdrop-blur-md lg:flex-col lg:gap-y-5">
-              {post.date && (
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                    Published
-                  </div>
-                  <time
-                    dateTime={post.date}
-                    className="mt-1 block font-display text-base text-foreground"
-                  >
-                    {formatDate(post.date)}
-                  </time>
-                  {hasTimeComponent(post.date) && (
-                    <span className="mt-0.5 block font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                      {formatTime(post.date)}
-                    </span>
-                  )}
-                </div>
-              )}
-              {post.readTime && (
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                    Read
-                  </div>
-                  <span className="mt-1 inline-flex items-center gap-1.5 font-display text-base text-foreground">
-                    <Clock size={13} className="text-muted-foreground" />
-                    {post.readTime}
-                  </span>
-                </div>
-              )}
-              {post.tags && post.tags.length > 0 && (
-                <div className="hidden lg:block">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                    Tagged
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                    {post.tags.map((tag) => (
-                      <Link
-                        key={tag}
-                        href={`/blog?tag=${tag}`}
-                        className="border-b border-border transition-colors hover:border-accent hover:text-accent"
-                      >
-                        #{tag}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
+      <article>
+        <header className="mx-auto mt-8 max-w-[860px] border-b-[1.5px] border-foreground pb-10">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <time dateTime={post.date} className="label">
+              {formatDate(post.date)}
+              {hasTimeComponent(post.date) && ` · ${formatTime(post.date)}`}
+            </time>
+            {post.readTime && (
+              <>
+                <span aria-hidden className="text-border">|</span>
+                <span className="label">{post.readTime}</span>
+              </>
+            )}
+          </div>
+          <h1 className="mt-5 font-display text-[clamp(2rem,4.8vw,3.4rem)] leading-[1.06] text-balance">{post.title}</h1>
+          {post.excerpt && (
+            <p className="mt-5 font-serif text-[1.2rem] italic leading-relaxed text-muted-foreground md:text-[1.3rem]">{post.excerpt}</p>
+          )}
+          {post.tags.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-1.5">
+              {post.tags.map((tag) => (
+                <Link key={tag} href={`/blog?tag=${encodeURIComponent(tag)}` as Route} className="chip transition-colors hover:border-foreground hover:text-foreground">
+                  {tag}
+                </Link>
+              ))}
             </div>
-          </div>
-
-          {/* Title column */}
-          <div className="col-span-12 mt-8 lg:col-span-9 lg:mt-0">
-            <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent">
-              The Notebook
-            </span>
-            <h1 className="font-display text-display-xl mt-4 text-balance">
-              {post.title}
-            </h1>
-            {post.excerpt && (
-              <p className="font-display mt-6 max-w-2xl text-xl italic leading-snug text-muted-foreground md:text-2xl">
-                {post.excerpt}
-              </p>
-            )}
-            {post.tags && post.tags.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground lg:hidden">
-                {post.tags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/blog?tag=${tag}`}
-                    className="border-b border-border transition-colors hover:border-accent hover:text-accent"
-                  >
-                    #{tag}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
         </header>
 
-        {/* Cover image */}
-        {post.coverImage && (
-          <div className="relative my-10 aspect-[16/9] overflow-hidden rounded-xl border border-border/50 bg-secondary shadow-lg shadow-black/20 md:my-14">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1400px) 100vw, 1400px"
-            />
-            <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-border/20" />
+        {hasCover && (
+          <div className="sheet relative mx-auto mt-10 aspect-[16/9] max-w-[1080px] overflow-hidden">
+            <Image src={post.coverImage} alt="" fill className="object-cover" priority sizes="(max-width: 1080px) 100vw, 1080px" />
           </div>
         )}
 
-        {/* Body — article column + sticky ToC sidebar on wide screens */}
-        <div className="mx-auto mt-10 grid grid-cols-1 gap-x-14 xl:grid-cols-[1fr_280px]">
-          <div>
-            {post.content && (
-              <div className="prose prose-lg dark:prose-invert max-w-none editorial-body">
-                <MdxRenderer source={post.content} />
-              </div>
-            )}
-
-            <div className="mt-20 border-t border-border pt-8">
-              <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                End of entry · Ahmad Nayfeh · {post.date ? formatDate(post.date) : ""}
-              </p>
-            </div>
-          </div>
-
+        <div className="mx-auto mt-12 grid max-w-[1080px] grid-cols-1 gap-x-12 xl:grid-cols-[minmax(0,760px)_240px] xl:justify-center">
+          <div className="article-body min-w-0">{post.content && <MdxRenderer source={stripLeadingH1(post.content)} />}</div>
           <aside className="hidden xl:block">
             <TableOfContents headings={tocHeadings} />
           </aside>
         </div>
+
+        <div className="mx-auto mt-16 max-w-[860px] border-t border-border pt-6">
+          <p className="label">End of entry · Ahmad Nayfeh · {formatDate(post.date)}</p>
+        </div>
       </article>
 
       {relatedPosts.length > 0 && (
-        <section className="mt-24 border-t border-border pt-16">
-          <div className="mb-10 flex items-center gap-3">
-            <span aria-hidden className="h-px w-8 bg-accent" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-              Keep reading
-            </span>
+        <section className="mx-auto mt-20 max-w-[1080px]">
+          <div className="mb-6 flex items-center gap-3">
+            <span className="label">Keep reading</span>
+            <span aria-hidden className="h-px flex-1 bg-border" />
           </div>
-          <h2 className="font-display text-display-md mb-10 text-balance">
-            Related entries from the notebook
-          </h2>
           <RelatedPosts posts={relatedPosts} />
         </section>
       )}
     </div>
   )
-}
-
-type PageProps = {
-  params: Promise<{ slug: string }>
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }

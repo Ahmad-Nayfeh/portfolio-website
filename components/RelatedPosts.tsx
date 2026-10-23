@@ -1,15 +1,11 @@
 import BlogCard from "@/components/BlogCard"
 import type { Post } from "@/types"
 
-interface RelatedPostsProps {
-  posts: Post[]
-}
-
-export default function RelatedPosts({ posts }: RelatedPostsProps) {
+export default function RelatedPosts({ posts }: { posts: Post[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {posts.map((post) => (
-        <BlogCard key={post.slug} post={post} />
+    <div className="border-t-[1.5px] border-foreground">
+      {posts.map((post, i) => (
+        <BlogCard key={post.slug} post={post} index={i} />
       ))}
     </div>
   )

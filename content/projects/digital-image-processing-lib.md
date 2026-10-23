@@ -1,14 +1,14 @@
 ---
 title: "DIP-Lib: Interactive Digital Image Processing Toolkit"
 slug: "digital-image-processing-lib"
-date: "2024-05-01"
+date: "2025-04-30"
 coverImage: "/images/projects/digital-image-processing-lib.jpg"
 tags: ["Image Processing", "Computer Vision"]
 excerpt: "A modular Streamlit-based web app for exploring core image processing techniques — complete with parameterized controls, visual comparisons, and dynamic pipelines."
-category: "Computer Vision"
-githubLink: "https://github.com/nahmad2000/Digital-Image-Processing-Library"
+category: "Lab"
+githubLink: "https://github.com/Ahmad-Nayfeh/Digital-Image-Processing-Library"
 liveDemoUrl: "https://digital-image-processing-library-nahmad.streamlit.app/"
-featured: true
+featured: false
 ---
 
 <div class="project-prose-container">

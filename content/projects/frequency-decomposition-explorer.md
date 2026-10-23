@@ -1,30 +1,13 @@
 ---
 title: "Frequency Decomposition Explorer"
 slug: "frequency-decomposition-explorer"
-date: "2024-04-10"
+date: "2025-04-29"
 coverImage: "/images/projects/frequency-decomposition-explorer.jpg"
 tags: ["Signal Processing", "Image Processing"]
 excerpt: "An interactive Streamlit app to visualize, isolate, and reconstruct 1D or 2D signals based on their frequency bands using FFT and IFFT."
-category: "Signal & Image Processing"
-githubLink: "https://github.com/nahmad2000/Frequency-Decomposition-Explorer"
+category: "Lab"
+githubLink: "https://github.com/Ahmad-Nayfeh/Frequency-Decomposition-Explorer"
 liveDemoUrl: "https://frequency-decomposition-explorer-nahmad.streamlit.app/"
-challenge: "Building a real-time collaborative task management system that works seamlessly across devices was the main challenge. The app needed to handle concurrent updates from multiple users and provide a smooth, responsive experience."
-solution: "I used Firebase for real-time database and authentication, which allowed for instant updates across all connected clients. React was used for the UI, with TypeScript providing type safety and improved developer experience."
-technologies:
-  - "React"
-  - "Firebase (Firestore, Authentication)"
-  - "TypeScript"
-  - "CSS Modules"
-  - "React DnD (for drag-and-drop functionality)"
-  - "React Query"
-features:
-  - "Task creation and management"
-  - "Project organization"
-  - "Due dates and reminders"
-  - "Drag-and-drop interface"
-  - "Real-time collaboration"
-  - "User authentication and authorization"
-  - "Mobile-responsive design"
 featured: false
 ---
 

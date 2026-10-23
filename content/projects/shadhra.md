@@ -3,11 +3,21 @@ title: "Shadhra: Arabic-First Reading Companion"
 slug: "shadhra"
 date: "2026-10-21"
 coverImage: "/images/projects/shadhra.jpg"
-tags: ["Product", "Full-Stack", "OCR", "Arabic"]
-excerpt: "A live web and Android app for saving quotes from printed books: photograph a page, extract the Arabic or English text, and resurface your library every day."
+tags: ["Full-Stack", "OCR", "LLMs", "Arabic"]
+excerpt: "A web and Android app for saving quotes from printed books: photograph a page, extract the Arabic or English text, and resurface your library every day."
 category: "Products"
 liveDemoUrl: "https://shadhra.app"
+status: "Live"
 featured: true
+gallery:
+  - "/images/projects/shadhra/library.jpg"
+  - "/images/projects/shadhra/home.jpg"
+  - "/images/projects/shadhra/capture.jpg"
+highlights:
+  - "Live on the web (shadhra.app) and on Google Play"
+  - "Photo-to-text capture for Arabic and English book pages"
+  - "FastAPI backend shared by a React web app and an Expo Android app"
+  - "OCR accuracy gate and about 300 test files in CI"
 ---
 
 # Shadhra (شَذْرَة)
@@ -24,11 +34,6 @@ Live on the web at [shadhra.app](https://shadhra.app) and on [Google Play](https
 - **Remember:** a daily quote from your archive and "on this day".
 - **Share:** quote cards and short essays built from your quotes.
 
-<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-  <img src="/images/projects/shadhra/ar-light-home.jpg" alt="Home screen" width="220" />
-  <img src="/images/projects/shadhra/ar-light-ai-chat.jpg" alt="Chat with your library" width="220" />
-  <img src="/images/projects/shadhra/ar-dark-constellation.jpg" alt="Quote map" width="220" />
-</div>
 
 ## How it is built
 

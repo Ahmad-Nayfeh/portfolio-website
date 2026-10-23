@@ -15,7 +15,10 @@ export interface Project {
   technologies: string[]
   features: string[]
   featured?: boolean
-  lang?: string // <-- تم إضافة هذا السطر
+  lang?: string
+  status?: string
+  gallery: string[]
+  highlights: string[]
 }
 
 export interface FullProject extends Project {
@@ -37,10 +40,34 @@ export interface FullPost extends Post {
   content: string
 }
 
+export interface NowItem {
+  label: string
+  detail: string
+}
+
 export interface HomeContent {
   title: string
   subtitle: string
   description: string
+  now: NowItem[]
+}
+
+export interface WorkStep {
+  title: string
+  detail: string
+}
+
+export interface WorkContent {
+  title: string
+  intro: string
+  products: string[]
+  steps: WorkStep[]
+  automation: string
+}
+
+export interface SkillGroup {
+  name: string
+  items: string[]
 }
 
 export interface AboutContent {
@@ -48,6 +75,8 @@ export interface AboutContent {
   tagline: string
   bio: string
   skills: string[]
+  skillGroups: SkillGroup[]
+  languages: string[]
   experience: ExperienceItem[]
   education: EducationItem[]
 }

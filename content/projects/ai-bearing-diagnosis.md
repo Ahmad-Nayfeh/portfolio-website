@@ -5,12 +5,11 @@ date: "2025-06-09"
 coverImage: "/images/projects/ai-bearing-diagnosis.jpg"
 tags: ["Deep Learning", "Signal Processing", "Predictive Maintenance"]
 excerpt: "An end-to-end deep learning project that uses a 1D Convolutional Neural Network (CNN) to diagnose bearing faults from vibration signals, deployed as an interactive Streamlit web app."
-category: "Predictive Maintenance"
-githubLink: "https://github.com/ahmad-nayfeh/ai-bearing-diagnosis"
+category: "Research"
+githubLink: "https://github.com/Ahmad-Nayfeh/AI-Bearing-Diagnosis"
 liveDemoUrl: "https://ai-bearing-diagnosis-nahmad.streamlit.app/"
-challenge: "A key challenge was handling the inherent class imbalance in the CWRU bearing dataset, where healthy signals are far more common than faulty ones. Another challenge was designing an inference system that could process real-world signals of any length, as the CNN model requires a fixed-size input."
-solution: "To address class imbalance, I used the Synthetic Minority Over-sampling Technique (SMOTE) to generate new data points for the underrepresented fault classes, creating a balanced training set. For handling variable-length signals in the Streamlit app, I implemented a robust preprocessing pipeline that pads short signals and uses a sliding window approach for long signals, ensuring consistent and accurate predictions."
 featured: false
+status: "Completed"
 ---
 
 <style>

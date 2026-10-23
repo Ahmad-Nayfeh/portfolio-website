@@ -1,24 +1,38 @@
 name: "Ahmad Nayfeh"
 tagline: "Electrical Design Engineer | AI Automation"
 skills:
-  - MV Secondary Switchgear Design (RMU, MRMU, LBS, Autorecloser)
+  - MV Secondary Switchgear Design
   - Electrical Schematics (SEE Electrical)
-  - BOM Engineering & SAP Master Data
-  - Utility Spec Compliance (IEC 62271, SEC)
-  - Engineering Workflow Automation
-  - LLM Tooling & AI Agents
+  - SAP BOM & Product Data
+  - Utility Specifications (IEC 62271)
+  - AI-Assisted Engineering Automation
   - Python
   - FastAPI & PostgreSQL
   - React & TypeScript
   - Kotlin & Jetpack Compose
-  - OCR & Document Processing
-  - PyTorch
-  - Computer Vision
-  - Digital Signal Processing
-  - Self-Supervised Learning
-  - Data Pipelines & ETL
-  - CI/CD (GitHub Actions)
-  - Git & GitHub
+  - PyTorch & Computer Vision
+skillGroups:
+  - name: "Engineering"
+    items:
+      - "MV secondary switchgear (RMU, metered RMU, LBS, autorecloser)"
+      - "Electrical schematics in SEE Electrical"
+      - "Bills of materials and product data in SAP"
+      - "Utility specifications and IEC 62271"
+  - name: "Software"
+    items:
+      - "Python, FastAPI, PostgreSQL, Redis"
+      - "React, TypeScript, Next.js, Tailwind"
+      - "Kotlin, Jetpack Compose, Expo"
+      - "GitHub Actions CI/CD, Docker"
+  - name: "AI"
+    items:
+      - "LLM tooling and agents"
+      - "OCR and document processing"
+      - "PyTorch, computer vision, self-supervised learning"
+      - "Signal processing"
+languages:
+  - "Arabic (native)"
+  - "English (professional)"
 experience:
   - title: "Electrical Design Engineer"
     company: "Alfanar, Secondary Switchgear Factory"

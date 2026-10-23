@@ -1,7 +1,7 @@
 # PROJECT_MAP — Portfolio Website
 
 > **Owner:** Ahmad Nayfeh
-> **Last updated:** 2026-05-09
+> **Last updated:** 2026-10-23
 
 ## [TECH_STACK]
 
@@ -11,7 +11,7 @@
 | Language | TypeScript | ^5 |
 | Styling | TailwindCSS | ^3.4.17 |
 | UI Library | shadcn/ui (Radix primitives) | — |
-| Fonts | Inter (sans), Newsreader (serif), JetBrains Mono (mono) | via next/font |
+| Fonts | IBM Plex Sans, Plex Serif (article body), Plex Mono, Plex Sans Arabic | via next/font |
 | MDX Rendering | next-mdx-remote | ^6.0.0 |
 | Remark | remark-gfm, remark-math | ^4.0.1, ^6.0.0 |
 | Rehype | rehype-katex ^7.0.1, rehype-pretty-code ^0.14.3, rehype-raw ^7.0.0 | — |
@@ -60,74 +60,55 @@ content/blog/*.mdx  →  gray-matter (frontmatter parsing)  →  next-mdx-remote
 
 ### Component Hierarchy
 ```
-RootLayout (layout.tsx)
-├── Navbar (sticky, client component, scroll-aware)
+RootLayout (layout.tsx) — ThemeProvider (light "paper" default, dark "blueprint")
+├── Navbar (client; sheet-numbered nav, CV link, ThemeToggle)
 ├── <main>
-│   ├── HomePage (page.tsx)
-│   │   ├── Hero (server)
-│   │   ├── FeaturedProjects (server)
-│   │   ├── RecentPosts (server)
-│   │   ├── Manifesto (server)
-│   │   └── CTA (server)
-│   ├── AboutPage
-│   │   └── SectionMasthead, FadeIn, etc.
-│   ├── BlogPage
-│   │   └── BlogGrid (client, useSearchParams for tag filter)
-│   ├── BlogPostPage
-│   │   ├── Article header (cover image, title, meta)
-│   │   ├── MdxRenderer (server, MDX → HTML)
-│   │   └── TableOfContents (client, IntersectionObserver)
-│   ├── ProjectsPage
-│   └── ProjectDetailPage
-└── Footer
+│   ├── HomePage (app/page.tsx)
+│   │   ├── home/Hero → home/SingleLineDiagram (animated SVG SLD; feeders link to sections)
+│   │   ├── home/NowPanel        ← content/home/intro.md `now:`
+│   │   ├── home/WorkSection     ← content/home/work.yaml
+│   │   ├── projects/ProductFeature (products tier, featured)
+│   │   ├── ProjectCard (research tier), BlogCard rows (latest posts)
+│   │   └── Contact block
+│   ├── AboutPage — story.md, TitleBlock spec, busbar timeline, skillGroups
+│   ├── BlogPage — BlogGrid (client, ?tag= filter) → BlogCard rows
+│   ├── BlogPostPage — MdxRenderer + TableOfContents (leading "# Title" stripped)
+│   ├── ProjectsPage — tiers (Products / Research & ML / Lab) from config/site.ts
+│   └── ProjectDetailPage — TitleBlock spec, gallery (phone frames), MarkdownRenderer
+└── Footer (title block)
 ```
 
-### Server vs Client Components
-- **Server:** Hero, FeaturedProjects, RecentPosts, Manifesto, CTA, Footer, MdxRenderer, SectionMasthead, BlogPage, BlogPostPage
-- **Client:** Navbar, TableOfContents, BlogGrid, FadeIn, ThemeToggle
-
-### Design Token Flow
-```
-lib/design-tokens.ts (named hex palette) ─→ Python scripts (plot_style.py, generate_cover.py)
-                                ─→ streams/ai-papers.yaml (DALL-E briefs)
-
-app/globals.css (CSS custom properties, HSL vars) ─→ tailwind.config.ts (semantic tokens)
-                                                   → Components (via @apply, utility classes)
-```
+### Project tiers
+`config/site.ts → projectTiers / tierOf(category)`. Frontmatter `category: "Products"` or
+`"Research"` places a project; anything else (incl. pipeline pages with
+`category: "AI Implementation"`) falls into **Lab**. Optional frontmatter:
+`status`, `gallery: [paths]`, `highlights: [strings]`.
 
 ## [CURRENT_DESIGN_SYSTEM]
 
-### Theme Name: "Analog Laboratory" (May 2026 redesign)
-**Vibe:** Scientific instrument, oscilloscope glow, laboratory notebook. Amber and forest green.
+### Theme Name: "Drawing Sheet" (October 2026 redesign)
+**Concept:** an electrical drawing set. Drafting paper with a fine grid, ink linework,
+title blocks, sheet numbers, and one red-pen markup colour. Signature element: the
+animated single-line diagram in the home hero.
 
-### Color Palette
-| Token | Light (HSL) | Dark (HSL) | Hex Ref |
-|-------|-------------|-------------|---------|
-| Background | parchment 45 25% 93% | forest black 120 42% 8% | #f5f0e8 (lt) / #0d1f0d (dk) |
-| Foreground | forest 120 28% 14% | warm cream 40 22% 88% | #1a2e1a (lt) |
-| Accent | amber 38 69% 50% | amber glow 36 80% 63% | #d4942a (lt) / #ffb347 (dk) |
-| Muted | sage 100 12% 48% | sage 100 10% 54% | #6b8a6b |
-| Border | cream 45 17% 82% | dark forest 120 16% 18% | #d8d5c8 (lt) |
-| Destructive | rust 2 55% 41% | rust lifted 2 55% 50% | #a1322f |
+### Tokens (app/globals.css)
+| Token | Light ("paper") | Dark ("blueprint") |
+|-------|-----------------|--------------------|
+| Background | 45 22% 95% (#F5F3EE) | 213 38% 9% (#0E1622) |
+| Foreground (ink) | 210 16% 11% | 210 25% 92% |
+| Accent (red pen) | 14 82% 46% (#D5471A) | 20 92% 60% |
+| Lamp (status) | 142 64% 36% | 142 70% 50% |
+| Phase colours | brown / black / grey (details only) | lifted variants |
+Radius 2px. Body background draws a 24px / 120px grid.
 
-### Typography
-- **UI/Body:** Inter (sans-serif, variable font)
-- **Display/Headings:** Cormorant Garamond (serif, 400-700 weight, italic) — replaces Newsreader
-- **Code:** JetBrains Mono (monospace, 400-600 weight)
-- **Scale:** display-2xl through display-md (clamped fluid sizes)
-- **Prose body:** 1.0625rem, line-height 1.75
+### Primitives
+`.sheet` (card with corner registration marks), `.sheet-hover`, `.label` (mono caps),
+`.chip`, `.btn` / `.btn-primary` / `.btn-ghost`, `.lamp`, `.redline` (underline on hover),
+`.phone` (screenshot frame), `components/drawing/TitleBlock`, `components/drawing/SectionHeader`.
 
-### Motion (unchanged)
-- No Framer Motion. CSS transitions + IntersectionObserver only.
-- Fade-up: 360ms cubic-bezier(0.22, 1, 0.36, 1), 8px translate
-- Lift: 280ms, 2px hover translate
-- Underline-grow: 280ms, scaleX 0→1
-- prefers-reduced-motion: all durations 0.01ms
-
-### Spacing (unchanged)
-- Max content width: 1400px
-- Page padding: px-6 (mobile) / px-10 (md) / px-16 (lg)
-- Container: mx-auto with 12-column grid
+### Motion
+CSS only (no Framer Motion). SLD: stroke-draw, switch blades close, then a dashed
+"current" flows along conductors. All motion is disabled under prefers-reduced-motion.
 
 ## [TASK_PROGRESS]
 
@@ -138,6 +119,7 @@ app/globals.css (CSS custom properties, HSL vars) ─→ tailwind.config.ts (sem
 - [x] Task 2: Full redesign — **Analog Laboratory** theme implemented (amber/forest palette, Cormorant Garamond display font)
 - [x] Task 3: Blog automation — uncommented `schedule: */30 * * * *` in `publish.yml`; stream cron at `17 0 * * 0` (Sunday 00:17 UTC)
 - [x] Task 4: Python plotting pipeline (merged with Task 1D above)
+- [x] Task 5 (Oct 2026): "Drawing Sheet" redesign of every page; projects curated into tiers (removed MNIST, Digital-Image-Processing, Edge-Vision; added Shadhra, Khatwa, Distill-SSL); removed the three auto-generated W19 paper-note posts; CV regenerated from `resume-src/resume.html`.
 
 ## [ORPHANS_AND_PENDING]
 

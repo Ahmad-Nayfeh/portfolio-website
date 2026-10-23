@@ -68,6 +68,10 @@ export const ProjectFrontmatter = z.object({
   features: z.array(z.string()).default([]),
   featured: z.boolean().default(false),
   lang: z.string().default("en"),
+  // Optional presentation fields (Oct 2026 redesign).
+  status: z.string().optional(), // e.g. "Live", "In use", "Archived"
+  gallery: z.array(z.string()).default([]), // screenshot paths
+  highlights: z.array(z.string()).default([]), // 2–4 short facts for cards
 })
 export type ProjectFrontmatter = z.infer<typeof ProjectFrontmatter>
 
