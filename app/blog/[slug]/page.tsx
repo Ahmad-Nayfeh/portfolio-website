@@ -90,9 +90,9 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         <div className="mx-auto mt-12 grid max-w-[1080px] grid-cols-1 gap-x-12 xl:grid-cols-[minmax(0,760px)_240px] xl:justify-center">
           <div className="article-body min-w-0">{post.content && <MdxRenderer source={stripLeadingH1(post.content)} />}</div>
-          <aside className="hidden xl:block">
+          <div className="hidden xl:block">
             <TableOfContents headings={tocHeadings} />
-          </aside>
+          </div>
         </div>
 
         <div className="mx-auto mt-16 max-w-[860px] border-t border-border pt-6">

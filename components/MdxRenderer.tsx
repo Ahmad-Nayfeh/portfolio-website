@@ -22,8 +22,8 @@ const prettyCodeOptions: PrettyCodeOptions = {
   // Pair of themes so light/dark mode both look intentional.
   // Tailwind's `prose-invert` swaps based on `.dark` ancestor.
   theme: {
-    light: "github-light",
-    dark: "github-dark",
+    light: "github-light-high-contrast",
+    dark: "github-dark-high-contrast",
   },
   keepBackground: false,
   defaultLang: "plaintext",

@@ -10,7 +10,8 @@ function shortDate(dateString: string) {
 }
 
 /** One notebook entry, laid out as a row in a drawing register. */
-export default function BlogCard({ post, index }: { post: Post; index?: number }) {
+export default function BlogCard({ post, index, headingLevel = 3 }: { post: Post; index?: number; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3"
   return (
     <Link
       href={`/blog/${post.slug}` as Route}
@@ -23,9 +24,9 @@ export default function BlogCard({ post, index }: { post: Post; index?: number }
         {shortDate(post.date)}
       </time>
       <div className="col-span-2 md:col-span-1">
-        <h3 className="text-[1.15rem] font-semibold leading-snug tracking-tight md:text-[1.25rem]">
+        <Heading className="text-[1.15rem] font-semibold leading-snug tracking-tight md:text-[1.25rem]">
           <span className="redline">{post.title}</span>
-        </h3>
+        </Heading>
         {post.excerpt && (
           <p className="mt-2 line-clamp-2 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">{post.excerpt}</p>
         )}

@@ -65,7 +65,7 @@ export default function Navbar() {
                   active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <span className={cn("font-mono text-[10px]", active ? "text-accent" : "text-muted-foreground/70")}>
+                <span className={cn("font-mono text-[10px]", active ? "text-accent" : "text-muted-foreground")}>
                   {item.sheet}
                 </span>
                 {item.name}

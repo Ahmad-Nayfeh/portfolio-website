@@ -44,7 +44,7 @@
     --muted-foreground: 210 7% 38%;
 
     /* Markup colour: the checker's red pen */
-    --accent: 14 82% 46%;              /* #D5471A */
+    --accent: 14 82% 41%;              /* #BD3F17 */
     --accent-foreground: 45 30% 98%;
 
     /* Status lamp */
@@ -61,7 +61,7 @@
     --border: 40 10% 80%;
     --border-strong: 210 12% 24%;
     --input: 40 10% 80%;
-    --ring: 14 82% 46%;
+    --ring: 14 82% 41%;
     --radius: 2px;
 
     /* Drafting grid */
@@ -614,11 +614,14 @@
 }
 
 /* Shiki dual-theme tokens (rehype-pretty-code emits --shiki-light / --shiki-dark). */
+.prose pre code {
+  color: hsl(var(--foreground));
+}
 code[data-theme] span {
-  color: var(--shiki-light);
+  color: var(--shiki-light, inherit);
 }
 .dark code[data-theme] span {
-  color: var(--shiki-dark);
+  color: var(--shiki-dark, inherit);
 }
 .prose pre[data-theme] {
   font-size: 0.86rem;

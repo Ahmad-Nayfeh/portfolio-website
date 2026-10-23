@@ -100,7 +100,7 @@ export default function BlogGrid({ posts }: BlogGridProps) {
       <div className="border-t-[1.5px] border-foreground">
         {filtered.length > 0 ? (
           filtered.map((post) => (
-            <BlogCard key={post.slug} post={post} index={posts.findIndex((p) => p.slug === post.slug)} />
+            <BlogCard key={post.slug} post={post} headingLevel={2} index={posts.findIndex((p) => p.slug === post.slug)} />
           ))
         ) : (
           <p className="py-16 text-center text-muted-foreground">No entries match that filter.</p>

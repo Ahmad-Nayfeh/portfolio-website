@@ -78,7 +78,7 @@ export default async function AboutPage() {
             <MarkdownRenderer content={about.bio} />
           </div>
         </div>
-        <aside className="lg:col-span-5">
+        <div className="lg:col-span-5">
           <TitleBlock
             cols={2}
             cells={[
@@ -98,7 +98,7 @@ export default async function AboutPage() {
               <Mail size={14} /> Email me
             </a>
           </div>
-        </aside>
+        </div>
       </section>
 
       {/* Timeline drawn as a vertical busbar with taps */}

@@ -58,14 +58,14 @@ Accurate wind power forecasting is critical for grid stability and energy planni
 - The hybrid method's reduced performance suggests feature drift between predicted features and ground truth inputs for RF
 
 
-#### Output Examples: Learning Curves 
+### Output Examples: Learning Curves 
 
 | Direct LSTM                                                             | Indirect LSTM                                                               |
 | ----------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | ![Direct LSTM Learning](/images/projects/wind-power-forecasting/lstm_direct_learning_curves.png) | ![Indirect LSTM Learning](/images/projects/wind-power-forecasting/lstm_indirect_learning_curves.png) |
 |                                                                         |                                                                             |
 
-#### Output Examples:: Actual vs Predicted (Test Set)
+### Output Examples: Actual vs Predicted (Test Set)
 
 | Direct LSTM                                                                            | Indirect RF                                                                        |
 | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |

@@ -27,7 +27,7 @@ const InfoCard = ({ icon, title, children }: { icon: React.ReactNode, title: str
         </span>
       </div>
       <div>
-        <h3 className="text-xl font-bold text-primary mb-2">{title}</h3>
+        <h2 className="text-xl font-bold text-primary mb-2">{title}</h2>
         <div className="text-muted-foreground space-y-3">{children}</div>
       </div>
     </div>
@@ -52,7 +52,7 @@ export default function TermsOfServicePage() {
           <p className="mt-4 text-lg text-muted-foreground">
             باستخدامك لخدماتنا، فإنك توافق على الالتزام بهذه الشروط.
           </p>
-          <p className="mt-2 text-sm text-gray-500">آخر تحديث: 15 يوليو 2025</p>
+          <p className="mt-2 text-sm text-muted-foreground">آخر تحديث: 15 يوليو 2025</p>
         </header>
 
         {/* Introduction Section */}

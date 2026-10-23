@@ -64,7 +64,7 @@ margin: 2rem 0;
 display: inline-flex;
 align-items: center;
 gap: 0.5rem;
-background-color: #FF0000;
+background-color: #C40000;
 color: white;
 padding: 0.75rem 1.5rem;
 border-radius: 0.5rem;
@@ -73,7 +73,7 @@ font-weight: 600;
 transition: background-color 0.3s ease, transform 0.2s ease;
 }
 .video-link-button:hover {
-background-color: #CC0000;
+background-color: #9E0000;
 transform: translateY(-2px);
 }
 .image-container-simple {
