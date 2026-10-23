@@ -1,11 +1,11 @@
 ---
 title: "Ahmad Nayfeh"
-subtitle: "AI Engineer & Data Scientist"
-description: "I architect and deploy end-to-end intelligent systems, transforming raw data into production-ready applications that solve real-world problems."
+subtitle: "Electrical Design Engineer & AI Automation"
+description: "I design medium-voltage switchgear by day and build the software that removes the repetitive work around it."
 ---
 
-# From Data to Deployed Solution
+# From Engineering Work to Working Software
 
-Welcome. I am an AI Engineer with a passion for building robust, full-stack systems that solve meaningful problems. My work combines **Computer Vision**, **Signal Processing**, and **Cloud-Native Data Engineering** to deliver solutions that are not just technically sound, but also scalable and impactful.
+I am an electrical design engineer at Alfanar's RMU factory, working on medium-voltage switchgear built to utility specifications. Much of that work is careful, repetitive checking, so I build AI-assisted tools that make it faster and less error-prone.
 
-Explore my projects to see how I leverage deep learning and rigorous engineering principles to turn raw data into actionable insights.
+Outside work I ship complete products: **Shadhra**, an Arabic-first reading app live on the web and Google Play, and **Khatwa**, an Android walking app. Explore the projects to see both sides: engineering automation and end-to-end products.

@@ -1,7 +1,9 @@
-## My Journey: From Engineering Principles to Intelligent Systems
+## My Journey: From Circuits to Shipped Software
 
-My career is a story about building things that work—and then making them intelligent. I began with a foundation in Electrical Engineering at KFUPM, where I developed a deep appreciation for the principles that govern complex systems. This background taught me to think methodically, test rigorously, and value solutions that are not just clever, but also robust and reliable.
+I studied Electrical Engineering at KFUPM, where I learned to think in systems: inputs, constraints, failure modes. My Master's work took that mindset into AI, from self-supervised learning to medical image synthesis.
 
-As I moved into my Master's studies, my focus shifted to a new, exciting frontier: applying that same engineering rigor to the world of Artificial Intelligence. I discovered a passion for the complete lifecycle of data-driven products, from the initial spark of an idea to the final deployed application.
+In January 2026 I joined Alfanar's RMU factory as an electrical design engineer. The job taught me how much engineering time goes into checking: drawings against SAP, BOMs against approvals, wire lists against schematics. I started turning those checks into repeatable, AI-assisted workflows, and colleagues began using them too.
 
-My goal is to do more than just build models; it is to engineer complete, end-to-end systems that deliver tangible value and solve meaningful problems
+In parallel I build products end to end. Shadhra, an Arabic-first app for saving and revisiting quotes from books, runs on a FastAPI backend with web and Android clients. Khatwa turns daily walking into a game. Both taught me what a portfolio project never does: real users, releases, and maintenance.
+
+My goal is simple: be the engineer who understands the domain deeply and can also build the software it is missing.

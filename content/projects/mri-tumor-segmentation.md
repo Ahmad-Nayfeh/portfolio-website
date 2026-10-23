@@ -24,7 +24,7 @@ featured: true
 
 This project tackles one of healthcare's most critical challenges: **brain tumor diagnosis**. I developed an end-to-end AI solution that can segment brain tumors from MRI scans in under 5 minutes - a process that typically takes radiologists 30 minutes to several hours.
 
-**The Impact:** My best model achieves a 96.34% Dice score, significantly outperforming typical human expert consistency (73-85%) and demonstrating the potential to revolutionize medical imaging workflows.
+**The Result:** My best model (ResNet-UNet) reaches a 0.963 Dice score on 2D slices of the BraTS-Africa dataset. This is a slice-level benchmark result, not a clinical validation.
 
 ## The Problem I Solved
 
@@ -39,7 +39,7 @@ Brain tumor segmentation is crucial for diagnosis and treatment planning, but th
 ### My Solution
 I built a comprehensive AI pipeline that delivers:
 - ⚡ **95% faster processing**: 5 minutes vs. hours
-- 🎯 **Superior accuracy**: 96.34% consistency vs. 73-85% human
+- 🎯 **High accuracy**: 0.963 Dice on held-out 2D slices
 - 🔄 **End-to-end automation**: From raw MRI to deployable web app
 - 🌐 **Production-ready**: Interactive Streamlit application
 
@@ -121,10 +121,9 @@ Created an interactive web application that allows real-time tumor segmentation:
 ![Training Results](/images/projects/mri-tumor-segmentation/loss_plot.png)
 
 ### Quantitative Results
-- **96.34% Dice Score**: ResNetUNet achieves state-of-the-art performance
+- **0.963 Dice Score**: best of the three architectures tested
 - **46% improvement**: Transfer learning vs. from-scratch training (96.34% vs 50.59%)
 - **10,692 samples processed**: Successfully scaled from 146 3D volumes
-- **Expert-level consistency**: Exceeds human radiologist agreement (73-85%) by 10-20%
 
 ### Key Technical Discoveries
 **Transfer Learning Dominance**: Pre-trained ResNet34 backbone dramatically outperformed from-scratch training, demonstrating the power of leveraging established visual features.
@@ -142,6 +141,6 @@ Created an interactive web application that allows real-time tumor segmentation:
 ### Potential Real-World Impact
 This project demonstrates how AI can transform healthcare delivery:
 - **Clinical Efficiency**: Dramatically reduces radiologist workload
-- **Diagnostic Consistency**: Eliminates human variability in critical diagnoses
-- **Accessibility**: Makes expert-level analysis available globally
+- **Diagnostic Consistency**: Could reduce variability between readers, pending clinical validation
+- **Accessibility**: Could support radiologists where specialists are scarce
 - **Treatment Planning**: Provides precise tumor boundaries for radiation therapy

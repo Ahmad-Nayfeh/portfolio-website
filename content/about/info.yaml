@@ -1,37 +1,31 @@
 name: "Ahmad Nayfeh"
-tagline: "AI Engineer | Data Scientist"
+tagline: "Electrical Design Engineer | AI Automation"
 skills:
-  - AI Engineering
-  - Data Science
-  - Deep Learning
-  - Computer Vision
-  - Image Segmentation (U-Net)
-  - Object Detection (YOLO)
-  - Digital Signal Processing
-  - Time-Series Analysis (1D CNNs)
-  - Data Engineering
-  - ETL Pipelines
-  - Cloud Architecture
-  - API Integration
+  - MV Switchgear Design (RMU / MRMU)
+  - Electrical Schematics (SEE Electrical)
+  - BOM Engineering & SAP Master Data
+  - Utility Spec Compliance (IEC 62271, SEC)
+  - Engineering Workflow Automation
+  - LLM Tooling & AI Agents
   - Python
+  - FastAPI & PostgreSQL
+  - React & TypeScript
+  - Kotlin & Jetpack Compose
+  - OCR & Document Processing
   - PyTorch
-  - TensorFlow
-  - SQL
-  - Pandas & NumPy
-  - Scikit-learn
-  - Firebase (NoSQL)
-  - Google Cloud APIs
-  - Streamlit
-  - Git & GitHub
+  - Computer Vision
+  - Digital Signal Processing
   - Self-Supervised Learning
-  - Transfer Learning
+  - Data Pipelines & ETL
+  - CI/CD (GitHub Actions)
+  - Git & GitHub
 experience:
   - title: "Electrical Design Engineer"
     company: "Alfanar, RMU Factory"
     location: "Riyadh, Saudi Arabia"
     startDate: "2026-01"
     endDate: "Present"
-    description: "Preparing electrical design packages — including schematic drawings, ferrule schedules, and label files — for medium-voltage switchgear built to customer compliance specifications. Supporting major utility clients across the Middle East."
+    description: "Own the electrical design of medium-voltage ring main units (RMU / metered RMU) built to utility specifications: from schematics and customer approval to a complete production release (drawings, wiring and ferrule lists, labels, SAP BOMs), then the design point of contact for QC, testing, and production until delivery. Migrated ~35 drawing sets from legacy AutoCAD PDFs into SEE Electrical and built an Excel-driven workflow to derive variants; built the configuration rule matrix that cut 18,432 theoretical combinations to 560 valid ones; reverse-engineered modular BOM kits from 43 SAP BOM exports (805 item codes), reproducing 93% of finalized quantities and feeding a tender pricing model; created and mass-updated SAP descriptions and PO texts for ~80 finished goods with a rule-based generator; and designed an AI-assisted 5-step release check (drawing vs. SAP BOMs vs. wire list vs. labels) that flagged 82 issues in a single 584-wire list before production."
   - title: "Teaching Assistant – Fundamentals of Electric Circuits"
     company: "KFUPM, Department of Electrical Engineering"
     location: "Dhahran, Saudi Arabia"
@@ -50,7 +44,7 @@ education:
     location: "Dhahran, Saudi Arabia"
     startDate: "2024"
     endDate: "Present"
-    description: "Research focuses on Self-Supervised Learning and Computer Vision for Medical Imaging."
+    description: "Thesis: synthesizing fluorescein angiography images from color fundus photographs with image-to-image translation models. Coursework in self-supervised learning and computer vision."
   - degree: "BSc in Electrical Engineering (Second Honor)"
     institution: "King Fahd University of Petroleum and Minerals"
     location: "Dhahran, Saudi Arabia"

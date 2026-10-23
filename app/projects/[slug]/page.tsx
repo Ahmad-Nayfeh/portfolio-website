@@ -100,13 +100,13 @@ export default async function ProjectPage({ params }: PageProps) {
                   </div>
                 </div>
               )}
-              {(project.githubLink || (project.liveDemoUrl && project.liveDemoUrl !== "#")) && (
+              {((project.githubLink && project.githubLink !== "#") || (project.liveDemoUrl && project.liveDemoUrl !== "#")) && (
                 <div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                     Links
                   </div>
                   <div className="mt-2 flex flex-col gap-2">
-                    {project.githubLink && (
+                    {project.githubLink && project.githubLink !== "#" && (
                       <a
                         href={project.githubLink}
                         target="_blank"
@@ -182,7 +182,7 @@ export default async function ProjectPage({ params }: PageProps) {
           <div className="mx-auto mt-20 border-t border-border pt-8">
             <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
               <span>End of case study</span>
-              {project.githubLink && (
+              {project.githubLink && project.githubLink !== "#" && (
                 <a
                   href={project.githubLink}
                   target="_blank"

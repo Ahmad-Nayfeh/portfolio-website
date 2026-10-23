@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ahmad Nayfeh — CV</title>
+<style>
+  @page { size: A4; margin: 10mm 12mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; font-size: 9.2pt; line-height: 1.32; color: #1d2327; margin: 0; }
+  h1 { font-size: 21pt; margin: 0; letter-spacing: -0.3px; }
+  .role { font-size: 11pt; color: #255E63; font-weight: 600; margin-top: 2px; }
+  .contact { margin-top: 5px; color: #4a5559; font-size: 8.8pt; }
+  .contact a { color: inherit; text-decoration: none; }
+  h2 { font-size: 10pt; text-transform: uppercase; letter-spacing: 1.2px; color: #255E63; border-bottom: 1.2px solid #255E63; padding-bottom: 2px; margin: 9px 0 4px; }
+  .summary { margin: 8px 0 0; }
+  .item { margin-bottom: 5px; }
+  .head { display: flex; justify-content: space-between; font-weight: 600; }
+  .sub { display: flex; justify-content: space-between; color: #4a5559; font-style: italic; font-size: 9pt; }
+  .stack { font-weight: 400; color: #4a5559; }
+  ul { margin: 2px 0 0; padding-left: 15px; }
+  li { margin: 1px 0; }
+  .skills div { margin: 2px 0; }
+  .skills b { color: #1d2327; }
+</style>
+</head>
+<body>
+  <h1>Ahmad Nayfeh</h1>
+  <div class="role">Electrical Design Engineer | AI Automation</div>
+  <div class="contact">
+    Riyadh, Saudi Arabia &nbsp;|&nbsp; +966 50 038 0453 &nbsp;|&nbsp; <a href="mailto:ahmadnayfeh2000@gmail.com">ahmadnayfeh2000@gmail.com</a> &nbsp;|&nbsp;
+    <a href="https://ahmadnayfeh.vercel.app">ahmadnayfeh.vercel.app</a> &nbsp;|&nbsp; <a href="https://linkedin.com/in/ahmad-nayfeh2000">linkedin.com/in/ahmad-nayfeh2000</a> &nbsp;|&nbsp; <a href="https://github.com/Ahmad-Nayfeh">github.com/Ahmad-Nayfeh</a>
+  </div>
+  <p class="summary">Electrical design engineer in medium-voltage switchgear who builds AI-assisted tools for the engineering work around it: verification, product data, and pricing. Also ships complete software products end to end (backend, web, Android). M.Sc. candidate in Electrical Engineering (AI focus) at KFUPM.</p>
+
+  <h2>Experience</h2>
+  <div class="item">
+    <div class="head"><span>Electrical Design Engineer, Alfanar (RMU Factory)</span><span>Jan 2026 – Present</span></div>
+    <div class="sub"><span>Medium-voltage ring main units built to utility specifications</span><span>Riyadh, KSA</span></div>
+    <ul>
+      <li><b>End-to-end design ownership:</b> take customer orders from electrical schematics through customer approval to a complete production release (drawings, wiring and ferrule lists, labels, SAP BOMs), then act as the design point of contact for QC, testing, and production until delivery.</li>
+      <li><b>SEE Electrical:</b> migrated ~35 drawing sets from legacy AutoCAD PDFs into SEE Electrical V8R5; built an Excel-driven workflow to derive multi-bay variants instead of redrawing them.</li>
+      <li><b>Product configuration:</b> built the metered-RMU configuration rule matrix that cut 18,432 theoretical combinations to 560 valid ones, each linked to its reference drawing.</li>
+      <li><b>SAP BOM engineering:</b> reverse-engineered modular BOM kits from 43 SAP BOM exports (805 item codes); the rebuilt kits reproduce 93% of finalized BOM quantities and feed a formula-based tender pricing model.</li>
+      <li><b>SAP master data:</b> created and mass-updated product descriptions and PO texts for ~80 finished goods; encoded the rules in a generator that reproduced hand-written texts exactly (9 of 9).</li>
+      <li><b>Release verification:</b> designed an AI-assisted 5-step check per finished good (drawing vs. SAP CS11/CO03 BOMs vs. wire list vs. labels); on one product it flagged 82 issues in a 584-wire list before production. Shared with colleagues as a reusable workflow.</li>
+    </ul>
+  </div>
+  <div class="item">
+    <div class="head"><span>Teaching Assistant, Fundamentals of Electric Circuits, KFUPM</span><span>Aug 2024 – May 2025</span></div>
+    <ul><li>Designed teaching materials and led weekly problem-solving sessions for 50+ students.</li></ul>
+  </div>
+  <div class="item">
+    <div class="head"><span>AI Research Intern, SDAIA–KFUPM Joint Research Center</span><span>Jun 2023 – Aug 2023</span></div>
+    <ul><li>Built a two-stage YOLOv8 + classifier pipeline for waste detection, improving F1 by 2% over baseline on a 10,000+ image dataset.</li></ul>
+  </div>
+
+  <h2>Projects</h2>
+  <div class="item">
+    <div class="head"><span>Shadhra: Arabic-first reading companion <span class="stack">· FastAPI, PostgreSQL, Redis, React, Expo, OCR, LLMs</span></span><span>2026</span></div>
+    <ul>
+      <li>Live web and Android app (shadhra.app, Google Play) that captures quotes from printed books by photo, with search, daily resurfacing, and chat over the user's own library.</li>
+      <li>OCR pipeline guarded by a CI accuracy gate (character error rate ≤ 5% on an Arabic test set); multi-provider LLM router with cost tracking and spending limits; ~300 automated test files.</li>
+    </ul>
+  </div>
+  <div class="item">
+    <div class="head"><span>Khatwa: walking app with a game layer <span class="stack">· Kotlin, Jetpack Compose, Firebase</span></span><span>2026</span></div>
+    <ul><li>Native Android app: step tracking, optional phone lock until a step goal is met, quests, ranks and streaks, and walk suggestions timed around weather and prayer times; CI with emulator tests and signed releases.</li></ul>
+  </div>
+  <div class="item">
+    <div class="head"><span>MRI brain tumor segmentation <span class="stack">· PyTorch, U-Net</span></span><span>2025</span></div>
+    <ul><li>ResNet-UNet reaching 0.963 Dice on BraTS-Africa 2D slices; compared three architectures and deployed a Streamlit app.</li></ul>
+  </div>
+
+  <h2>Education</h2>
+  <div class="item">
+    <div class="head"><span>M.Sc. Electrical Engineering (AI focus), KFUPM</span><span>2024 – Present</span></div>
+    <div class="sub"><span>Thesis: synthesizing fluorescein angiography from color fundus photographs (image-to-image translation)</span><span></span></div>
+  </div>
+  <div class="item">
+    <div class="head"><span>B.Sc. Electrical Engineering (Second Honor), KFUPM</span><span>2018 – 2024</span></div>
+  </div>
+
+  <h2>Skills</h2>
+  <div class="skills">
+    <div><b>Engineering:</b> MV switchgear (RMU / MRMU), IEC 62271, utility specifications, SEE Electrical, SAP (BOM, product master data)</div>
+    <div><b>Software:</b> Python, FastAPI, PostgreSQL, React / TypeScript, Kotlin / Jetpack Compose, GitHub Actions CI/CD</div>
+    <div><b>AI:</b> LLM tooling and agents, OCR and document processing, PyTorch, computer vision</div>
+    <div><b>Languages:</b> Arabic (native), English (professional)</div>
+  </div>
+
+  <h2>Awards</h2>
+  <div>Top 3 team, ACT28 AI for Climate Action Hackathon (Samsung &amp; UNDP), 100+ participants, Jun 2024</div>
+</body>
+</html>
