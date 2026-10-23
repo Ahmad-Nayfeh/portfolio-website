@@ -9,6 +9,8 @@ export interface Project {
   tags: string[]
   githubLink: string
   liveDemoUrl: string
+  /** Label for liveDemoUrl ("Download" for apps); defaults to "Live". */
+  linkLabel?: string
   category: string
   challenge: string
   solution: string

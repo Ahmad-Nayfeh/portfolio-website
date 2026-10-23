@@ -4,7 +4,7 @@ slug: "wind-power-forecasting"
 date: "2025-04-24"
 coverImage: "/images/projects/wind-power-forecasting.jpg"
 tags: ["Deep Learning", "Time Series", "Energy"]
-excerpt: "Hybrid deep learning and machine learning pipeline for wind power forecasting using direct LSTM and LSTM→Random Forest architectures."
+excerpt: "Forecasting a wind turbine's power output: a direct LSTM against a two-stage LSTM → Random Forest pipeline. The direct model halves the error."
 category: "Lab"
 githubLink: "https://github.com/Ahmad-Nayfeh/WindPowerForecasting-LSTM-RF"
 featured: false
@@ -14,11 +14,11 @@ featured: false
 
 ## Overview
 
-This project tackles the challenge of short-term wind power prediction using a hybrid approach that combines deep learning and ensemble methods. The pipeline implements two forecasting strategies: (1) **Direct LSTM** that predicts power output from raw inputs, and (2) **Indirect LSTM→Random Forest**, where LSTM predicts meteorological features used by a Random Forest to estimate power. The solution includes robust data preprocessing, model training, visual analytics, and performance benchmarking.
+Short-term wind power prediction for a single turbine, comparing two strategies: (1) a **direct LSTM** that predicts power output, and (2) an **indirect LSTM → Random Forest**, where the LSTM predicts the weather features and a Random Forest turns them into power. The pipeline covers preprocessing, training, evaluation and plots for both.
 
 ## Motivation
 
-Accurate wind power forecasting is critical for grid stability and energy planning. This project simulates a real-world scenario of turbine-level forecasting using publicly available data and explores whether hybrid learning models can improve accuracy, robustness, or interpretability over pure deep learning models.
+Accurate wind power forecasting is critical for grid stability and energy planning. Grid operators need to know how much power turbines will produce in the next hours. This project uses public turbine data to test whether splitting the problem in two (forecast the weather, then map weather to power) beats predicting power directly.
 
 ## Technical Approach
 
@@ -39,13 +39,12 @@ Accurate wind power forecasting is critical for grid stability and energy planni
   - Feature distributions and ACF/PACF
   - Correlation heatmaps and learning curves
 
-## Key Features / Contributions
+## Pipeline
 
-- End-to-end pipeline for sequential time series forecasting
-- Fully modular: config-driven experimentation across approaches
-- Resilient evaluation framework with inverse scaling and data windowing
-- Automated saving of models, plots, metrics for both pipelines
-- Rich set of reusable utilities for scaling, splitting, and sequence generation
+- One configurable pipeline runs both approaches end to end
+- Metrics are computed after undoing the scaling, so they are in kW
+- Models, plots and metrics are saved for each run
+- Shared utilities for scaling, splitting and building input sequences
 
 ## Results & Findings
 
@@ -54,8 +53,11 @@ Accurate wind power forecasting is critical for grid stability and energy planni
 | **Direct LSTM** | 231.81 | 375.24 | 0.9261 | 0.9805 | 374.72 | 288.02 |
 | **Indirect (LSTM → RF)** | 429.12 | 720.31 | 0.7278 | 0.9170 | 711.10 | 1017.82 |
 
-- **Direct LSTM** significantly outperforms the hybrid pipeline in all metrics, especially error-based ones (RMSE, MAPE)
-- The hybrid method's reduced performance suggests feature drift between predicted features and ground truth inputs for RF
+MAE, RMSE and SDE are in kW; MAPE is in percent.
+
+- **The direct LSTM wins on every metric.** Its RMSE is about half that of the two-stage pipeline.
+- **Errors compound in the two-stage pipeline.** The Random Forest was trained on real weather features but receives the LSTM's predicted ones, so the LSTM's errors pass straight into the power estimate.
+- **MAPE is not a fair metric here.** A turbine often produces close to zero power, and dividing by near-zero values inflates the percentage error (288% even for the better model). MAE and RMSE are the numbers to trust.
 
 
 ### Output Examples: Learning Curves 
@@ -72,9 +74,7 @@ Accurate wind power forecasting is critical for grid stability and energy planni
 | ![Direct Actual vs Predicted](/images/projects/wind-power-forecasting/lstm_direct_actual_vs_predicted_test.png) | ![RF Actual vs Predicted](/images/projects/wind-power-forecasting/rf_indirect_actual_vs_predicted_test.png) |
 
 
-> 📌 **Insight**: The Direct LSTM approach outperforms the Indirect method in all evaluation metrics on the test set, particularly in RMSE and MAPE.
+## Next
 
-## Reflection
-
-This project deepened my understanding of temporal forecasting, especially the effects of model architecture on downstream performance. It also offered hands-on practice with pipeline design, modularization, and interpretable evaluation in time-series modeling. Potential next steps include testing exogenous variables, adding weather forecast integration, or transitioning to probabilistic models.
+Next steps worth trying: real weather forecasts as inputs instead of predicted ones, a metric that handles zero output (such as normalised MAE), and probabilistic forecasts that give a range instead of a single value.
 

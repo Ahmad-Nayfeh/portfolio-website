@@ -4,62 +4,45 @@ slug: "digital-image-processing-lib"
 date: "2025-04-30"
 coverImage: "/images/projects/digital-image-processing-lib.jpg"
 tags: ["Image Processing", "Computer Vision"]
-excerpt: "A modular Streamlit-based web app for exploring core image processing techniques — complete with parameterized controls, visual comparisons, and dynamic pipelines."
+excerpt: "A Streamlit app for learning classical image processing: nine modules with live parameters, stacked into a pipeline that shows the image after every step."
 category: "Lab"
 githubLink: "https://github.com/Ahmad-Nayfeh/Digital-Image-Processing-Library"
 liveDemoUrl: "https://digital-image-processing-library-nahmad.streamlit.app/"
 featured: false
+highlights:
+  - "Nine classical image processing modules"
+  - "Stack steps into a pipeline and see each stage"
+  - "OpenCV and scikit-image behind a Streamlit UI"
 ---
 
-<div class="project-prose-container">
+# DIP-Lib
 
-## 🧠 Project Summary
-**DIP-Lib** is a hands-on, visual toolkit for digital image processing, built as an interactive web app using Streamlit. It's designed for learners and researchers to explore 9 classical image processing modules in a single, pipeline-based UI. You can adjust parameters, stack transformations, and see the results live, helping build intuition through guided, real-time feedback.
+> A place to see what an image processing operation does by moving a slider, instead of reading about it.
 
-<br/>
-<a href="https://digital-image-processing-library-nahmad.streamlit.app/" target="_blank" rel="noopener noreferrer" class="project-cta-link">
-    🚀 Launch the Interactive App
-</a>
+[Open the app](https://digital-image-processing-library-nahmad.streamlit.app/)
 
-## 📂 Core Modules
-The toolkit is divided into distinct, interactive modules:
+## How it works
 
-### 🔻 1. Downsampling & Interpolation
-Resize images with methods like `simple` or `antialias` and upscale using `nearest`, `bilinear`, or `lanczos` interpolation. The app visualizes how each combination affects quality using **PSNR** and **SSIM** metrics.
+Upload an image, pick a module, adjust its parameters, and preview the effect. Add it to the pipeline, repeat, then run the pipeline: the app shows the image after every step, reports PSNR and SSIM between the original and the result, and lets you download it. Steps can be removed and the pipeline cleared at any time.
 
-### 🔄 2. Geometric Transformations
-Apply affine and projective transformations like rotation, scaling, and shearing. All parameters are controlled via sliders and can be layered dynamically.
+## The nine modules
 
-### 🧹 3. Noise Analysis & Removal
-Add synthetic **Gaussian** or **Salt & Pepper** noise, then evaluate various denoising filters:
-- **Median Filter** (great for impulse noise)
-- **Gaussian Blur** (for smoothing)
-- **Non-Local Means** (excellent for preserving texture)
+- **Downsampling and interpolation:** shrink and enlarge with different methods (nearest, bilinear, Lanczos).
+- **Geometric transformations:** rotate, scale, translate and shear.
+- **Noise:** add Gaussian or salt-and-pepper noise, then remove it with Gaussian blur, median or non-local means filters.
+- **Enhancement:** gamma correction, histogram equalisation and CLAHE.
+- **Lighting correction:** blur subtraction in the spatial domain, or homomorphic filtering in the frequency domain.
+- **Edge detection:** Sobel, Scharr, Laplacian and Canny.
+- **Sharpening:** unsharp masking.
+- **Thresholding:** global or adaptive.
+- **Colour spaces:** convert between BGR, RGB, HSV and LAB, and view each channel.
 
-### ✨ 4. Image Enhancement
-Boost brightness and contrast using Gamma Correction, Histogram Equalization, and **CLAHE** (adaptive enhancement) to optimize visibility in dark or low-contrast images.
+## Screens
 
-### 🌗 5. Lighting Correction
-Fix non-uniform lighting with two powerful techniques: **spatial filtering** (Gaussian blur subtraction) and **homomorphic filtering** (frequency domain suppression).
+![Uploading an image and choosing a module](/images/projects/digital-image-processing-lib/demo1.png)
+![Previewing an enhancement with before-and-after colour histograms](/images/projects/digital-image-processing-lib/demo2.png)
+![A two-step pipeline with the image after each step and final PSNR and SSIM](/images/projects/digital-image-processing-lib/demo3.png)
 
-### 🔬 6. Edge Detection & Sharpening
-Compare classic edge detectors like **Sobel**, **Scharr**, **Laplacian**, and **Canny**. This module also includes an **Unsharp Masking** filter to enhance fine details.
+## Built with
 
-## 🛠️ Technologies Used
-- **UI Framework**: Streamlit
-- **Core Processing**: OpenCV, NumPy, scikit-image
-- **Visualization**: Matplotlib, Seaborn
-
-## 📸 Sample Gallery
-<div class="project-gallery">
-    <img src="/images/projects/digital-image-processing-lib/demo1.png" alt="DIP-Lib Demo 1" />
-    <img src="/images/projects/digital-image-processing-lib/demo2.png" alt="DIP-Lib Demo 2" />
-    <img src="/images/projects/digital-image-processing-lib/demo3.png" alt="DIP-Lib Demo 3" />
-</div>
-
-## 💡 Why It Matters
-- **Educational**: Helps students learn through direct, visual experimentation.
-- **Research Utility**: Useful for benchmarking filters, comparing transformations, and prepping data.
-- **Usability-First**: Completely web-based with real-time feedback and no installation required.
-
-</div>
+Python, OpenCV, NumPy and scikit-image for the processing, Streamlit for the interface.

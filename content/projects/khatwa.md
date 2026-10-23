@@ -7,7 +7,9 @@ tags: ["Android", "Kotlin", "Jetpack Compose", "Arabic"]
 excerpt: "A native Android app that counts steps, can lock the phone until you walk, and turns walking into daily quests, levels, and streaks, with walk suggestions timed around weather and prayer times."
 category: "Products"
 status: "Released"
+liveDemoUrl: "https://ahmad-nayfeh.github.io/khatwa/"
 featured: true
+linkLabel: "Download"
 gallery:
   - "/images/projects/khatwa/home.jpg"
   - "/images/projects/khatwa/system.jpg"
@@ -22,6 +24,8 @@ highlights:
 # Khatwa (خطوة)
 
 > I wanted to walk more, and willpower was not enough. Khatwa makes skipping a walk cost something.
+
+**Download:** [ahmad-nayfeh.github.io/khatwa](https://ahmad-nayfeh.github.io/khatwa/) (Android 8+, free)
 
 ## What it does
 

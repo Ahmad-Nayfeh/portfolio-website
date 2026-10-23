@@ -65,7 +65,7 @@ export default function ProductFeature({ project, index, reverse = false }: Prod
           </Link>
           {hasLink(project.liveDemoUrl) && (
             <a href={project.liveDemoUrl} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
-              Open live <ArrowUpRight size={14} />
+              {project.linkLabel ?? "Open live"} <ArrowUpRight size={14} />
             </a>
           )}
         </div>

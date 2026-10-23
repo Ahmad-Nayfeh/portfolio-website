@@ -18,13 +18,13 @@ Welcome to your comprehensive guide to understanding AI Agents. The goal of this
 
 To understand agents, we must first distinguish them from simpler concepts and then break down their fundamental components.
 
-- 🤖 **Automation (The Checklist Follower):** Follows a fixed, predefined set of rules. It is static, cannot reason, and operates within a deterministic workflow that follows fixed, unchanging rules (Ferrag et al., 2025).
+- **Automation (The Checklist Follower):** Follows a fixed, predefined set of rules. It is static, cannot reason, and operates within a deterministic workflow that follows fixed, unchanging rules (Ferrag et al., 2025).
     
     - **Example:** A script that runs every morning, checks the weather API, and sends a templated email.
-- 💬 **Single Prompt (The Question-Answerer):** A one-off transaction with an LLM. The interaction has no memory or continuity.
+- **Single Prompt (The Question-Answerer):** A one-off transaction with an LLM. The interaction has no memory or continuity.
     
     - **Example:** Asking a chatbot, "What are the pros and cons of Python?" It answers, and the interaction ends.
-- 🧠 **AI Agent (The Autonomous Problem-Solver):** An agent is a system designed to achieve a goal by autonomously interacting with an environment. It operates in a continuous loop of reasoning, acting, and learning. As one survey puts it, an agent is an artificial entity that "perceives its context, makes decisions, and then takes actions in response" (Luo et al., 2025). Unlike a single prompt, an agent-based process involves AI agents who "actively formulate a strategy, carry out tasks using available tools, and evaluate the outcomes" (Ferrag et al., 2025).
+- **AI Agent (The Autonomous Problem-Solver):** An agent is a system designed to achieve a goal by autonomously interacting with an environment. It operates in a continuous loop of reasoning, acting, and learning. As one survey puts it, an agent is an artificial entity that "perceives its context, makes decisions, and then takes actions in response" (Luo et al., 2025). Unlike a single prompt, an agent-based process involves AI agents who "actively formulate a strategy, carry out tasks using available tools, and evaluate the outcomes" (Ferrag et al., 2025).
     
 
 #### The Four Pillars of an Agent System
@@ -175,27 +175,27 @@ By combining reasoning, tool use, and memory, agents are expanding the range of 
 
 To make these concepts more concrete, here are profiles of several cutting-edge agent systems from recent research.
 
-- **🧬 CellAgent: The Automated Biologist**
+- **CellAgent: The Automated Biologist**
     
     - **Purpose:** To fully automate the complex, multi-step workflow of single-cell RNA sequencing (scRNA-seq) data analysis, which normally requires deep expertise in both biology and programming (Xiao et al., 2024).
     - **Results:** CellAgent successfully completed its analysis tasks in 92% of cases, more than doubling the completion rate of using GPT-4 directly. In a benchmark for data correction, it achieved the highest overall score compared to existing specialized tools (Xiao et al., 2024).
     - **Code:** [http://cell.agent4science.cn/](http://cell.agent4science.cn/)
-- **📄 AutoP2C: The Paper-to-Code Engine**
+- **AutoP2C: The Paper-to-Code Engine**
     
     - **Purpose:** To automate the "Paper-to-Code" (P2C) process by transforming the multimodal content of scientific papers (text, tables, diagrams) into fully executable, multi-file code repositories (Lin et al., 2025).
     - **Results:** AutoP2C successfully generated executable code for all eight papers in a benchmark study, while powerful baseline models could only produce runnable code for one. It also achieved a higher average code replication score than existing tools on the PaperBench benchmark (Lin et al., 2025).
     - **Code:** [https://github.com/shoushouyu/Automated-Paper-to-Code](https://github.com/shoushouyu/Automated-Paper-to-Code)
-- **♟️ STRIDE: The Strategic Negotiator**
+- **STRIDE: The Strategic Negotiator**
     
     - **Purpose:** To enhance the strategic reasoning of LLMs in interactive, economically important tasks like bargaining and mechanism design, where standard models fail due to poor mathematical and long-term planning skills (Li et al., 2024).
     - **Results:** In experiments on Markov Decision Processes, STRIDE achieved a 98% success rate in finding the optimal action, compared to just 58% for a Chain-of-Thought (CoT) baseline, demonstrating its superior strategic capability (Li et al., 2024).
     - **Code:** [https://github.com/cyrilli/STRIDE](https://github.com/cyrilli/STRIDE)
-- **🏗️ SoA (Self-Organized Agents): The Scalable Code Architect**
+- **SoA (Self-Organized Agents): The Scalable Code Architect**
     
     - **Purpose:** To overcome the context length limitations of single LLM agents, enabling the generation and management of ultra-large-scale codebases through a hierarchical multi-agent system (Ishibashi & Nishimura, 2024).
     - **Results:** SoA outperformed a powerful single-agent baseline (Reflexion) by 5 percentage points on the HumanEval Pass@1 benchmark. Critically, it achieved this while ensuring each individual agent handled significantly less code, proving its scalability (Ishibashi & Nishimura, 2024).
     - **Code:** [https://github.com/tsukushiAI/self-organized-agent](https://github.com/tsukushiAI/self-organized-agent)
-- **🎓 GenMentor: The Personalized AI Tutor**
+- **GenMentor: The Personalized AI Tutor**
     
     - **Purpose:** To deliver a "goal-oriented" learning experience in an Intelligent Tutoring System, where a team of agents proactively guides a professional learner toward a specific career objective (Wang et al., 2025).
     - **Results:** GenMentor was validated in a study with 20 professionals, who gave it an overall satisfaction score of 4.3 out of 5. It also significantly outperformed baselines in automated evaluations of its ability to map goals to skills and generate personalized learning paths (Wang et al., 2025).

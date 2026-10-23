@@ -1,160 +1,54 @@
 ---
-title: "AI-Powered Bearing Fault Diagnosis"
+title: "Bearing Fault Diagnosis with a 1D CNN"
 slug: "ai-bearing-diagnosis"
 date: "2025-06-09"
 coverImage: "/images/projects/ai-bearing-diagnosis.jpg"
 tags: ["Deep Learning", "Signal Processing", "Predictive Maintenance"]
-excerpt: "An end-to-end deep learning project that uses a 1D Convolutional Neural Network (CNN) to diagnose bearing faults from vibration signals, deployed as an interactive Streamlit web app."
+excerpt: "A 1D CNN that classifies bearing faults from raw vibration signals (CWRU dataset), tested on an unseen motor load and under added noise, with a Streamlit app for uploading a signal."
 category: "Research"
 githubLink: "https://github.com/Ahmad-Nayfeh/AI-Bearing-Diagnosis"
 liveDemoUrl: "https://ai-bearing-diagnosis-nahmad.streamlit.app/"
 featured: false
+highlights:
+  - "1D CNN on raw vibration windows, PyTorch"
+  - "Tested on an unseen motor load (2 HP)"
+  - "Noise test: holds at 25% noise, fails past 50%"
 status: "Completed"
 ---
 
-<style>
-.project-container-simple {
-font-family: 'Inter', sans-serif;
-line-height: 1.75;
-}
-.project-header-simple {
-text-align: center;
-padding: 2rem 0;
-border-bottom: 1px solid hsl(var(--border));
-margin-bottom: 2.5rem;
-}
-.project-header-simple h1 {
-font-size: 2.5rem;
-font-weight: 800;
-letter-spacing: -0.025em;
-margin-bottom: 0.5rem;
-}
-.project-header-simple p {
-font-size: 1.125rem;
-color: hsl(var(--muted-foreground));
-max-width: 700px;
-margin: 0 auto;
-}
-.project-section-simple {
-margin-bottom: 3rem;
-}
-.project-section-simple h2 {
-font-size: 1.75rem;
-font-weight: 700;
-color: hsl(var(--primary));
-margin-bottom: 1rem;
-padding-bottom: 0.5rem;
-border-bottom: 2px solid hsl(var(--primary) / 0.1);
-}
-.project-section-simple p, .project-section-simple ul {
-color: hsl(var(--foreground) / 0.9);
-}
-.project-section-simple ul {
-list-style-position: outside;
-padding-left: 1.5rem;
-}
-.project-section-simple li {
-margin-bottom: 0.5rem;
-}
-.video-link-container {
-text-align: center;
-margin: 2rem 0;
-}
-.video-link-button {
-display: inline-flex;
-align-items: center;
-gap: 0.5rem;
-background-color: #C40000;
-color: white;
-padding: 0.75rem 1.5rem;
-border-radius: 0.5rem;
-text-decoration: none;
-font-weight: 600;
-transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.video-link-button:hover {
-background-color: #9E0000;
-transform: translateY(-2px);
-}
-.image-container-simple {
-margin: 2rem 0;
-text-align: center;
-background: hsl(var(--muted) / 0.4);
-padding: 1rem;
-border-radius: 0.75rem;
-border: 1px solid hsl(var(--border));
-}
-.image-container-simple img {
-border-radius: 0.5rem;
-box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-max-width: 100%;
-}
-.image-container-simple figcaption {
-margin-top: 0.75rem;
-font-size: 0.9rem;
-color: hsl(var(--muted-foreground));
-font-style: italic;
-}
-</style>
+# Bearing Fault Diagnosis
 
-<div class="project-container-simple">
-<div class="project-header-simple">
-<h1>AI-Powered Bearing Fault Diagnosis</h1>
-<p>An end-to-end deep learning project that uses a 1D Convolutional Neural Network (CNN) to diagnose bearing faults from vibration signals, deployed as an interactive Streamlit web app.</p>
-</div>
+> Can a small 1D CNN tell a healthy bearing from three kinds of fault using only the raw vibration signal, and how far can it be trusted?
 
-<div class="video-link-container">
-    <a href="https://youtu.be/F31jicRn_A8" target="_blank" rel="noopener noreferrer" class="video-link-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
-        <span>Watch the Video Demo</span>
-    </a>
-</div>
+[Watch the video demo](https://youtu.be/F31jicRn_A8) · [Open the app](https://ai-bearing-diagnosis-nahmad.streamlit.app/)
 
-<div class="project-section-simple">
-    <h2>Overview</h2>
-    <p>This project provides an end-to-end solution for automated bearing fault diagnosis using deep learning. It leverages a 1D Convolutional Neural Network (CNN) to analyze raw vibration signals from machinery and accurately classify the health of the bearing. The entire workflow, from data exploration and preprocessing to model training and deployment, is encapsulated in a series of Jupyter notebooks and a final, user-friendly Streamlit web application.</p>
-</div>
+## Setup
 
-<div class="project-section-simple">
-    <h2>The Challenge</h2>
-    <p>In predictive maintenance, a primary goal is to detect failures before they happen. However, real-world sensor data presents significant challenges. The collected data is often imbalanced, with a surplus of 'normal' operation signals and a scarcity of 'fault' signals. Furthermore, a model trained on fixed-length segments needs a way to handle continuous, variable-length data streams during live inference. This project tackles both of these core issues head-on.</p>
-</div>
+- **Data:** the public Case Western Reserve University (CWRU) bearing dataset, four classes: normal, inner-race fault (IRF), outer-race fault (ORF) and ball fault (BF).
+- **Windows:** each recording is cut into 2,048-sample windows with 50% overlap.
+- **Split by motor load, not at random:** training and validation use the 0 HP and 1 HP recordings; the test set is the 2 HP recordings (824 windows), which the model never sees. A random split would put overlapping windows of the same recording on both sides and inflate the score.
+- **Imbalance:** normal windows outnumber each fault class about four to one. Two models were trained for 25 epochs each: one on the original data, one on data balanced with SMOTE.
+- **Model:** three Conv1d + BatchNorm + pooling blocks and a small classifier, in PyTorch.
 
-<div class="project-section-simple">
-    <h2>Technical Approach</h2>
-    <p>The solution is broken down into a clear, multi-step process:</p>
-    <ul>
-        <li><strong>Data Analysis (EDA)</strong>: The project begins with a thorough exploratory data analysis of the public Case Western Reserve University (CWRU) bearing dataset to understand its characteristics.</li>
-        <li><strong>Preprocessing & Augmentation</strong>: Raw signals are segmented into windows suitable for the CNN. To combat data imbalance, the training set is balanced using the SMOTE algorithm from the `imbalanced-learn` library.</li>
-        <li><strong>1D CNN Model Development</strong>: A custom 1D CNN architecture is built using PyTorch, specifically designed to learn discriminative features from time-series vibration data. The model is trained and evaluated on both the original and the SMOTE-balanced datasets to demonstrate the performance improvement.</li>
-        <li><strong>Interactive Deployment</strong>: The trained model and a `scikit-learn` scaler are deployed in a Streamlit application. This app features an intelligent prediction function that can process uploaded signal files of any length by applying padding or a sliding-window technique before feeding them to the model.</li>
-    </ul>
-</div>
+## Results
 
-<div class="project-section-simple">
-    <h2>Key Features</h2>
-    <ul>
-        <li><strong>Real-Time Diagnosis</strong>: Users can upload a CSV file containing a vibration signal and receive an instant diagnosis of the bearing's condition.</li>
-        <li><strong>Robust Signal Handling</strong>: The inference logic is designed to be flexible, correctly analyzing signals that are shorter or longer than the model's expected input size.</li>
-        <li><strong>High-Performance Model</strong>: The 1D CNN architecture is effective at capturing the complex patterns in vibration data, leading to accurate fault classification.</li>
-        <li><strong>Demonstrated Impact of SMOTE</strong>: The project clearly shows that training on a balanced dataset significantly improves the model's ability to correctly identify less common fault types.</li>
-    </ul>
-</div>
+| Test (2 HP, 824 windows) | Accuracy |
+|---|---|
+| Original data | 100% |
+| SMOTE-balanced data | 100% |
+| + noise at 25% of signal std | 100% |
+| + noise at 50% | 87.0% |
+| + noise at 75% | 28.8% |
+| + noise at 100% | 23.7% |
 
-<div class="project-section-simple">
-    <h2>Results</h2>
-    <p>The trained 1D CNN model demonstrates high accuracy in classifying the four different bearing states. The experiments documented in the notebooks show that the model trained on the SMOTE-balanced dataset outperforms the one trained on the original, imbalanced data, particularly in its recall for the minority fault classes.</p>
-    <div class="image-container-simple">
-        <figure>
-            <img src="/images/projects/ai-bearing-diagnosis/demo.png" alt="Streamlit UI Demo" />
-            <figcaption>The interactive Streamlit UI for real-time fault diagnosis.</figcaption>
-        </figure>
-    </div>
-</div>
+## What the numbers actually say
 
-<div class="project-section-simple">
-    <h2>Reflection</h2>
-    <p>This project was a fantastic exercise in building a complete, real-world machine learning application. It highlighted the critical importance of preprocessing and data balancing—proving that the model is only as good as the data it's trained on. Implementing the 1D CNN in PyTorch was a great learning experience, and using Streamlit to deploy the final model made it incredibly easy to create an interactive and shareable demo. Future work could involve testing the model on different datasets, experimenting with more advanced deep learning architectures like LSTMs or Transformers, and optimizing the model for deployment on edge devices for true real-time monitoring.</p>
-</div>
+- **CWRU is easy for a CNN.** Both models were perfect on the unseen load, so this test cannot show whether SMOTE helps. A harder dataset, or a test on different bearings, would.
+- **Noise is where it breaks.** At 50% noise, ball faults are mostly mistaken for inner-race faults (BF recall 9%). At 75%, almost everything is called an inner-race fault. A real sensor in a noisy plant would need noise augmentation in training, or denoising before the model.
+- **The app handles real-length signals.** Inputs shorter than a window are extended by reflection padding; longer ones are cut into overlapping windows, and the class probabilities are averaged across them.
 
-</div>
+![The Streamlit app](/images/projects/ai-bearing-diagnosis/demo.png)
+
+## Built with
+
+Python, PyTorch, scikit-learn and imbalanced-learn (scaling, SMOTE), pandas and NumPy, and Streamlit for the app. The four notebooks go from data exploration to the trained model and the app.

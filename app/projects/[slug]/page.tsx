@@ -90,7 +90,7 @@ export default async function ProjectPage({ params }: PageProps) {
         <span className="flex flex-wrap gap-x-5 gap-y-1">
           {hasLink(project.liveDemoUrl) && (
             <a href={project.liveDemoUrl} target="_blank" rel="noopener noreferrer" className="redline inline-flex items-center gap-1.5 font-medium">
-              Live <ArrowUpRight size={13} />
+              {project.linkLabel ?? "Live"} <ArrowUpRight size={13} />
             </a>
           )}
           {hasLink(project.githubLink) && (

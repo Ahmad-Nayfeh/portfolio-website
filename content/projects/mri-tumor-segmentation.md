@@ -1,147 +1,59 @@
 ---
-title: "AI-Powered MRI Brain Tumor Segmentation"
+title: "MRI Brain Tumor Segmentation"
 slug: "mri-tumor-segmentation"
 date: "2025-06-14"
 coverImage: "/images/projects/mri-tumor-segmentation.jpg"
 tags: ["Deep Learning", "Medical Imaging", "Computer Vision"]
-excerpt: "An end-to-end deep learning solution for the automated segmentation of brain tumors from multi-modal MRI scans."
+excerpt: "Three U-Net variants compared for brain tumor segmentation on 2D slices of BraTS-Africa MRI (four modalities), with a Streamlit app to compare predictions with the ground truth."
 category: "Research"
 githubLink: "https://github.com/Ahmad-Nayfeh/MRI-Tumor-Segmentation"
 liveDemoUrl: "https://mri-tumor-segmentation-nahmad.streamlit.app/"
 featured: true
 status: "Completed"
+highlights:
+  - "U-Net with a pretrained ResNet34 encoder: 0.963 Dice"
+  - "Same U-Net from scratch: 0.506 Dice"
+  - "Slice-level split: an optimistic estimate"
 ---
 
-# 🧠 AI-Powered MRI Brain Tumor Segmentation
+# MRI Brain Tumor Segmentation
 
-> A comprehensive deep learning project that transforms medical imaging workflow - from research to production deployment.
+> How much does a pretrained encoder matter when segmenting brain tumors from a small MRI dataset?
 
-[![Live Demo](https://img.shields.io/badge/🚀-Live%20Demo-blue?style=for-the-badge)](https://mri-tumor-segmentation-nahmad.streamlit.app/)
-[![GitHub](https://img.shields.io/badge/📁-Source%20Code-black?style=for-the-badge)](https://github.com/ahmad-nayfeh/MRI-Tumor-Segmentation)
+[Open the app](https://mri-tumor-segmentation-nahmad.streamlit.app/)
 
-![Dataset Overview](/images/projects/mri-tumor-segmentation/dataset.gif)
+![The four MRI modalities and the tumor mask, slice by slice](/images/projects/mri-tumor-segmentation/dataset.gif)
 
-## Project Overview
+## Setup
 
-This project tackles one of healthcare's most critical challenges: **brain tumor diagnosis**. I developed an end-to-end AI solution that can segment brain tumors from MRI scans in under 5 minutes - a process that typically takes radiologists 30 minutes to several hours.
+- **Data:** BraTS-Africa, 146 patients (one was skipped for a corrupt file). Each scan has four MRI modalities (T1, T1 with contrast, T2, FLAIR) and an expert tumor mask.
+- **From 3D to 2D:** the four modalities are stacked as four input channels, each normalised to [0, 1]. Only slices that contain tumor are kept, which gives **10,692** 2D slices.
+- **Split:** 70% train, 15% validation, 15% test (1,604 test slices).
+- **Loss:** binary cross-entropy plus Dice loss, so that small tumors are not drowned out by background pixels.
+- **Models:**
+  - **ResNetUNet:** a U-Net with a ResNet34 encoder pretrained on ImageNet.
+  - **BaselineUNet:** a standard U-Net trained from scratch.
+  - **TransUNet (simplified):** a CNN-only stand-in for TransUNet, without the transformer blocks yet.
 
-**The Result:** My best model (ResNet-UNet) reaches a 0.963 Dice score on 2D slices of the BraTS-Africa dataset. This is a slice-level benchmark result, not a clinical validation.
+## Results
 
-## The Problem I Solved
+| Model | Test Dice |
+|---|---|
+| ResNetUNet (pretrained encoder) | **0.963** |
+| BaselineUNet (from scratch) | 0.506 |
+| TransUNet (simplified) | 0.069 |
 
-### Healthcare Challenge
-Brain tumor segmentation is crucial for diagnosis and treatment planning, but the current manual process has serious limitations:
+![Training loss per model](/images/projects/mri-tumor-segmentation/loss_plot.png)
 
-- **Time-Intensive**: Radiologists spend 30 minutes to several hours per scan
-- **Inconsistent Results**: Human experts achieve only 73-85% consistency (Dice scores)
-- **Clinical Bottleneck**: Delays in diagnosis and treatment planning
-- **High Stakes**: Glioblastoma has only a 6.9% five-year survival rate - accuracy and speed matter
+## What the numbers actually say
 
-### My Solution
-I built a comprehensive AI pipeline that delivers:
-- ⚡ **95% faster processing**: 5 minutes vs. hours
-- 🎯 **High accuracy**: 0.963 Dice on held-out 2D slices
-- 🔄 **End-to-end automation**: From raw MRI to deployable web app
-- 🌐 **Production-ready**: Interactive Streamlit application
+- **The pretrained encoder is the difference.** With the same decoder and data, starting from ImageNet weights took Dice from 0.51 to 0.96.
+- **The simplified TransUNet failed,** even though its training loss converged. Without the transformer blocks and with weaker skip connections, it did not learn the spatial detail the task needs. It is a starting point, not a result.
+- **The test score is optimistic.** The split was made per slice, not per patient, so neighbouring slices of the same patient appear in both training and test sets, and they look almost identical. The test also contains only slices with tumor, so false alarms on healthy slices are not measured. A per-patient split, with healthy slices included, is the honest next step and would likely give a lower score.
+- **This is a learning project, not a clinical tool.** Nothing here has been validated for medical use.
 
-## Technical Approach & Architecture
+![Comparing a prediction with the ground truth in the app](/images/projects/mri-tumor-segmentation/demo.png)
 
-Deep Learning Models
-I implemented and rigorously benchmarked three distinct architectures, each representing different approaches to medical image segmentation:
-ResNetUNet - Enhanced U-Net with pre-trained ResNet34 backbone
+## Built with
 
-Dice Score: 96.34%
-Key Insight: Transfer learning dominates
-
-BaselineUNet - Standard U-Net built from scratch
-
-Dice Score: 50.59%
-Key Insight: Good foundation, limited generalization
-
-TransUNet - Simplified CNN-Transformer hybrid foundation
-
-Dice Score: 6.86%*
-Key Insight: Architectural complexity challenges
-
-*My TransUNet implementation was deliberately simplified as a stepping stone toward full Vision Transformer integration - the low performance revealed critical insights about skip connections and architectural requirements.
-
-### Advanced Data Engineering Pipeline
-**Dataset**: BraTS-Africa (146 patients, 4 MRI modalities each)
-- **Multi-modal Integration**: Stacked T1, T1c, T2, and FLAIR sequences into 4-channel volumes
-- **Smart Preprocessing**: Automated cropping of empty "air" slices, reducing dataset by ~30%
-- **Normalization Strategy**: Min-max scaling across modalities for training stability
-- **3D-to-2D Conversion**: Generated 10,692 training slices from 146 3D volumes
-- **Data Integrity**: Rigorous 70/15/15 train/validation/test split maintaining patient-level separation
-
-## Key Technical Achievements
-
-### 🏗️ **End-to-End Pipeline Development**
-Built complete workflow from raw medical data to production deployment:
-- Data preprocessing and augmentation
-- Model training with multiple architectures
-- Performance benchmarking and validation
-- Web application development and deployment
-
-### 🧠 **Advanced Medical AI Implementation**
-- **Multi-Modal Fusion**: Expertly handled 4 MRI sequences (T1, T1c, T2, FLAIR) with strategic channel stacking
-- **Loss Function Engineering**: Designed hybrid BCE + Dice Loss to handle severe class imbalance and optimize for clinical metrics
-- **Transfer Learning Mastery**: Leveraged pre-trained ResNet34 backbone, achieving 46% performance improvement over from-scratch training
-- **Architecture Analysis**: Conducted thorough failure analysis revealing critical insights about skip connections and model convergence
-
-### 🚀 **Production Deployment**
-Created an interactive web application that allows real-time tumor segmentation:
-- User-friendly interface for medical professionals
-- Real-time model inference
-- Visual comparison of different architectures
-
-![Demo Screenshot](/images/projects/mri-tumor-segmentation/demo.png)
-
-**[Try the Live Demo →](https://mri-tumor-segmentation-nahmad.streamlit.app/)**
-
-## Development Process & Skills Demonstrated
-
-### Research & Analysis
-- Conducted comprehensive benchmarking of 3 distinct architectures (U-Net variants + Transformer hybrid)
-- Performed rigorous quantitative and qualitative analysis of model failures
-- Identified key insights: transfer learning superiority, skip connection necessity, generalization challenges
-- Analyzed 10,692 2D slices across 146 patients with multi-modal MRI data
-
-### Technical Implementation
-- **Deep Learning**: PyTorch, U-Net, ResNet34 transfer learning, custom loss functions
-- **Medical Data Processing**: NIfTI format handling, 3D-to-2D conversion, multi-modal fusion
-- **Performance Engineering**: BCE+Dice hybrid loss, class imbalance handling, training optimization
-- **Model Analysis**: Comprehensive failure analysis, architectural insights, convergence studies
-
-### Project Management
-- Structured development using Jupyter notebooks for reproducibility
-- Clear documentation and code organization
-- Version control and collaborative development practices
-
-## Results & Impact
-
-![Training Results](/images/projects/mri-tumor-segmentation/loss_plot.png)
-
-### Quantitative Results
-- **0.963 Dice Score**: best of the three architectures tested
-- **46% improvement**: Transfer learning vs. from-scratch training (96.34% vs 50.59%)
-- **10,692 samples processed**: Successfully scaled from 146 3D volumes
-
-### Key Technical Discoveries
-**Transfer Learning Dominance**: Pre-trained ResNet34 backbone dramatically outperformed from-scratch training, demonstrating the power of leveraging established visual features.
-
-**Architectural Insights**: My TransUNet failure analysis revealed critical requirements for medical segmentation - specifically the necessity of skip connections for preserving spatial detail during decoder reconstruction.
-
-**Loss Function Engineering**: The hybrid BCE+Dice loss successfully balanced pixel-level accuracy with structural similarity, directly optimizing for the clinical evaluation metric.
-
-### Technical Learning Outcomes
-- Mastered medical AI domain-specific challenges
-- Gained expertise in U-Net and advanced CNN architectures
-- Developed skills in 3D medical data processing
-- Created production-ready ML applications
-
-### Potential Real-World Impact
-This project demonstrates how AI can transform healthcare delivery:
-- **Clinical Efficiency**: Dramatically reduces radiologist workload
-- **Diagnostic Consistency**: Could reduce variability between readers, pending clinical validation
-- **Accessibility**: Could support radiologists where specialists are scarce
-- **Treatment Planning**: Provides precise tumor boundaries for radiation therapy
+Python, PyTorch and torchvision (pretrained ResNet34), NiBabel for the NIfTI scans, NumPy, and Streamlit for the app. Four notebooks cover exploration, preprocessing, training and benchmarking, and inference.

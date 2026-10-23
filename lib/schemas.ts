@@ -62,6 +62,7 @@ export const ProjectFrontmatter = z.object({
   category: z.string().default("Uncategorized"),
   githubLink: z.string().optional(),
   liveDemoUrl: z.string().optional(),
+  linkLabel: z.string().optional(), // label for liveDemoUrl, e.g. "Download" for apps
   challenge: z.string().default(""),
   solution: z.string().default(""),
   technologies: z.array(z.string()).default([]),
