@@ -1,7 +1,7 @@
 name: "Ahmad Nayfeh"
 tagline: "Electrical Design Engineer | AI Automation"
 skills:
-  - MV Switchgear Design (RMU / MRMU)
+  - MV Secondary Switchgear Design (RMU, MRMU, LBS, Autorecloser)
   - Electrical Schematics (SEE Electrical)
   - BOM Engineering & SAP Master Data
   - Utility Spec Compliance (IEC 62271, SEC)
@@ -21,11 +21,11 @@ skills:
   - Git & GitHub
 experience:
   - title: "Electrical Design Engineer"
-    company: "Alfanar, RMU Factory"
+    company: "Alfanar, Secondary Switchgear Factory"
     location: "Riyadh, Saudi Arabia"
     startDate: "2026-01"
     endDate: "Present"
-    description: "Own the electrical design of medium-voltage ring main units (RMU / metered RMU) built to utility specifications: from schematics and customer approval to a complete production release (drawings, wiring and ferrule lists, labels, SAP BOMs), then the design point of contact for QC, testing, and production until delivery. Migrated ~35 drawing sets from legacy AutoCAD PDFs into SEE Electrical and built an Excel-driven workflow to derive variants; built the configuration rule matrix that cut 18,432 theoretical combinations to 560 valid ones; reverse-engineered modular BOM kits from 43 SAP BOM exports (805 item codes), reproducing 93% of finalized quantities and feeding a tender pricing model; created and mass-updated SAP descriptions and PO texts for ~80 finished goods with a rule-based generator; and designed an AI-assisted 5-step release check (drawing vs. SAP BOMs vs. wire list vs. labels) that flagged 82 issues in a single 584-wire list before production."
+    description: "Own the electrical design of medium-voltage secondary switchgear (RMU, metered RMU, load-break switches, autoreclosers) built to utility specifications: from schematics and customer approval to a complete production release (drawings, wiring and ferrule lists, labels, SAP BOMs), then the design point of contact for QC, testing, and production until delivery. Migrated ~35 drawing sets from legacy AutoCAD PDFs into SEE Electrical and built an Excel-driven workflow to derive variants; built the configuration rule matrix that cut 18,432 theoretical combinations to 560 valid ones; reverse-engineered modular BOM kits from 43 SAP BOM exports (805 item codes), reproducing 93% of finalized quantities and feeding a tender pricing model; created and mass-updated SAP descriptions and PO texts for ~80 finished goods with a rule-based generator; and designed an AI-assisted 5-step release check (drawing vs. SAP BOMs vs. wire list vs. labels) that flagged 82 issues in a single 584-wire list before production."
   - title: "Teaching Assistant – Fundamentals of Electric Circuits"
     company: "KFUPM, Department of Electrical Engineering"
     location: "Dhahran, Saudi Arabia"
