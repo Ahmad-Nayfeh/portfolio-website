@@ -14,6 +14,7 @@ highlights:
   - "U-Net with a pretrained ResNet34 encoder: 0.963 Dice"
   - "Same U-Net from scratch: 0.506 Dice"
   - "Slice-level split: an optimistic estimate"
+result: "Pretrained-encoder U-Net: 0.963 test Dice (slice-level split)"
 ---
 
 # MRI Brain Tumor Segmentation

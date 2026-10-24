@@ -18,7 +18,7 @@ export default function BlogCard({ post, index, headingLevel = 3 }: { post: Post
       className="group grid grid-cols-[3.25rem_1fr] gap-x-4 gap-y-1 border-b border-border py-6 transition-colors hover:bg-card/70 md:grid-cols-[5.5rem_8rem_1fr_auto] md:items-baseline md:gap-x-6 md:px-3"
     >
       <span className="font-mono text-[11px] font-semibold text-accent md:pt-1">
-        N-{String((index ?? 0) + 1).padStart(2, "0")}
+        {String((index ?? 0) + 1).padStart(2, "0")}
       </span>
       <time dateTime={post.date} className="label col-start-2 row-start-1 self-center md:col-start-auto md:row-start-auto md:self-baseline md:pt-1">
         {shortDate(post.date)}

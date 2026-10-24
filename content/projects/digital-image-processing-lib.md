@@ -13,6 +13,7 @@ highlights:
   - "Nine classical image processing modules"
   - "Stack steps into a pipeline and see each stage"
   - "OpenCV and scikit-image behind a Streamlit UI"
+result: "Live app with nine image processing modules"
 ---
 
 # DIP-Lib

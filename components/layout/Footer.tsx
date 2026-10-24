@@ -13,7 +13,7 @@ export default function Footer() {
         {/* Title block */}
         <div className="grid grid-cols-2 border-[1.5px] border-foreground md:grid-cols-12 [&>div]:border-b [&>div]:border-r [&>div]:border-border">
           <div className="col-span-2 px-4 py-4 md:col-span-5 md:row-span-2">
-            <div className="label text-[9.5px]">Drawn by</div>
+            <div className="label text-[9.5px]">Portfolio of</div>
             <div className="mt-1.5 text-2xl font-semibold tracking-tight">{siteConfig.name}</div>
             <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
               Electrical design engineer in medium-voltage switchgear. I build AI-assisted tools and ship software products.
@@ -45,15 +45,14 @@ export default function Footer() {
             </div>
           </div>
           <div className="px-4 py-3 md:col-span-3">
-            <div className="label text-[9.5px]">Rev</div>
+            <div className="label text-[9.5px]">Updated</div>
             <div className="mt-1 font-mono text-[13px]">{REV}</div>
           </div>
           <div className="col-span-2 px-4 py-3 md:col-span-12">
-            <div className="label text-[9.5px]">Sheets</div>
+            <div className="label text-[9.5px]">Pages</div>
             <nav aria-label="Footer" className="mt-1.5 flex flex-wrap gap-x-6 gap-y-1 text-[14px]">
               {siteConfig.nav.map((item) => (
                 <Link key={item.path} href={item.path as Route} className="redline">
-                  <span className="mr-1.5 font-mono text-[10.5px] text-muted-foreground">{item.sheet}</span>
                   {item.name}
                 </Link>
               ))}

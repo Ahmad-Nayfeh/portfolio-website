@@ -19,6 +19,8 @@ highlights:
   - "Optional phone lock until the daily step goal is met"
   - "Daily walk challenge using OpenStreetMap, weather, and prayer times"
   - "Signed releases from CI with unit and emulator tests"
+role: "Designed, built, and released it on my own"
+result: "Released for Android, with signed builds from CI"
 ---
 
 # Khatwa (خطوة)

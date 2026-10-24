@@ -14,6 +14,7 @@ highlights:
   - "Tested on an unseen motor load (2 HP)"
   - "Noise test: holds at 25% noise, fails past 50%"
 status: "Completed"
+result: "100% on an unseen motor load; 87% with 50% added noise"
 ---
 
 # Bearing Fault Diagnosis

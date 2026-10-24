@@ -73,6 +73,8 @@ export const ProjectFrontmatter = z.object({
   status: z.string().optional(), // e.g. "Live", "In use", "Archived"
   gallery: z.array(z.string()).default([]), // screenshot paths
   highlights: z.array(z.string()).default([]), // 2–4 short facts for cards
+  role: z.string().optional(), // my part, for the summary box
+  result: z.string().optional(), // the outcome in one line, for the summary box
 })
 export type ProjectFrontmatter = z.infer<typeof ProjectFrontmatter>
 

@@ -2,7 +2,8 @@ import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
 interface SectionHeaderProps {
-  number: string
+  /** Kept for older callers; no longer shown. */
+  number?: string
   kicker: string
   title: ReactNode
   description?: ReactNode
@@ -12,16 +13,13 @@ interface SectionHeaderProps {
 }
 
 /**
- * Section heading styled like a drawing zone marker: a numbered tag on a rule,
+ * Section heading: a small label on a rule,
  * then the title and an optional description / action on the right.
  */
-export default function SectionHeader({ number, kicker, title, description, action, className, id }: SectionHeaderProps) {
+export default function SectionHeader({ kicker, title, description, action, className, id }: SectionHeaderProps) {
   return (
     <header className={cn("mb-10 md:mb-14", className)} id={id}>
       <div className="flex items-center gap-3">
-        <span className="flex h-6 min-w-[2.25rem] items-center justify-center border-[1.5px] border-foreground px-1.5 font-mono text-[11px] font-semibold">
-          {number}
-        </span>
         <span className="label">{kicker}</span>
         <span aria-hidden className="h-px flex-1 bg-border" />
       </div>

@@ -5,9 +5,11 @@ import { ArrowUpRight } from "lucide-react"
 import type { Project } from "@/types"
 import { projectYear, splitTitle } from "@/components/projects/projectName"
 import { cn } from "@/lib/utils"
+import { projectTiers, tierOf } from "@/config/site"
 
 interface ProjectCardProps {
   project: Project
+  /** No longer shown; kept so older callers compile. */
   sheetNo?: string
   /** "wide" lays the image beside the text (used when a card sits alone). */
   layout?: "stacked" | "wide"
@@ -29,11 +31,7 @@ export default function ProjectCard({ project, sheetNo, layout = "stacked" }: Pr
       lang={isArabic ? "ar" : undefined}
     >
       <div className={cn("flex h-9 items-center justify-between border-b border-border px-4", layout === "wide" && "md:col-span-2")} dir="ltr">
-        {sheetNo ? (
-          <span className="font-mono text-[10.5px] font-semibold text-accent">{sheetNo}</span>
-        ) : (
-          <span className="label text-[9.5px]">{project.category}</span>
-        )}
+        <span className="label text-[9.5px]">{projectTiers.find((t) => t.id === tierOf(project.category))?.name}</span>
         <span className="flex items-center gap-2">
           {project.status && (
             <>

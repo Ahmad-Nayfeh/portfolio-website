@@ -202,6 +202,8 @@ export async function getAllProjects(): Promise<Project[]> {
           status: fm.status,
           gallery: fm.gallery,
           highlights: fm.highlights,
+          role: fm.role,
+          result: fm.result,
         });
       }
     }
@@ -242,6 +244,8 @@ export async function getAllProjectsWithContent(): Promise<FullProject[]> {
                 status: fm.status,
                 gallery: fm.gallery,
                 highlights: fm.highlights,
+          role: fm.role,
+          result: fm.result,
             });
         }
     }

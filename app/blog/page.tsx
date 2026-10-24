@@ -5,7 +5,7 @@ import { getAllPosts } from "@/lib/content"
 
 export const metadata: Metadata = {
   title: "Notebook",
-  description: "Long-form explainers on signals, images, and how machines learn.",
+  description: "Articles with runnable code and measured results, on signals, images, and machine learning.",
 }
 
 function BlogGridSkeleton() {
@@ -29,11 +29,10 @@ export default async function BlogPage() {
     <div className="mx-auto w-full max-w-[1240px] px-5 pb-16 pt-10 md:px-8 md:pt-16">
       <header className="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-end">
         <div className="lg:col-span-7">
-          <span className="label">Sheet 03 · Notebook</span>
           <h1 className="mt-4 font-display text-[clamp(2.5rem,6vw,4.25rem)] leading-[1]">Notebook</h1>
         </div>
         <p className="max-w-md text-[1.05rem] leading-relaxed text-muted-foreground lg:col-span-5 lg:justify-self-end lg:text-right">
-          Writing is how I check that I actually understand something. These are long-form explainers on signals, images, and how machines learn.
+          Each article runs real code and reports what it measured: on signals, images, and machine learning.
         </p>
       </header>
 

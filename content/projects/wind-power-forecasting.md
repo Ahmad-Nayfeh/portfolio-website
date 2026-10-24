@@ -8,6 +8,7 @@ excerpt: "Forecasting a wind turbine's power output: a direct LSTM against a two
 category: "Lab"
 githubLink: "https://github.com/Ahmad-Nayfeh/WindPowerForecasting-LSTM-RF"
 featured: false
+result: "Direct LSTM: RMSE 375 kW, against 720 kW for the two-stage pipeline"
 ---
 
 # Wind Power Forecasting

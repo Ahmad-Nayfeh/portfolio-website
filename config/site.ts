@@ -16,10 +16,10 @@ export const siteConfig = {
     location: "Riyadh, Saudi Arabia",
   },
   nav: [
-    { name: "Index", path: "/", sheet: "01" },
-    { name: "Projects", path: "/projects", sheet: "02" },
-    { name: "Notebook", path: "/blog", sheet: "03" },
-    { name: "About", path: "/about", sheet: "04" },
+    { name: "Home", path: "/" },
+    { name: "Projects", path: "/projects" },
+    { name: "Notebook", path: "/blog" },
+    { name: "About", path: "/about" },
   ],
 } as const
 
@@ -31,9 +31,9 @@ export const siteConfig = {
 export const projectTiers = [
   {
     id: "products",
-    name: "Products",
+    name: "Apps",
     categories: ["Products"],
-    blurb: "Complete applications with real users, releases, and maintenance.",
+    blurb: "Complete apps I designed, built, and released, with real users.",
   },
   {
     id: "research",
@@ -43,9 +43,9 @@ export const projectTiers = [
   },
   {
     id: "lab",
-    name: "Lab",
+    name: "Smaller projects",
     categories: [] as string[],
-    blurb: "Smaller tools and experiments, kept for reference.",
+    blurb: "Interactive tools and experiments.",
   },
 ] as const
 

@@ -133,4 +133,4 @@ CSS only (no Framer Motion). SLD: stroke-draw, switch blades close, then a dashe
 
 ### Still Present
 1. **`rehype-raw` installed but unused** — listed in deps but omitted from MdxRenderer plugins. Not harmful but unnecessary.
-2. **Notebook rule:** every post must carry runnable code and an experiment with its results. Long text-only essays are not published (the AI-agents survey was removed for this reason).
+2. **Notebook rule:** every post must carry runnable code and an experiment with its results. Long text-only essays are not published (the AI-agents survey was removed for this reason). Rules: `content/blog/STYLE.md`. Experiment scripts live in `notebook-code/<slug>/`. New drafts come from `scripts/notebook/` (see its README) as pull requests for review.

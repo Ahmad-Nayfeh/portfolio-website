@@ -18,6 +18,8 @@ highlights:
   - "Photo-to-text capture for Arabic and English book pages"
   - "FastAPI backend shared by a React web app and an Expo Android app"
   - "OCR accuracy gate and about 300 test files in CI"
+role: "Designed, built, and released it on my own"
+result: "Live on the web (shadhra.app) and on Google Play"
 ---
 
 # Shadhra (شَذْرَة)

@@ -1,0 +1,58 @@
+name: notebook-draft
+
+# Drafts one Notebook article with a real, executed experiment, then opens a pull request.
+# Nothing is published until the owner reviews the pull request and merges it.
+#
+# Needs one repository secret: GEMINI_API_KEY (free, from https://aistudio.google.com/apikey).
+# Optional repository variable: GEMINI_MODEL, to switch models without editing code.
+# Rules every article follows: content/blog/STYLE.md. The script: scripts/notebook/pipeline.py.
+
+on:
+  schedule:
+    - cron: "17 5 1,15 * *"     # 1st and 15th of each month, 08:17 Riyadh
+  workflow_dispatch:
+
+concurrency:
+  group: notebook-draft
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install experiment libraries
+        run: |
+          pip install numpy scipy matplotlib pandas scikit-learn opencv-python-headless pooch
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Draft the article and run its experiment
+        id: draft
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+        run: python scripts/notebook/pipeline.py --report notebook-report.md
+
+      - name: Open the pull request for review
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: notebook/${{ steps.draft.outputs.slug }}
+          commit-message: "Notebook draft: ${{ steps.draft.outputs.slug }}"
+          title: "Notebook draft (${{ steps.draft.outputs.checks }}): ${{ steps.draft.outputs.title }}"
+          body-path: notebook-report.md
+          add-paths: |
+            content/blog/*.mdx
+            notebook-code/**
+            public/images/blog/**
+            pipeline-state/notebook-used.json
+          delete-branch: true

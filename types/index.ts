@@ -21,6 +21,10 @@ export interface Project {
   status?: string
   gallery: string[]
   highlights: string[]
+  /** My part in it, for the summary box. */
+  role?: string
+  /** The outcome in one line, for the summary box. */
+  result?: string
 }
 
 export interface FullProject extends Project {

@@ -2,10 +2,8 @@ import type { Route } from "next"
 import Link from "next/link"
 import { ArrowRight, Mail, Linkedin, Github, FileDown } from "lucide-react"
 import Hero from "@/components/home/Hero"
-import NowPanel from "@/components/home/NowPanel"
 import WorkSection from "@/components/home/WorkSection"
 import SectionHeader from "@/components/drawing/SectionHeader"
-import ProductFeature from "@/components/projects/ProductFeature"
 import ProjectCard from "@/components/ProjectCard"
 import BlogCard from "@/components/BlogCard"
 import { getAllProjects, getHomeContent, getRecentPosts, getWorkContent } from "@/lib/content"
@@ -19,58 +17,19 @@ export default async function HomePage() {
     getRecentPosts(3),
   ])
 
-  const products = projects.filter((p) => tierOf(p.category) === "products")
-  const flagship = products.filter((p) => p.featured).slice(0, 2)
-  const otherProducts = products.filter((p) => !flagship.includes(p))
-  const research = projects.filter((p) => tierOf(p.category) === "research").slice(0, 3)
+  // Selected work: the apps I built and released, newest first.
+  const selected = projects.filter((p) => tierOf(p.category) === "products").slice(0, 3)
 
   return (
     <>
       <Hero content={home} />
-      <NowPanel items={home.now} />
 
-      {work && <WorkSection work={work} />}
-
-      {/* 02 · Products */}
-      <section id="products" className="scroll-mt-24 border-y border-border bg-card/40">
+      <section id="work" className="scroll-mt-24 border-y border-border bg-card/40">
         <div className="mx-auto w-full max-w-[1240px] px-5 py-20 md:px-8 md:py-28">
           <SectionHeader
-            number="02"
-            kicker="Products"
-            title="Software I designed, built, and ship."
-            description="End-to-end products with real users: backend, web, and mobile, released and maintained by me."
-          />
-          <div className="space-y-20 md:space-y-28">
-            {flagship.map((p, i) => (
-              <ProductFeature key={p.slug} project={p} index={i} reverse={i % 2 === 1} />
-            ))}
-          </div>
-          {otherProducts.length > 0 && (
-            <div className="mt-16 border-t border-border pt-8">
-              <div className="label mb-4">Also shipped</div>
-              <div className={otherProducts.length === 1 ? "" : "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"}>
-                {otherProducts.map((p, i) => (
-                  <ProjectCard
-                    key={p.slug}
-                    project={p}
-                    layout={otherProducts.length === 1 ? "wide" : "stacked"}
-                    sheetNo={`P-${String(flagship.length + i + 1).padStart(2, "0")}`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 03 · Research */}
-      {research.length > 0 && (
-        <section id="research" className="mx-auto w-full max-w-[1240px] scroll-mt-24 px-5 py-20 md:px-8 md:py-28">
-          <SectionHeader
-            number="03"
-            kicker="Research & ML"
-            title="Deep learning and signal processing."
-            description="From my M.Sc. at KFUPM and independent study: medical imaging, predictive maintenance, and self-supervised learning."
+            kicker="Selected work"
+            title="Apps I designed, built, and released."
+            description="Each one is in real use, with releases and maintenance by me."
             action={
               <Link href={"/projects" as Route} className="redline inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.14em]">
                 All projects <ArrowRight size={13} />
@@ -78,22 +37,22 @@ export default async function HomePage() {
             }
           />
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {research.map((p, i) => (
-              <ProjectCard key={p.slug} project={p} sheetNo={`R-${String(i + 1).padStart(2, "0")}`} />
+            {selected.map((p) => (
+              <ProjectCard key={p.slug} project={p} />
             ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
-      {/* 04 · Notebook */}
+      {work && <WorkSection work={work} />}
+
       {posts.length > 0 && (
         <section id="notebook" className="border-y border-border bg-card/40">
           <div className="mx-auto w-full max-w-[1240px] px-5 py-20 md:px-8 md:py-28">
             <SectionHeader
-              number="04"
               kicker="Notebook"
-              title="Writing, to understand things properly."
-              description="Long-form explainers on signals, images, and how machines learn."
+              title="Experiments, written up."
+              description="Articles with runnable code and measured results, on signals, images, and machine learning."
               action={
                 <Link href={"/blog" as Route} className="redline inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.14em]">
                   All entries <ArrowRight size={13} />
@@ -109,9 +68,8 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 05 · Contact */}
       <section id="contact" className="mx-auto w-full max-w-[1240px] scroll-mt-24 px-5 py-20 md:px-8 md:py-28">
-        <SectionHeader number="05" kicker="Contact" title="Let's talk." />
+        <SectionHeader kicker="Contact" title="Let's talk." />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <p className="text-[1.15rem] leading-relaxed text-foreground/85 lg:col-span-5">
             Open to conversations about switchgear engineering, design automation, and building software products. Email is the fastest way to reach me.
