@@ -133,4 +133,4 @@ CSS only (no Framer Motion). SLD: stroke-draw, switch blades close, then a dashe
 
 ### Still Present
 1. **`rehype-raw` installed but unused** — listed in deps but omitted from MdxRenderer plugins. Not harmful but unnecessary.
-2. **`a-comprehensive-guide-to-ai-agents.mdx` has 0 code blocks** — hand-written guide post; intentional (no demo code needed for a survey article).
+2. **Notebook rule:** every post must carry runnable code and an experiment with its results. Long text-only essays are not published (the AI-agents survey was removed for this reason).
