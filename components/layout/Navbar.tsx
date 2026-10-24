@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import type { Route } from "next"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, FileDown } from "lucide-react"
+import { Menu, ChevronUp, FileDown } from "lucide-react"
 import ThemeToggle from "@/components/ThemeToggle"
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
@@ -48,7 +48,7 @@ export default function Navbar() {
           </span>
           <span className="flex flex-col leading-none">
             <span className="text-[15px] font-semibold tracking-tight">Ahmad Nayfeh</span>
-            <span className="label mt-1 text-[9.5px]">Design Engineer</span>
+            <span className="label mt-1 text-[9.5px]">Electrical Design Engineer</span>
           </span>
         </Link>
 
@@ -65,9 +65,6 @@ export default function Navbar() {
                   active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <span className={cn("font-mono text-[10px]", active ? "text-accent" : "text-muted-foreground")}>
-                  {item.sheet}
-                </span>
                 {item.name}
                 <span
                   aria-hidden
@@ -81,14 +78,9 @@ export default function Navbar() {
             )
           })}
           <span aria-hidden className="mx-3 h-5 w-px bg-border" />
-          <a
-            href={siteConfig.resume}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mr-2 inline-flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-accent"
-          >
+          <a href={siteConfig.resume} target="_blank" rel="noopener noreferrer" className="btn btn-primary mr-2 px-3.5 py-2">
             <FileDown size={13} />
-            CV
+            Download CV
           </a>
           <ThemeToggle />
         </nav>
@@ -103,7 +95,7 @@ export default function Navbar() {
             aria-controls="mobile-nav"
             aria-label={isOpen ? "Close menu" : "Open menu"}
           >
-            {isOpen ? <X size={17} /> : <Menu size={17} />}
+            {isOpen ? <ChevronUp size={17} /> : <Menu size={17} />}
           </button>
         </div>
       </div>
@@ -120,9 +112,6 @@ export default function Navbar() {
                     aria-current={active ? "page" : undefined}
                     className="flex items-baseline gap-3 py-3.5 text-base font-medium"
                   >
-                    <span className={cn("font-mono text-[11px]", active ? "text-accent" : "text-muted-foreground")}>
-                      {item.sheet}
-                    </span>
                     <span className={active ? "text-foreground" : "text-muted-foreground"}>{item.name}</span>
                   </Link>
                 </li>

@@ -4,7 +4,7 @@ slug: "reading-marathon-app"
 date: "2026-10-24"
 coverImage: "/images/projects/reading-marathon-app.jpg"
 tags: ["Android", "Kotlin", "Jetpack Compose", "Firebase", "Arabic"]
-excerpt: "An Arabic Android app for reading with friends: log today's minutes in one tap, and they count in every group you belong to. Groups read a shared book, with a ranking and an activity feed. It replaced a Streamlit dashboard fed by Google Forms."
+excerpt: "An Arabic Android app for reading, alone or with friends: pick the book you are reading, log your time in it with one tap, and keep a personal shelf. Groups read a shared book together, with a ranking. It replaced a Streamlit dashboard fed by Google Forms."
 category: "Products"
 status: "Released"
 liveDemoUrl: "https://ahmad-nayfeh.github.io/marathon/"
@@ -12,13 +12,15 @@ featured: true
 linkLabel: "Download"
 gallery:
   - "/images/projects/reading-marathon-app/app-home.jpg"
+  - "/images/projects/reading-marathon-app/app-shelf.jpg"
   - "/images/projects/reading-marathon-app/app-group.jpg"
-  - "/images/projects/reading-marathon-app/app-log.jpg"
 highlights:
-  - "One-tap logging, a reading timer, and quick-log buttons in the reminder"
-  - "Groups with roles, invite codes and public discovery, on Firebase with tested security rules"
-  - "Scoring and statistics in a pure-Kotlin module with unit tests"
-  - "Imports the group's old Google Form history"
+  - "Every minute is logged against a book: one tap, a timer, or the reminder"
+  - "A catalog of about 4,900 books from Wikidata, searchable offline"
+  - "Groups with roles and invite codes, on Firebase with tested security rules"
+  - "Export your data or delete your account from inside the app"
+role: "Designed, built, and released it on my own"
+result: "Released for Android; replaced a Google Form and a Streamlit dashboard"
 ---
 
 # Reading Marathon (ماراثون القراءة)
@@ -29,30 +31,27 @@ highlights:
 
 ## What it does
 
-- **Logging in one tap:** buttons add 15, 30, 45 or 60 minutes to today, with undo. A timer runs in a notification while you read, and the evening reminder has quick-log buttons, so a day can be logged without opening the app. Any of the last 14 days can be edited.
-- **Reading is personal, groups add it up:** a reader logs once, and the minutes count in every group they are in.
-- **Groups:** for friends, family or a reading club. Private (invite code or link) or public (anyone can find and join). Roles: owner, admins, members.
-- **A shared book:** each period has a book and dates, with the ranking, who read today, and who finished the book.
-- **Points:** one point per N minutes (10 by default) plus a bonus for finishing the book (50 by default), set per group. The ranking can be shared as text to WhatsApp.
-- **Personal page:** a daily goal, streaks, hours this month and year, and a reading heatmap.
-- **For admins:** books, members, readers without the app (an admin logs for them, and merges their history into their account if they join later), import of the old Google Form responses, and CSV export.
+- **The book comes first:** every minute is logged against a book. The home screen has a card for each book you are reading, with buttons for 15, 30, 45 or 60 minutes (with undo), a reading timer that runs in a notification, and "other time" for any of the last 14 days. The evening reminder logs into your book without opening the app.
+- **My shelf:** your books, with or without a group: reading now, finished, and want to read, with your time in each.
+- **A real catalog:** about 4,900 books, each with its Arabic title, its author, and its English title as another name. The list comes from Wikidata (written works with an Arabic Wikipedia article and a known author) and is searched on the phone, so it works offline. Missing books come from Google Books or are typed in, and readers can suggest fixes.
+- **Groups:** private (invite code or link) or public. Each group reads a shared book over set dates, with a ranking, who read today, and who finished. The group chooses whether the ranking counts all reading or only the shared book.
+- **Everyone logs for themselves:** nobody can log reading or a finish for anyone else, not even a group owner. The security rules enforce it.
+- **Your data is yours:** export your reading log and shelf as CSV, or delete your account and everything in it, from inside the app.
 
 <div class="not-prose grid grid-cols-2 gap-4 sm:grid-cols-3">
-  <img src="/images/projects/reading-marathon-app/app-log.jpg" alt="Editing a day of reading" loading="lazy" />
-  <img src="/images/projects/reading-marathon-app/app-activity.jpg" alt="A group's activity feed" loading="lazy" />
-  <img src="/images/projects/reading-marathon-app/app-groups.jpg" alt="My groups and public groups" loading="lazy" />
+  <img src="/images/projects/reading-marathon-app/app-log.jpg" alt="Logging time for a book on any of the last two weeks" loading="lazy" />
+  <img src="/images/projects/reading-marathon-app/app-catalog.jpg" alt="Finding a book in the catalog" loading="lazy" />
+  <img src="/images/projects/reading-marathon-app/app-activity.jpg" alt="A group's activity" loading="lazy" />
 </div>
 
 ## How it is built
 
-- **Kotlin + Jetpack Compose** with Material 3, DataStore and WorkManager. The interface is Arabic and always right-to-left, with a calm paper-and-ink design.
-- **A pure-Kotlin `core` module** holds every rule: points, rankings, streaks, validation and the CSV import, with unit tests.
-- **Firebase** (Google or anonymous sign-in, Firestore with offline cache). A day is written to the reader's private log and to each of their groups. The security rules enforce roles, joining by invite code and who may write what; 70 tests run them against the Firestore emulator.
-- **Testing:** a screenshot tour of every main screen, rendered with Robolectric on an in-memory backend, runs in CI without an emulator.
-- **CI/CD:** GitHub Actions builds the app and publishes signed releases from version tags.
+- **Kotlin + Jetpack Compose** with Material 3, DataStore and WorkManager. The interface is Arabic and always right-to-left, with a calm paper-and-ink design in light and dark.
+- **A pure-Kotlin `core` module** holds every rule: points, rankings, streaks, validation and catalog search, with unit tests.
+- **Firebase:** Google sign-in only, and Firestore with an offline cache. A reading is written to the reader's private log and shelf, and to each of their groups. The security rules enforce roles, invite codes, and that each reader writes only their own reading; 127 tests run them against the Firestore emulator.
+- **Admin panel** in the app and on the web: catalog review, groups, users, announcements, and an audit log of every action.
+- **Testing:** a screenshot tour of the main screens, rendered with Robolectric on an in-memory backend, runs without an emulator.
 
 ## Where it came from
 
-The first version (2025) was a **Streamlit dashboard**: readers filled in a Google Form, and the organiser's dashboard pulled the responses through the Google Sheets API into Firestore and drew the charts with Plotly. It worked, but logging meant filling a form every day, and readers never saw the results unless someone shared a screenshot.
-
-The Android app's first release kept that model (one organiser, a long daily form). Version 2 rebuilt it around one-tap logging and groups, after watching how often people actually logged. The web version still runs at [reading-marathon.streamlit.app](https://reading-marathon.streamlit.app/) ([privacy policy](/privacy), [terms](/terms)).
+The first version (2025) was a **Streamlit dashboard**: readers filled in a Google Form, and the organiser's dashboard pulled the responses through the Google Sheets API into Firestore and drew the charts with Plotly. It worked, but logging meant filling a form every day, and readers never saw the results unless someone shared a screenshot. The Android app replaced it with one-tap logging, books, and groups.

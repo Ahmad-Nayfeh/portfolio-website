@@ -54,7 +54,7 @@ export default async function ProjectPage({ params }: PageProps) {
   const hasCover = project.coverImage && !project.coverImage.startsWith("/placeholder")
 
   const spec: TitleBlockCell[] = [
-    { label: "Type", value: tier.name, emphasis: true },
+    { label: "Type", value: tier.name },
     { label: "Date", value: formatDate(project.date) },
   ]
   if (project.status) {
@@ -69,8 +69,10 @@ export default async function ProjectPage({ params }: PageProps) {
       ),
     })
   }
+  if (project.role) spec.push({ label: "My role", value: project.role, span: 2 })
+  if (project.result) spec.push({ label: "Result", value: project.result, span: 2, emphasis: true })
   spec.push({
-    label: "Stack",
+    label: "Tools",
     span: 2,
     value: (
       <span className="flex flex-wrap gap-1.5">
@@ -131,8 +133,8 @@ export default async function ProjectPage({ params }: PageProps) {
         {project.gallery.length > 0 ? (
           <div className="sheet mt-10 overflow-hidden">
             <div className="flex items-center justify-between border-b border-border px-4 py-2">
-              <span className="label text-[9.5px]">{name} · Screens</span>
-              <span className="label text-[9.5px]">{project.gallery.length} views</span>
+              <span className="label text-[9.5px]">Screenshots</span>
+              <span className="label text-[9.5px]">{project.gallery.length}</span>
             </div>
             <div className="flex flex-wrap items-end justify-center gap-4 px-4 py-8 md:gap-8 md:px-10 md:py-12">
               {project.gallery.map((src, i) => (

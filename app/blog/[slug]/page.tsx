@@ -84,7 +84,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         {hasCover && (
           <div className="sheet relative mx-auto mt-10 aspect-[16/9] max-w-[1080px] overflow-hidden">
-            <Image src={post.coverImage} alt="" fill className="object-cover" priority sizes="(max-width: 1080px) 100vw, 1080px" />
+            <Image src={post.coverImage} alt="" fill className="bg-card object-contain p-2" priority sizes="(max-width: 1080px) 100vw, 1080px" />
           </div>
         )}
 

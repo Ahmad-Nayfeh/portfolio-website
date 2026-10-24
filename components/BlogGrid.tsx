@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { Search, X } from "lucide-react"
+import { Search } from "lucide-react"
 import BlogCard from "@/components/BlogCard"
 import type { Post } from "@/types"
 import { cn } from "@/lib/utils"
@@ -92,7 +92,7 @@ export default function BlogGrid({ posts }: BlogGridProps) {
             }}
             className="inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.14em] text-accent"
           >
-            <X size={12} /> Clear
+            Clear
           </button>
         )}
       </div>

@@ -627,3 +627,8 @@ code[data-theme] span {
   font-size: 0.86rem;
   line-height: 1.6;
 }
+
+/* Long links (URLs as link text) must wrap on phones instead of widening the page. */
+.prose a {
+  overflow-wrap: anywhere;
+}

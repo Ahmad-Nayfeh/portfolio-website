@@ -9,6 +9,7 @@ category: "Lab"
 githubLink: "https://github.com/Ahmad-Nayfeh/Frequency-Decomposition-Explorer"
 liveDemoUrl: "https://frequency-decomposition-explorer-nahmad.streamlit.app/"
 featured: false
+result: "Live app for FFT band filtering of signals and images"
 ---
 
 # Frequency Decomposition Explorer

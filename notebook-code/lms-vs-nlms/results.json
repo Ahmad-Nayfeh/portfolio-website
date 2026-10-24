@@ -1,0 +1,108 @@
+{
+  "input_snr_db": {
+    "first_half": 3.3617035076262933,
+    "second_half": -4.890009842642307
+  },
+  "sweep": {
+    "lms": [
+      {
+        "mu": 0.0005,
+        "first_half": 14.950248576459247,
+        "second_half": 14.750234565632683
+      },
+      {
+        "mu": 0.001,
+        "first_half": 17.66230740509336,
+        "second_half": 15.602139331058671
+      },
+      {
+        "mu": 0.002,
+        "first_half": 20.380820201061223,
+        "second_half": 16.234659686326353
+      },
+      {
+        "mu": 0.005,
+        "first_half": 23.744761694614173,
+        "second_half": 14.533666773309426
+      },
+      {
+        "mu": 0.01,
+        "first_half": 25.433450152926433,
+        "second_half": 9.140515792016908
+      },
+      {
+        "mu": 0.02,
+        "first_half": 24.90176291450942,
+        "second_half": 0.33577325216363446
+      },
+      {
+        "mu": 0.05,
+        "first_half": 19.430510701813457,
+        "second_half": NaN
+      }
+    ],
+    "nlms": [
+      {
+        "mu": 0.002,
+        "first_half": 15.78148807621085,
+        "second_half": 10.732859655583532
+      },
+      {
+        "mu": 0.005,
+        "first_half": 19.429485205681832,
+        "second_half": 13.038551858674364
+      },
+      {
+        "mu": 0.01,
+        "first_half": 22.186894549178238,
+        "second_half": 14.083471902556177
+      },
+      {
+        "mu": 0.02,
+        "first_half": 24.61398907139843,
+        "second_half": 14.715033038203638
+      },
+      {
+        "mu": 0.05,
+        "first_half": 25.756061518844856,
+        "second_half": 15.653869714297233
+      },
+      {
+        "mu": 0.1,
+        "first_half": 23.13833619999889,
+        "second_half": 16.250850906312678
+      },
+      {
+        "mu": 0.2,
+        "first_half": 17.908169956443935,
+        "second_half": 15.384255240183693
+      },
+      {
+        "mu": 0.5,
+        "first_half": 8.906577563453203,
+        "second_half": 8.878155662352617
+      }
+    ]
+  },
+  "picked": {
+    "lms_mu": 0.01,
+    "nlms_mu": 0.05
+  },
+  "lms": {
+    "first_half_db": 25.433450152926433,
+    "second_half_db": 9.140515792016908,
+    "improvement_second_half_db": 14.030525634659215
+  },
+  "nlms": {
+    "first_half_db": 25.756061518844856,
+    "second_half_db": 15.653869714297233,
+    "improvement_second_half_db": 20.54387955693954
+  },
+  "notch": {
+    "first_half_db": 27.11141970536709,
+    "second_half_db": 22.89779310912129,
+    "distortion_snr_on_clean_ecg_db": 34.29915868734108,
+    "improvement_second_half_db": 27.7878029517636
+  },
+  "nlms_minus_lms_second_half_db": 6.513353922280325
+}

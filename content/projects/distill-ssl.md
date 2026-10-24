@@ -9,6 +9,8 @@ category: "Research"
 githubLink: "https://github.com/Ahmad-Nayfeh/Distill-SSL"
 status: "Completed"
 featured: true
+role: "Course project, KFUPM (CHE 567)"
+result: "Best distilled student 53.7% top-1, against 47.1% trained alone"
 ---
 
 # Distill-SSL

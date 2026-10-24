@@ -67,7 +67,6 @@ export default async function AboutPage() {
   return (
     <div className="mx-auto w-full max-w-[1240px] px-5 pb-16 pt-10 md:px-8 md:pt-16">
       <header className="mb-14">
-        <span className="label">Sheet 04 · About</span>
         <h1 className="mt-4 font-display text-[clamp(2.5rem,6vw,4.25rem)] leading-[1]">{about.name}</h1>
         <p className="mt-4 font-mono text-[13px] font-medium uppercase tracking-[0.16em] text-accent">{about.tagline}</p>
       </header>
@@ -103,7 +102,7 @@ export default async function AboutPage() {
 
       {/* Timeline drawn as a vertical busbar with taps */}
       <section className="mt-24">
-        <SectionHeader number="01" kicker="Timeline" title="Work and education" />
+        <SectionHeader kicker="Timeline" title="Work and education" />
         <ol className="relative ml-2 border-l-[3px] border-foreground md:ml-[10.5rem]">
           {entries.map((e) => (
             <li key={`${e.kind}-${e.title}-${e.start}`} className="relative pb-10 pl-8 last:pb-0 md:pl-10">
@@ -131,7 +130,7 @@ export default async function AboutPage() {
 
       {about.skillGroups.length > 0 && (
         <section className="mt-24">
-          <SectionHeader number="02" kicker="Skills" title="What I work with" />
+          <SectionHeader kicker="Skills" title="What I work with" />
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {about.skillGroups.map((g) => (
               <div key={g.name} className="sheet p-5">
