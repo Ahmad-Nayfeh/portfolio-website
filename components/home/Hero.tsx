@@ -96,13 +96,14 @@ export default function Hero({ content }: { content: HomeContent }) {
   )
 }
 
-/** Tiny load-break-switch glyph for the phone feeder list. */
+/** Tiny load-break-switch glyph for the phone feeder list: a contact ring and a blade, no crossbar. */
 function FeederGlyph() {
   return (
-    <svg width="14" height="30" viewBox="0 0 14 30" aria-hidden className="shrink-0">
-      <path d="M7 0 V7 M2 7 H12 M7 21 V30" stroke="currentColor" strokeWidth="1.4" fill="none" />
-      <line x1="7" y1="21" x2="7" y2="8" stroke="hsl(var(--accent))" strokeWidth="1.6" strokeLinecap="round" />
-      <circle cx="7" cy="21" r="1.8" fill="currentColor" />
+    <svg width="16" height="30" viewBox="0 0 16 30" aria-hidden className="shrink-0">
+      <path d="M6 0 V5.5 M6 21 V30" stroke="currentColor" strokeWidth="1.4" fill="none" />
+      <circle cx="6" cy="7.5" r="2" fill="none" stroke="currentColor" strokeWidth="1.3" />
+      <line x1="6" y1="21" x2="12" y2="10" stroke="hsl(var(--accent))" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="6" cy="21" r="1.8" fill="currentColor" />
     </svg>
   )
 }

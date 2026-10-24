@@ -114,13 +114,13 @@ export default function SingleLineDiagram({ feeders, source }: SingleLineDiagram
             <rect x={x - 58} y={BUS_Y + 4} width="116" height="300" fill="transparent" />
 
             <path d={`M${x} ${BUS_Y} V200`} stroke={ink} strokeWidth="1.5" fill="none" className="sld-draw sld-hl" style={v(50, d0)} />
-            {/* load-break switch: fixed-contact bar, pivot, and blade */}
-            <path d={`M${x - 7} 200 H${x + 7}`} stroke={ink} strokeWidth="1.5" className="sld-fade sld-hl" style={{ animationDelay: `${d0 + 0.2}s` }} />
+            {/* load-break switch: fixed contact (a ring, never a crossbar), pivot, and blade */}
+            <circle cx={x} cy="200" r="3.2" fill={paper} stroke={ink} strokeWidth="1.5" className="sld-fade sld-hl" style={{ animationDelay: `${d0 + 0.2}s` }} />
             <line
               x1={x}
               y1="238"
               x2={x}
-              y2="202"
+              y2="204"
               stroke={ink}
               strokeWidth="1.75"
               strokeLinecap="round"
