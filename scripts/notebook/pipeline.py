@@ -145,7 +145,7 @@ def recent_papers(n: int = 60) -> list[dict]:
         out.append({
             "id": pid,
             "title": " ".join(e.findtext("a:title", "", ns).split()),
-            "authors": [a.findtext("a:name", "", ns) for a in e.findall("a:author", ns)][:6],
+            "authors": [a.findtext("a:name", "", ns) for a in e.findall("a:author", ns)],   # all of them: they are cited
             "published": e.findtext("a:published", "", ns)[:10],
             "abstract": " ".join(e.findtext("a:summary", "", ns).split())[:1500],
         })
@@ -160,10 +160,12 @@ Honesty over impressiveness: never invent numbers, quotes or citations. Follow t
 {STYLE}"""
 
 PLAN_PROMPT = """[[plan]]
-Below are recent arXiv papers. Pick ONE whose central idea you can test yourself, honestly, with a
-small experiment that runs on a laptop CPU in under 10 minutes. Prefer topics in: {topics}.
-The experiment must compare the paper's idea with a simple, strong baseline, and say plainly if the
-baseline wins.
+Below are recent arXiv papers. Pick ONE whose CENTRAL CLAIM you can test yourself, honestly, with a
+small experiment that runs on a laptop CPU in under 10 minutes. Only pick papers in: {topics}.
+The experiment must test the claim the paper actually makes, under the same kind of conditions, not a
+different question next to it. If a paper's claim needs large models, GPUs or training a generator,
+skip that paper and pick another. The experiment must compare the paper's idea with a simple, strong
+baseline, and the article will say plainly if the baseline wins.
 
 Data must be one of: synthetic data generated in the script; datasets bundled with SciPy or
 scikit-learn (e.g. scipy.datasets.electrocardiogram, sklearn.datasets.load_digits); or a small public
@@ -210,6 +212,8 @@ Frontmatter fields: title, slug ("{slug}"), date ("{date}"), tags (3 to 4), exce
 states the main finding), coverImage ("/images/blog/{slug}/<one of the figures>"), featured (false).
 
 Paper: {paper}
+Cite the paper with ALL of these authors, exactly as given, in this order.
+Describe the paper's claim exactly as its abstract states it. Do not attribute to it claims it does not make.
 Question: {question}
 Figures: {figures}
 
@@ -271,6 +275,8 @@ def validate(mdx: str, results: dict, code: str) -> list[str]:
     prose = re.sub(r"```.*?```", "", body, flags=re.S)
     prose = re.sub(r"\$\$.*?\$\$", "", prose, flags=re.S)
     prose = prose.replace("\u2212", "-")   # typographic minus
+    prose = re.sub(r"\]\([^)]*\)", "]", prose)                  # link targets
+    prose = re.sub(r"(?i)arxiv[:\s]*\d{4}\.\d{4,5}(v\d+)?", "", prose)   # arXiv ids
     words = len(re.findall(r"\w+", prose))
     if not 1100 <= words <= 2200:
         problems.append(f"Prose length is {words} words (target 1200-1800).")
@@ -294,8 +300,8 @@ def validate(mdx: str, results: dict, code: str) -> list[str]:
             continue                     # small integers: counts, section numbers
         if 1900 <= v <= 2100 and "." not in tok:
             continue                     # years
-        if tok.lstrip("-") in in_code:
-            continue                     # a parameter of the experiment
+        if tok.lstrip("-") in in_code or (is_pct and any(abs(float(c) * 100 - v) < 1e-6 for c in in_code)):
+            continue                     # a parameter of the experiment (0.5 in the code may read as 50%)
         decimals = len(tok.split(".")[1]) if "." in tok else 0
         tol = 0.5 * 10 ** -decimals + 1e-9
         ok = any(abs(abs(k) - abs(v)) <= tol or abs(abs(k) * 100 - abs(v)) <= tol for k in known)
@@ -362,6 +368,8 @@ def main():
 
     report += [
         f"**Paper:** [{paper['title']}](https://arxiv.org/abs/{paper['id']}) ({paper['published']})",
+        f"**Authors:** {', '.join(paper['authors'])}",
+        f"**Abstract (start):** {paper['abstract'][:600]}...",
         f"**Question:** {plan['question']}",
         f"**Experiment:** ran successfully on attempt {attempts}; {len(figures)} figures.",
         "",
@@ -370,7 +378,8 @@ def main():
         "",
         "## Before approving",
         "- Read the article: is every claim backed by the results and the figures?",
-        "- Is the paper's idea described fairly? Open the paper link and check.",
+        "- Does the experiment test what the paper actually claims (compare with the abstract above)?",
+        "- Is the paper's idea described fairly, and are the authors in Sources complete?",
         "- Merge to publish; close to discard. Nothing goes live without your approval.",
     ]
     Path(args.report).write_text("\n".join(report))
