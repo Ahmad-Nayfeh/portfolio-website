@@ -1,0 +1,187 @@
+---
+title: "Dataset Auditing with Canaries: Low-Pass vs High-Pass Watermarks"
+slug: "spectral-canary-dataset-auditing"
+date: "2026-10-25"
+tags: ["Watermarking", "Signal Processing", "Machine Learning"]
+excerpt: "Testing dataset canary signals across frequency bands at matched visual fidelity reveals an unexpected finding for direct image-level auditing. High-pass spectral canaries achieve near-perfect detection across perturbations, while low-pass traces struggle against natural low-frequency background energy."
+coverImage: "/images/blog/spectral-canary-dataset-auditing/robustness_across_perturbations.png"
+featured: false
+---
+
+# Dataset Auditing with Canaries: Low-Pass vs High-Pass Watermarks
+
+When machine learning practitioners release an image dataset, they often want to know if third parties train proprietary models on it without permission. Auditing this training is difficult. A text-to-image generator absorbs broad stylistic patterns, color palettes, and compositional structures without memorizing or reproducing individual training photographs.
+
+To solve this, researchers developed **dataset-use auditing**. Before releasing a dataset, you add a subtle, shared signal called a **canary** to every image. If an external model trains on the collection, you later check whether generated outputs contain traces of that canary. A recent paper from Ho et al. (2026) titled *SpectralCanary* proposed embedding this canary into the low-frequency components of the two-dimensional Fourier spectrum. Their reasoning is that generative models prioritize coarse, low-frequency scene composition during early training iterations, meaning low-frequency traces should transfer into model weights more reliably than high-frequency noise.
+
+However, dataset auditing begins with watermarking and signal detection. An auditor must detect the embedded signal against the background image before and after downstream transformations like blur, noise, or downsampling. This article evaluates the signal detection properties of frequency-domain dataset canaries directly on images.
+
+## The question
+
+Does embedding dataset canary signals into low-frequency Fourier components improve detection robustness under image perturbations compared to spatial additive and high-frequency spectral watermarking at matched visual fidelity?
+
+Specifically, this experiment answers three operational questions:
+
+1. At a fixed target visual fidelity of 38.0 dB Peak Signal-to-Noise Ratio (PSNR), which frequency band preserves the highest structural similarity (SSIM) to the original image?
+2. How reliably does a normalized matched filter detect the canary in clean images across low-frequency, spatial, and high-frequency embedding schemes?
+3. What happens to detection accuracy when marked images undergo common image processing perturbations: Gaussian blur, additive noise, and resampling?
+
+All numbers below come from running a self-contained Python script with fixed random seeds: [notebook-code/spectral-canary-dataset-auditing](https://github.com/Ahmad-Nayfeh/portfolio-website/tree/main/notebook-code/spectral-canary-dataset-auditing).
+
+## The setup
+
+**The dataset.** I generate 200 synthetic 128x128 single-channel images using randomized smooth trigonometric gradients, overlapping geometric circles and rectangles, and Gaussian-filtered texture noise. 100 images serve as the positive collection receiving the canary signal, and 100 independent images serve as negative control samples.
+
+**The canary signal.** A fixed reference pattern $C(x, y)$ is generated from a zero-mean Gaussian field, smoothed slightly with a Gaussian filter ($\sigma = 0.8$), and normalized to unit variance. Its two-dimensional Fourier transform is $\mathcal{F}\{C\}$.
+
+**The frequency masks.** In the 2D discrete Fourier transform, frequencies are centered such that zero frequency (DC) sits in the middle. We define radial distance from the center as $r = \sqrt{u^2 + v^2}$. Two Gaussian masks partition the spectrum:
+
+- Low-pass mask: $M_{\text{lp}}(r) = \exp(-r^2 / (2 \sigma_{\text{lp}}^2))$ with $\sigma_{\text{lp}} = 0.10$.
+- High-pass mask: $M_{\text{hp}}(r) = 1 - \exp(-r^2 / (2 \sigma_{\text{hp}}^2))$ with $\sigma_{\text{hp}} = 0.15$.
+
+**The embedding methods.** We compare three distinct embedding strategies:
+
+1. **Low-Pass Spectral (SpectralCanary design):** The image Fourier transform $\mathcal{F}\{I\}$ is blended with the canary transform via frequency-domain substitution:
+   $$\mathcal{F}\{I_{\text{marked}}\} = \mathcal{F}\{I\} \cdot (1 - \alpha M_{\text{lp}}) + \alpha M_{\text{lp}} \mathcal{F}\{C\}$$
+2. **Spatial Additive:** The canary is added directly to pixel values:
+   $$I_{\text{marked}} = I + \beta C$$
+3. **High-Pass Spectral:** The canary is blended into the high-frequency spectrum:
+   $$\mathcal{F}\{I_{\text{marked}}\} = \mathcal{F}\{I\} \cdot (1 - \gamma M_{\text{hp}}) + \gamma M_{\text{hp}} \mathcal{F}\{C\}$$
+
+**Visual fidelity calibration.** Human perception is sensitive to visible artifacts. Peak Signal-to-Noise Ratio (PSNR) measures the squared pixel distortion in decibels. To ensure a strictly fair comparison, I use a binary search on the synthetic dataset to tune the embedding strengths $\alpha$, $\beta$, and $\gamma$ so that every method achieves the exact same target fidelity of 38.0 dB PSNR against the unmodified image.
+
+**The detector.** For each scheme, we apply a normalized matched filter (Pearson correlation coefficient) between the extracted target band and the known canary. For spatial watermarking, the correlation is computed over zero-mean pixel arrays. For spectral watermarking, the correlation is computed over the inverse Fourier transform of the band-isolated components.
+
+**The perturbation attacks.** Marked and control images are passed through three typical processing transformations:
+
+- **Gaussian Blur:** A spatial filter with standard deviation $\sigma = 2.0$, representing low-pass attenuation.
+- **Additive Gaussian Noise:** Zero-mean noise with standard deviation $\sigma = 0.12$, representing transmission or sensor corruption.
+- **Resampling:** Downsampling the image by 50% using bilinear interpolation and upsampling back to 128x128 pixels.
+
+Detection quality is measured using the Area Under the Receiver Operating Characteristic Curve (ROC-AUC), evaluating how cleanly marked images separate from unmarked controls.
+
+## The code
+
+The full implementation relies exclusively on NumPy, SciPy, and scikit-learn. The core logic handles the Fourier domain modulation and matched filtering:
+
+```python
+def embed_lowpass(img, alpha):
+    F_img = np.fft.fftshift(np.fft.fft2(img))
+    F_marked = F_img * (1.0 - alpha * mask_lp) + (alpha * mask_lp * F_canary)
+    marked = np.real(np.fft.ifft2(np.fft.ifftshift(F_marked)))
+    return np.clip(marked, 0.0, 1.0)
+
+def embed_highpass(img, gamma):
+    F_img = np.fft.fftshift(np.fft.fft2(img))
+    F_marked = F_img * (1.0 - gamma * mask_hp) + (gamma * mask_hp * F_canary)
+    marked = np.real(np.fft.ifft2(np.fft.ifftshift(F_marked)))
+    return np.clip(marked, 0.0, 1.0)
+
+def detect_lowpass(img):
+    F_img = np.fft.fftshift(np.fft.fft2(img))
+    sub_y = F_img * mask_lp
+    sub_c = F_canary * mask_lp
+    y_sp = np.real(np.fft.ifft2(np.fft.ifftshift(sub_y)))
+    c_sp = np.real(np.fft.ifft2(np.fft.ifftshift(sub_c)))
+    y_flat = y_sp.flatten() - np.mean(y_sp)
+    c_flat = c_sp.flatten() - np.mean(c_sp)
+    norm = np.linalg.norm(y_flat) * np.linalg.norm(c_flat) + 1e-12
+    return float(np.dot(y_flat, c_flat) / norm)
+```
+
+## Results
+
+First, we verify the calibrated image fidelity across all 100 positive samples:
+
+| Watermarking Method | Mean PSNR (dB) | Mean SSIM |
+| :--- | :--- | :--- |
+| Low-Pass (SpectralCanary) | 37.92 | 0.9921 |
+| Spatial Additive | 38.04 | 0.9704 |
+| High-Pass Spectral | 38.03 | 0.9649 |
+
+At roughly 38.0 dB PSNR, low-pass watermarking yields the highest Structural Similarity Index (0.9921), compared to 0.9704 for spatial additive and 0.9649 for high-pass embedding. Because the human visual system is sensitive to localized edge disruptions, smoothing the modification over low spatial frequencies preserves broad structural contours.
+
+![Visual fidelity, Fourier magnitude spectra, and absolute residual maps](/images/blog/spectral-canary-dataset-auditing/watermark_fidelity_vis.png)
+
+Next, we measure canary detection performance (ROC-AUC) across the four operational conditions:
+
+| Perturbation Attack | Low-Pass (SpectralCanary) | Spatial Additive | High-Pass Spectral |
+| :--- | :--- | :--- | :--- |
+| Clean (Unmodified) | 0.5935 | 0.9202 | 1.0000 |
+| Gaussian Blur ($\sigma = 2.0$) | 0.5622 | 0.6228 | 0.9134 |
+| Gaussian Noise ($\sigma = 0.12$) | 0.5904 | 0.9128 | 1.0000 |
+| Resampling (2x Down/Up) | 0.5852 | 0.7885 | 1.0000 |
+
+Under clean conditions, High-Pass Spectral achieves a perfect ROC-AUC of 1.0, and Spatial Additive reaches 0.9202. Low-Pass Spectral achieves only 0.5935, barely exceeding random guessing (0.5000).
+
+![Canary detection ROC curves under Gaussian blur attack](/images/blog/spectral-canary-dataset-auditing/detection_roc_curves.png)
+
+Under Gaussian blur, all methods experience a performance drop, but the ranking is unchanged. High-Pass Spectral retains an AUC of 0.9134. Spatial Additive falls to 0.6228. Low-Pass Spectral drops to 0.5622.
+
+![Bar chart comparing detection ROC-AUC across perturbation regimes](/images/blog/spectral-canary-dataset-auditing/robustness_across_perturbations.png)
+
+Under additive Gaussian noise and spatial downsampling/upsampling, High-Pass Spectral maintains an AUC of 1.0000, while Low-Pass Spectral stays flat at 0.5904 and 0.5852.
+
+## What the numbers say
+
+These results present an instructive contrast to the claims in Ho et al. (2026). The paper argues that low-frequency Fourier components are the superior carrier for dataset-use auditing. However, in our controlled signal detection experiment, low-frequency embedding demonstrates the lowest detection reliability among all tested alternatives.
+
+Why does this happen? The answer lies in the fundamental spectral physics of images.
+
+### The power spectrum of natural images
+
+Natural images—and synthetic images with smooth gradients and macroscopic shapes—exhibit a power spectral density that drops roughly as $1/f^2$, where $f$ is spatial frequency. The low-frequency Fourier bins contain almost all the image's intrinsic energy. High-frequency bins contain very little intrinsic energy.
+
+When we calibrate embedding strength to a uniform 38.0 dB PSNR across all methods:
+
+1. **In the high-frequency band**, the host image provides near-zero background energy. Even a low-power canary signal added to high-frequency components achieves an exceptional signal-to-interference ratio. When the matched filter correlates the test image against the known high-frequency canary, there is virtually no native image energy to cause false alarms. As a result, the clean AUC is 1.0000.
+2. **In the low-frequency band**, the host image contains large DC offsets, broad gradients, and geometric macro-structures. Even though the low-pass canary is embedded, the host image's native low-frequency energy acts as heavy in-band interference. The matched filter calculates the inner product between the test image and the canary. Because the background image has large non-zero projection onto smooth low-frequency bases, positive and negative control distributions overlap heavily, dragging the AUC down to 0.5935.
+
+### Why blur did not rescue the low-pass canary
+
+A common intuition in signal processing is that low-pass filters destroy high frequencies and preserve low frequencies. Therefore, one might expect Gaussian blur to wipe out high-pass watermarks while leaving low-pass watermarks intact.
+
+In our measurements, Gaussian blur ($σ = 2.0$) did reduce the High-Pass Spectral AUC from 1.0000 to 0.9134. Yet 0.9134 remains far superior to Low-Pass Spectral's 0.5622 and Spatial Additive's 0.6228. Even after 2x downsampling and upsampling, high-pass spectral detection remained at 1.0000.
+
+Because the background interference in high-frequency bands is so close to zero, even an attenuated high-frequency residual retains sufficient signal-to-noise ratio for matched filter detection. Meanwhile, Gaussian blur attenuates the host image and the low-pass canary similarly, leaving the poor signal-to-interference ratio of the low-pass band unchanged.
+
+### Reconciling with the SpectralCanary paper
+
+Does this mean the SpectralCanary paper is wrong? Not necessarily, but it reveals an essential distinction between **neural network representation transfer** and **direct image watermarking**.
+
+Ho et al. trained text-to-image diffusion models on watermarked datasets. Convolutional and transformer backbones act as inductive biases that absorb broad low-frequency color and layout correlations during early optimization steps, while frequently discarding uncorrelated high-frequency pixel noise. Thus, low frequencies survive the *neural training bottleneck* better than high frequencies.
+
+However, our experiment demonstrates the trade-off: what neural networks learn easily, matched filter detectors struggle to isolate from image backgrounds. If an auditor tries to verify canaries directly on images or simple image transformations without training an end-to-end model, low-frequency canaries suffer from severe host-signal interference.
+
+## What this experiment does not show
+
+- **No generative diffusion models are trained.** This experiment measures direct signal detection on images under explicit image transformations. It does not test how well weights inside a latent diffusion model or transformer absorb canary signals during backpropagation.
+- **Synthetic single-channel data.** We tested 128x128 grayscale images generated with synthetic shapes and smooth gradients. Full-resolution natural RGB datasets like ImageNet or LAION-5B have different textural statistics, though their power spectral density still follows the $1/f^2$ law.
+- **Linear matched filters only.** We used a standard normalized cross-correlation detector. A non-linear detector or a deep convolutional verifier trained to suppress host image structures might improve low-pass canary separation.
+- **Single canary pattern.** We evaluated one fixed random Gaussian canary template per run. While consistent across all three embedding schemes, different structural templates (such as orthogonal chirp patterns) might alter interference rejection.
+
+## Takeaways
+
+1. **Fidelity and detectability trade off across frequency.** Low-pass embedding achieved the highest visual fidelity (SSIM 0.9921 vs 0.9649 for high-pass at ~38.0 dB PSNR), but delivered the worst detection performance (AUC 0.5935 vs 1.0000 on clean images).
+2. **Host image interference dominates low frequencies.** The $1/f^2$ natural power spectrum means low-frequency detectors face high in-band noise from the image itself, lowering the true positive rate at low false positive rates.
+3. **High-pass spectral detection resists perturbations.** Despite Gaussian blur, High-Pass Spectral watermarking maintained an AUC of 0.9134, easily outperforming Spatial Additive (0.6228) and Low-Pass Spectral (0.5622).
+4. **Context matters for dataset auditing.** If your verification pipeline operates directly on image assets, high-pass spectral embedding provides far superior signal isolation. Low-pass embedding is only justified when auditing through the lossy learning bottleneck of a neural network that actively discards high-frequency details.
+
+## Run it yourself
+
+You can reproduce every number and chart on your local machine in under 30 seconds:
+
+```bash
+git clone https://github.com/Ahmad-Nayfeh/portfolio-website
+cd portfolio-website/notebook-code/spectral-canary-dataset-auditing
+pip install numpy scipy matplotlib scikit-learn
+python experiment.py
+```
+
+The script will output `results.json` and generate the three figures shown above.
+
+## Sources
+
+- S.-T. Ho, A. Satheesh, S. Chawathe, H. Nghiem, Y. Lee, and A. A. Schoen, "SpectralCanary: Embarrassingly Simple Low-Frequency Traces for T2I Dataset-Use Auditing," *arXiv preprint arXiv:2610.31659*, 2026.
+- Z. Wang, A. C. Bovik, H. R. Sheikh, and E. P. Simoncelli, "Image quality assessment: from error visibility to structural similarity," *IEEE Transactions on Image Processing*, 13(4), 2004.
+- D. J. Field, "Relations between the statistics of natural images and the response properties of cortical cells," *Journal of the Optical Society of America A*, 4(12), 1987 (derivation of the $1/f^2$ image spectrum).

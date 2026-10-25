@@ -1,0 +1,20 @@
+{
+  "psnr_lowpass": 37.92253253611275,
+  "psnr_spatial": 38.03582805034157,
+  "psnr_highpass": 38.02736438439756,
+  "ssim_lowpass": 0.9920611145386472,
+  "ssim_spatial": 0.9704272407670484,
+  "ssim_highpass": 0.9648593640385402,
+  "auc_clean_lowpass": 0.5935,
+  "auc_clean_spatial": 0.9202,
+  "auc_clean_highpass": 1.0,
+  "auc_blur_lowpass": 0.5622,
+  "auc_blur_spatial": 0.6228,
+  "auc_blur_highpass": 0.9134,
+  "auc_noise_lowpass": 0.5904,
+  "auc_noise_spatial": 0.9128,
+  "auc_noise_highpass": 1.0,
+  "auc_resample_lowpass": 0.5852,
+  "auc_resample_spatial": 0.7885,
+  "auc_resample_highpass": 1.0
+}
