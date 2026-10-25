@@ -20,8 +20,8 @@
 | Tailwind Plugin | @tailwindcss/typography | ^0.5.16 |
 | Package Manager | pnpm | 9.15.9 |
 | Node | — | 22.x |
-| Python | Scripts pipeline | 3.12 |
-| Python Key Deps | anthropic, openai, matplotlib, numpy, scipy, scikit-learn, seaborn | — |
+| Python | Notebook experiments and drafts | 3.12 |
+| Python Key Deps | numpy, scipy, matplotlib, scikit-learn, torch (CPU); Gemini API for drafts | — |
 
 ## [SYSTEM_FLOW]
 
@@ -32,18 +32,12 @@ content/blog/*.mdx  →  gray-matter (frontmatter parsing)  →  next-mdx-remote
                           └─ components/MdxRenderer.tsx (remark + rehype plugins)
 ```
 
-### Blog Automation Pipeline (GitHub Actions)
+### Notebook drafts (GitHub Actions, reviewed)
 ```
-┌─ schedule (cron) ─┐
-│ workflow_dispatch  │→ main.py → load_streams (check cron) → discover_papers (HF daily)
-└───────────────────┘                                       → select_papers (Claude)
-                                                             → generate_post (stages)
-                                                             → generate_cover (DALL-E)
-                                                             → write_post (MDX)
-                                                             → generate_inline_images (DALL-E)
-                                                             → run_demo (matplotlib subprocess)
-                                                             → validate_build (next build)
-                                                             → Create PR → Auto-merge
+notebook-draft.yml (1st and 15th, or manual) → scripts/notebook/pipeline.py
+  → recent arXiv papers → Gemini picks one + writes experiment.py → run it (up to 3 fixes)
+  → Gemini writes the article from results.json → number/structure checks
+  → pull request for the owner's review (never auto-merged)
 ```
 
 ### Page Routing
