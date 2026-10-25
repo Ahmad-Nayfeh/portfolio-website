@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import functools
 import json
 import os
 import re
@@ -41,7 +42,31 @@ STATE = ROOT / "pipeline-state/notebook-used.json"
 STYLE = (BLOG / "STYLE.md").read_text()
 EXAMPLE = (BLOG / "lms-vs-nlms-ecg.mdx").read_text()
 
-MODELS = [m for m in [os.environ.get("GEMINI_MODEL"), "gemini-2.5-flash", "gemini-2.0-flash"] if m]
+# Model names get retired often, so the newest available "flash" models are discovered at run
+# time; GEMINI_MODEL (a repository variable) can still pin one.
+FALLBACK_MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash"]
+
+
+@functools.lru_cache(maxsize=1)
+def available_models(key: str) -> list[str]:
+    """Stable Flash models that support generateContent, newest version first."""
+    try:
+        url = "https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000&key=" + urllib.parse.quote(key)
+        with urllib.request.urlopen(url, timeout=60) as r:
+            models = json.load(r).get("models", [])
+    except (urllib.error.URLError, json.JSONDecodeError, TimeoutError) as e:
+        print(f"  could not list models ({e!r}); using the fallback list", flush=True)
+        return FALLBACK_MODELS
+    names = []
+    for m in models:
+        name = m.get("name", "").removeprefix("models/")
+        if "generateContent" not in m.get("supportedGenerationMethods", []):
+            continue
+        if not re.fullmatch(r"gemini-\d+(\.\d+)?-flash", name):   # skips lite, preview, image, tts, dated variants
+            continue
+        names.append(name)
+    names.sort(key=lambda n: [int(x) for x in re.findall(r"\d+", n)], reverse=True)
+    return names or FALLBACK_MODELS
 ALLOWED_LIBS = "numpy, scipy, matplotlib, pandas, scikit-learn, opencv-python-headless, torch (CPU)"
 BANNED = ["revolutionary", "game-changer", "game changer", "groundbreaking", "paradigm shift", "cutting-edge", "delve"]
 TOPICS = "adaptive filtering, spectral analysis, denoising, image processing, medical imaging, self-supervised learning, vibration and condition monitoring"
@@ -60,7 +85,8 @@ def ask(prompt: str, system: str, want_json: bool = True) -> dict | str:
         "generationConfig": {"temperature": 0.4, **({"responseMimeType": "application/json"} if want_json else {})},
     }
     last = None
-    for model in MODELS:
+    models = [m for m in [os.environ.get("GEMINI_MODEL")] if m] + available_models(key)
+    for model in dict.fromkeys(models):
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={urllib.parse.quote(key)}"
         for attempt in range(4):
             try:
