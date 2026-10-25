@@ -17,5 +17,5 @@ Run it now: Actions, then "notebook-draft", then "Run workflow".
 Test without a key: `NOTEBOOK_FAKE_LLM=fixture.json python scripts/notebook/pipeline.py`
 (the fixture holds canned "plan", "fix" and "article" answers).
 
-The older Claude + DALL-E pipeline (`publish.yml`, `project-publish.yml`, `scripts/*.py`) is
-disabled and not used.
+The Gemini API key belongs to the Google account ahmad2224466@gmail.com (created in Google AI
+Studio, October 2026). To replace it: create a new key there, then update the `GEMINI_API_KEY` secret.

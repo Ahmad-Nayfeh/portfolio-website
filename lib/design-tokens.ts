@@ -3,9 +3,6 @@
  *
  * Single source of truth for the visual identity shared across:
  *   • Website (Tailwind classes, inline styles)
- *   • Blog cover images (generate_cover.py STYLE_SUFFIX)
- *   • Inline figures (scripts/plot_style.py PALETTE)
- *   • DALL-E illustration briefs (streams/ai-papers.yaml)
  *
  * Deep dark canvas with electric teal, amber, and magenta accents.
  */
