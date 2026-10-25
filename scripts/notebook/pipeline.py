@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import functools
+import http.client
 import json
 import os
 import re
@@ -86,6 +87,7 @@ def ask(prompt: str, system: str, want_json: bool = True) -> dict | str:
     }
     last = None
     models = [m for m in [os.environ.get("GEMINI_MODEL")] if m] + available_models(key)
+    print(f"  models to try: {list(dict.fromkeys(models))[:4]}", flush=True)
     for model in dict.fromkeys(models):
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={urllib.parse.quote(key)}"
         for attempt in range(4):
@@ -102,9 +104,11 @@ def ask(prompt: str, system: str, want_json: bool = True) -> dict | str:
                     time.sleep(20 * (attempt + 1))
                     continue
                 break  # 400/403/404: try the next model
-            except (KeyError, json.JSONDecodeError, urllib.error.URLError, TimeoutError) as e:
+            except (KeyError, json.JSONDecodeError, urllib.error.URLError, http.client.HTTPException, OSError) as e:
+                # Includes the server closing a long request without answering: wait and try again.
                 last = f"{model}: {e!r}"
-                time.sleep(5)
+                print(f"  {last}; retrying", flush=True)
+                time.sleep(15 * (attempt + 1))
         print(f"  model failed: {last}", flush=True)
     raise RuntimeError(f"No model answered. Last error: {last}")
 
@@ -310,7 +314,7 @@ def main():
 
     papers = recent_papers()
     print(f"{len(papers)} candidate papers")
-    listing = "\n\n".join(f"[{p['id']}] {p['title']} ({p['published']})\n{p['abstract']}" for p in papers[:40])
+    listing = "\n\n".join(f"[{p['id']}] {p['title']} ({p['published']})\n{p['abstract'][:700]}" for p in papers[:25])
     plan = ask(PLAN_PROMPT.format(topics=TOPICS, libs=ALLOWED_LIBS, papers=listing), SYSTEM)
     slug = re.sub(r"[^a-z0-9-]", "", plan["slug"].lower())[:60].strip("-")
     paper = next((p for p in papers if p["id"] == plan["paper_id"]), None)
