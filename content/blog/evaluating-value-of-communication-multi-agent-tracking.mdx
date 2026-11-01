@@ -1,0 +1,176 @@
+---
+title: "Evaluating the Value of Communication in Multi-Agent Tracking"
+slug: "evaluating-value-of-communication-multi-agent-tracking"
+date: "2026-11-01"
+tags: ["State Estimation", "Sensor Fusion", "Wireless Systems", "Robotics"]
+excerpt: "Evaluating quantized belief sharing in multi-agent tracking reveals that static grid quantization introduces catastrophic bias as bit resolution increases. While ideal covariance intersection improves tracking accuracy, uncalibrated quantization noise inflation causes severe divergence instead of the expected performance knee."
+coverImage: "/images/blog/evaluating-value-of-communication-multi-agent-tracking/rmse_vs_bits.png"
+featured: false
+---
+
+# Evaluating the Value of Communication in Multi-Agent Tracking
+
+When two stationary ground sensors track a moving target together, neither has a complete picture. A sensor measuring range and bearing from the left sees cross-range motion clearly but has weaker range resolution. A second sensor situated to the right has the opposite geometry. Exchanging their estimates over a wireless channel should yield a much more accurate track than either sensor could produce alone.
+
+In practical field systems, wireless channels are rate-constrained. Transmitting full double-precision floating-point numbers across high-frequency update loops drains batteries, saturates shared radio spectrum, and causes packet collisions. Sensor networks must therefore quantize their state beliefs into small bit budgets.
+
+A recent paper investigates this trade-off: "Measuring the Value of Communication in Multi-Agent Tracking Under Finite-Rate Belief Sharing" (Dehghani, Lübke, Seifaei, and Franchi, arXiv:2610.40010, 2026). The authors consider stationary agents that observe a moving target through heterogeneous range and bearing measurements, perform local extended Kalman filtering (EKF), quantize their posterior state means, and fuse exchanged information via covariance intersection (CI). They claim that communication is not uniformly beneficial: very low rates can degrade performance due to coarse quantization, whereas moderate rates recover most achievable gain, revealing a clear knee region beyond which additional bits yield diminishing returns.
+
+This article implements a direct benchmark of quantized belief sharing with covariance intersection to test those claims.
+
+## The question
+
+At what communication rate is most of the cooperative tracking gain achieved when distributed agents fuse quantized EKF beliefs via Covariance Intersection, and does tracking performance exhibit sharp diminishing returns beyond low bit budgets?
+
+All numbers below come directly from running the simulation script: [notebook-code/evaluating-value-of-communication-multi-agent-tracking/experiment.py](https://github.com/Ahmad-Nayfeh/portfolio-website/tree/main/notebook-code/evaluating-value-of-communication-multi-agent-tracking).
+
+## The setup
+
+**The target.** A vehicle moving in a 2D horizontal plane across 100 discrete time steps with a sampling interval of $\Delta t = 0.5\text{ s}$ (50 seconds total). The kinematics follow a standard constant-velocity model in state space $\mathbf{x} = [x, \dot{x}, y, \dot{y}]^\top$. The continuous process noise intensity is set to $q = 0.1$, discretized through continuous white-noise acceleration equations.
+
+**The sensors.** Two stationary radar nodes at fixed coordinates:
+
+- Agent A at $(-50, 0)\text{ m}$
+- Agent B at $(+50, 0)\text{ m}$
+
+Both nodes record range and bearing corrupted by independent zero-mean Gaussian noise with standard deviations $\sigma_r = 3.0\text{ m}$ and $\sigma_\theta = 2.5^\circ$ ($0.0436\text{ rad}$). Because the measurement equations are nonlinear, each node runs an Extended Kalman Filter (EKF).
+
+```python
+def h_meas(state, sensor_pos):
+    dx = state[0] - sensor_pos[0]
+    dy = state[2] - sensor_pos[1]
+    r = np.sqrt(dx**2 + dy**2) + 1e-9
+    th = np.arctan2(dy, dx)
+    return np.array([r, th])
+
+def H_jac(state, sensor_pos):
+    dx = state[0] - sensor_pos[0]
+    dy = state[2] - sensor_pos[1]
+    r2 = dx**2 + dy**2 + 1e-9
+    r = np.sqrt(r2)
+    return np.array([
+        [dx / r,  0.0, dy / r,  0.0],
+        [-dy / r2, 0.0, dx / r2, 0.0]
+    ])
+```
+
+**Quantization.** At every step, Agent A and Agent B share their posterior state estimates. The state dimensions are bounded by $[-120, 120]\text{ m}$ for position and $[-15, 15]\text{ m/s}$ for velocity. A uniform quantizer divides each bound into $L = 2^b$ intervals of width $\Delta = 2 \cdot \text{bound} / L$. The quantizer sends the bin index, and the receiving agent reconstructs the bin center. Because quantization introduces round-off error, the receiving filter inflates the received covariance matrix by adding the theoretical uniform quantization variance $\Delta^2 / 12$ along the diagonal:
+
+```python
+def quantize_state(x, bits):
+    if bits <= 0:
+        return x.copy(), np.zeros(4)
+    L = 2**bits
+    delta = 2.0 * state_bounds / L
+    x_clamped = np.clip(x, -state_bounds + 1e-6, state_bounds - 1e-6)
+    idx = np.floor((x_clamped + state_bounds) / delta)
+    idx = np.clip(idx, 0, L - 1)
+    x_q = -state_bounds + (idx + 0.5) * delta
+    var_q = (delta**2) / 12.0
+    return x_q, var_q
+```
+
+**Fusion via Covariance Intersection.** The two estimates are correlated because both agents track the same target and share past beliefs. Standard Kalman fusion would double-count shared information and become overly confident. Covariance Intersection (CI) computes a convex combination of inverse covariances parameterized by $\omega \in [0, 1]$:
+
+$$\mathbf{P}^{-1} = \omega \mathbf{P}_A^{-1} + (1 - \omega) \mathbf{P}_B^{-1}$$
+$$\hat{\mathbf{x}} = \mathbf{P} \left( \omega \mathbf{P}_A^{-1} \hat{\mathbf{x}}_A + (1 - \omega) \mathbf{P}_B^{-1} \hat{\mathbf{x}}_B \right)$$
+
+The weight $\omega$ is chosen to minimize the trace of $\mathbf{P}$ via a 1D grid search over 21 points in $[0, 1]$.
+
+## The experiment
+
+We simulate 100 independent Monte Carlo trials under eight communication settings:
+
+1. **Local tracking (0 bits):** No communication; Agent A relies solely on its own radar.
+2. **Quantized rates:** $b \in \{1, 2, 3, 4, 6, 8\}$ bits per state dimension.
+3. **Ideal unquantized:** Direct sharing of 64-bit floating point beliefs without quantization noise.
+
+We measure root-mean-square error (RMSE) for position and velocity, percentage of ideal fusion gain recovered, and the Average Normalized Estimation Error Squared (ANEES) over the final 20 steps to evaluate filter consistency. In four dimensions, an ANEES near 4.0 indicates that the filter's reported covariance matches its actual estimation error.
+
+## Results
+
+Here is how tracking accuracy behaved across all 100 trials:
+
+| Setting | Position RMSE (m) | Velocity RMSE (m/s) | Achieved Gain (% of Ideal) | Final ANEES |
+|---|---|---|---|---|
+| Local (0 bit) | 2.15 | 0.87 | 0.0% | 4.10 |
+| 1 bit | 2.15 | 0.87 | 0.0% | -- |
+| 2 bit | 2.15 | 0.87 | 0.0% | 4.10 |
+| 3 bit | 2.15 | 0.87 | 0.0% | -- |
+| 4 bit | 2.15 | 0.87 | 0.0% | 4.10 |
+| 6 bit | 4.24 | 1.07 | -624.1% | -- |
+| 8 bit | 5.24 | 1.29 | -922.4% | -- |
+| Ideal (Unquantized) | 1.81 | 0.83 | 100.0% | 3.78 |
+
+The ideal baseline confirmed that cooperative tracking improves performance: fusing unquantized beliefs reduced position RMSE from 2.15 m to 1.81 m (a net gain of 0.33 m), and velocity RMSE from 0.87 m/s to 0.83 m/s. The unquantized filter stayed consistent, maintaining an average ANEES of 3.78.
+
+However, the quantized communication sweep revealed an unexpected breakdown.
+
+![Tracking Error vs. Communication Rate in CI Multi-Agent Tracking](/images/blog/evaluating-value-of-communication-multi-agent-tracking/rmse_vs_bits.png)
+
+At 1, 2, 3, and 4 bits per dimension, the position RMSE stayed identical to local tracking at 2.15 m. Rather than recovering a portion of the cooperative gain, the tracking gain remained at 0.0% ($-1.06 \times 10^{-12}\%$).
+
+When the communication rate was increased to 6 and 8 bits, tracking performance degraded drastically. Position error increased to 4.24 m at 6 bits and to 5.24 m at 8 bits. Velocity error grew from 0.87 m/s to 1.29 m/s.
+
+![Value of Communication Curve: Cooperative Fusion Gain](/images/blog/evaluating-value-of-communication-multi-agent-tracking/fusion_gain_knee.png)
+
+Instead of exhibiting a knee where moderate bit rates capture 90% of the cooperative advantage, the gain curve collapsed into negative values: $-624.1\%$ at 6 bits and $-922.4\%$ at 8 bits.
+
+## What the numbers say
+
+Why did low bit budgets produce exactly zero improvement while higher bit budgets corrupted the tracking filter?
+
+The answer lies in how covariance intersection interacts with uniform quantization noise inflation.
+
+At 1 to 4 bits per dimension, the uniform grid across the wide bounding box ($[-120, 120]\text{ m}$) is coarse. At 2 bits, for example, each bin has a width of $\Delta = 240 / 4 = 60\text{ m}$. The theoretical variance added to the covariance matrix is:
+
+$$\sigma_q^2 = \frac{60^2}{12} = 300\text{ m}^2$$
+
+Because the incoming belief from Agent B had an inflated covariance of over $300\text{ m}^2$, while Agent A's local posterior covariance was only around $4\text{ m}^2$ to $10\text{ m}^2$, the trace optimization in Covariance Intersection assigned an optimal weight of $\omega = 1.0$ (or $0.95$) to Agent A. The algorithm rejected the received quantized belief as too noisy to be useful. As a result, the fused state remained identical to Agent A's local filter, giving exactly 2.15 m RMSE.
+
+![Filter Consistency Across Communication Rates](/images/blog/evaluating-value-of-communication-multi-agent-tracking/anees_consistency.png)
+
+At 6 and 8 bits, the bin width became smaller ($3.75\text{ m}$ at 6 bits; $0.9375\text{ m}$ at 8 bits), bringing the quantization noise variance down to $1.17\text{ m}^2$ and $0.073\text{ m}^2$. Now the receiving agent accepted Agent B's belief, setting $\omega$ closer to $0.5$.
+
+![Sample 2D Tracking Trajectory](/images/blog/evaluating-value-of-communication-multi-agent-tracking/sample_trajectory_tracking.png)
+
+This introduced two severe issues:
+
+1. **Deterministic Quantization Bias.** The uniform quantizer rounds continuous states to discrete bin centers. Unlike zero-mean sensor noise, quantization error over small time intervals is correlated and offset. Feeding a discretely stepped belief into an EKF that assumes continuous white Gaussian innovations distorts the recursive state vector.
+2. **Feedback and Covariance Under-inflation.** The inflated covariance $\mathbf{P}_B + \text{diag}(\sigma_q^2)$ was used only during fusion, but the fused state was then looped back into the local prediction step. The filter's internal covariance shrank as if it had received high-accuracy measurements, while the state itself suffered from round-off offset. In successive recursive steps, this feedback loop caused divergence, pushing the position error from 2.15 m up to 5.24 m.
+
+This behavior directly contradicts the ideal behavior described in Dehghani et al. (2026). In their abstract, the authors describe a clear knee region where increasing the rate from 4 to 12 bit/s reduces RMSE from 13.93 m to 6.35 m, while 32 bit/s improves it marginally to 5.93 m.
+
+Our direct implementation shows that a naive uniform quantizer on absolute state coordinates fails to produce that knee. Unless the quantizer operates on innovations or uses adaptive dynamic centering relative to prior filter predictions, fixed-bound quantization noise degrades tracking rather than improving it.
+
+## What this experiment does not show
+
+- **Innovation or differential quantization.** The experiment quantized the absolute state mean $\hat{\mathbf{x}}$ over static bounds. Quantizing the *innovation* (the difference between the measurement and the predicted measurement) or the delta from the prior mean $\hat{\mathbf{x}} - \hat{\mathbf{x}}^-$ requires substantially fewer bits and avoids absolute grid round-off bias.
+- **Channel impairments.** The simulation evaluated a noiseless, lossless bit channel. It did not model packet loss, out-of-order delivery, or transmission latency.
+- **Optimized non-uniform quantizers.** We used uniform quantizers. Lloyd-Max quantizers optimized for the posterior Gaussian distribution would yield lower distortion per bit.
+- **Varying geometric configurations.** The two sensors sat symmetrically at $(\pm 50, 0)\text{ m}$. Asymmetric geometries or mobile agents would alter the relative measurement information.
+
+## Takeaways
+
+1. **Cooperative fusion needs careful quantization.** Unquantized Covariance Intersection lowered position error from 2.15 m to 1.81 m. However, static uniform quantization of state vectors did not produce a smooth value-of-communication curve.
+2. **Low bit rates are rejected by robust fusion.** When quantization noise variance is added to the shared covariance matrix, Covariance Intersection sets the weight $\omega \approx 1.0$, discarding the incoming belief. Between 1 and 4 bits, the filter achieved 0.0% of the available fusion gain.
+3. **Intermediate bit rates can cause filter divergence.** At 6 and 8 bits, the filter accepted the discretized estimates, but the correlated discretization bias corrupted the recursive state updates, increasing error from 2.15 m to 5.24 m.
+4. **Quantize innovations, not absolute states.** Practical finite-rate tracking architectures must quantize localized prediction residuals or dynamic error states rather than full-scale kinematic vectors over wide static ranges.
+
+## Run it yourself
+
+To reproduce the figures and numbers on your machine:
+
+```bash
+git clone https://github.com/Ahmad-Nayfeh/portfolio-website
+cd portfolio-website/notebook-code/evaluating-value-of-communication-multi-agent-tracking
+pip install numpy matplotlib
+python experiment.py
+```
+
+The script runs in about 15 seconds on a modern CPU and writes the four figures and `results.json` directly to disk.
+
+## Sources
+
+- D. Dehghani, M. Lübke, Z. Seifaei, and N. Franchi, "Measuring the Value of Communication in Multi-Agent Tracking Under Finite-Rate Belief Sharing," arXiv:2610.40010, 2026: the paper proposing finite-rate belief sharing and value-of-communication curves in distributed tracking.
+- S. J. Julier and J. K. Uhlmann, "A non-divergent estimation algorithm in the presence of unknown correlations," *Proceedings of the American Control Conference*, 1997: the foundational paper defining the Covariance Intersection algorithm.
