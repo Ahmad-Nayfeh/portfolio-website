@@ -1,0 +1,94 @@
+{
+  "fixed_r1_acc": 100.0,
+  "fixed_r1_loss": 0.3873,
+  "fixed_r2_acc": 100.0,
+  "fixed_r2_loss": 0.2759,
+  "flex_offsets_only_acc": 100.0,
+  "flex_offsets_only_loss": 0.1864,
+  "flex_thresholds_only_acc": 100.0,
+  "flex_thresholds_only_loss": 0.1044,
+  "flex_full_acc": 100.0,
+  "flex_full_loss": 0.0665,
+  "multiscale_fixed_acc": 100.0,
+  "inference_fixed_ms_per_image": 0.155,
+  "inference_flex_ms_per_image": 0.156,
+  "initial_offsets": [
+    [
+      1.5,
+      0.0
+    ],
+    [
+      1.0607,
+      1.0607
+    ],
+    [
+      0.0,
+      1.5
+    ],
+    [
+      -1.0607,
+      1.0607
+    ],
+    [
+      -1.5,
+      0.0
+    ],
+    [
+      -1.0607,
+      -1.0607
+    ],
+    [
+      -0.0,
+      -1.5
+    ],
+    [
+      1.0607,
+      -1.0607
+    ]
+  ],
+  "learned_offsets": [
+    [
+      2.8499,
+      -2.0471
+    ],
+    [
+      2.9619,
+      2.1004
+    ],
+    [
+      -0.0241,
+      3.5416
+    ],
+    [
+      -1.9948,
+      1.9797
+    ],
+    [
+      -4.3452,
+      0.2386
+    ],
+    [
+      -2.3678,
+      -2.3528
+    ],
+    [
+      -0.0059,
+      -3.1155
+    ],
+    [
+      3.1051,
+      -3.0817
+    ]
+  ],
+  "learned_thresholds": [
+    0.6714,
+    0.606,
+    -0.5874,
+    0.5208,
+    -0.8286,
+    0.9668,
+    -0.5933,
+    -0.6823
+  ],
+  "num_extractor_params": 24
+}
