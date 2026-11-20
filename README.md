@@ -1,3 +1,5 @@
+> **This site has moved.** It now lives at **https://ahmadnayfeh.com**, built from the repository [`Ahmad-Nayfeh/ahmadnayfeh.com`](https://github.com/Ahmad-Nayfeh/ahmadnayfeh.com). This repository is kept only so that `ahmadnayfeh.vercel.app` keeps forwarding old links (see `vercel.json`). Make changes in the new repository.
+
 # 🚀 Ahmad Nayfeh's Portfolio
 
 <div align="center">
@@ -5,14 +7,14 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel)](https://ahmadnayfeh.vercel.app/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel)](https://ahmadnayfeh.com/)
 
 </div>
 
 A modern portfolio website showcasing my projects, experience, and articles in **Artificial Intelligence**, **Data Science**, and **Signal & Image Processing**.
 
 <p align="center">
-  <a href="https://ahmadnayfeh.vercel.app/" target="_blank">
+  <a href="https://ahmadnayfeh.com/" target="_blank">
     <img src="homepage.png" alt="A screenshot of the portfolio website's homepage" width="800"/>
   </a>
 </p>
@@ -59,7 +61,7 @@ This website was designed with a **"Separation of Content from Presentation"** p
 
 <div align="center">
 
-[![Website](https://img.shields.io/badge/Website-ahmadnayfeh.vercel.app-3693F3?style=for-the-badge&logo=vercel)](https://ahmadnayfeh.vercel.app/)
+[![Website](https://img.shields.io/badge/Website-ahmadnayfeh.vercel.app-3693F3?style=for-the-badge&logo=vercel)](https://ahmadnayfeh.com/)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-ahmad--nayfeh2000-0077B5?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/ahmad-nayfeh2000/)
 [![Email](https://img.shields.io/badge/Email-ahmadnayfeh2000%40gmail.com-D14836?style=for-the-badge&logo=gmail)](mailto:ahmadnayfeh2000@gmail.com)
 
