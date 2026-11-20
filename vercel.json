@@ -1,0 +1,12 @@
+{
+  "redirects": [
+    { "source": "/blog", "destination": "https://ahmadnayfeh.com/notebook/", "permanent": true },
+    { "source": "/blog/:slug*", "destination": "https://ahmadnayfeh.com/notebook/:slug*", "permanent": true },
+    { "source": "/projects/khatwa", "destination": "https://ahmadnayfeh.com/apps/khatwa/", "permanent": true },
+    { "source": "/projects/reading-marathon-app", "destination": "https://ahmadnayfeh.com/apps/marathon/", "permanent": true },
+    { "source": "/projects/shadhra", "destination": "https://ahmadnayfeh.com/apps/shadhra/", "permanent": true },
+    { "source": "/privacy", "destination": "https://ahmadnayfeh.com/apps/marathon/privacy/", "permanent": true },
+    { "source": "/resume.pdf", "destination": "https://ahmadnayfeh.com/resume.pdf", "permanent": true },
+    { "source": "/:path((?!terms).*)", "destination": "https://ahmadnayfeh.com/:path", "permanent": true }
+  ]
+}
